@@ -300,6 +300,7 @@ export const translations = {
     promptTemplateHansen: 'Hansen Strategy',
     promptTemplateNof1: 'NoF1 English Framework',
     promptTemplateTaroLong: 'Taro Long Position',
+    promptTemplateV6: 'V6 AutoAdaptive',
     promptDescDefault: '📊 Default Stable Strategy',
     promptDescDefaultContent:
       'Maximize Sharpe ratio, balanced risk-reward, suitable for beginners and stable long-term trading',
@@ -1137,6 +1138,7 @@ export const translations = {
     promptTemplateHansen: 'Hansen 策略',
     promptTemplateNof1: 'NoF1 英文框架',
     promptTemplateTaroLong: 'Taro 长仓',
+    promptTemplateV6: 'V6自适应',
     promptDescDefault: '📊 默认稳健策略',
     promptDescDefaultContent:
       '最大化夏普比率，平衡风险收益，适合新手和长期稳定交易',

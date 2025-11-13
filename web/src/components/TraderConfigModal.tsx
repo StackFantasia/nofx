@@ -664,6 +664,7 @@ export function TraderConfigModal({
                         Hansen: 'promptTemplateHansen',
                         nof1: 'promptTemplateNof1',
                         taro_long_prompts: 'promptTemplateTaroLong',
+                        v6: 'promptTemplateV6',
                       }
                       const key = keyMap[name]
                       return key
