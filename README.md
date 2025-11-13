@@ -1081,6 +1081,7 @@ sudo apt-get install libta-lib0-dev
 **Solution**:
 - Coin pool API is optional
 - If API fails, system uses default mainstream coins (BTC, ETH, etc.)
+- ~~Check API URL and auth parameter in config.json~~ *Check configuration in web interface*
 - Check configuration in web interface
 
 ---
