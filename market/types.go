@@ -15,6 +15,8 @@ type Data struct {
 	FundingRate       float64
 	IntradaySeries    *IntradayData
 	LongerTermContext *LongerTermData
+	MidtermContext    *MidtermData // 新增：15分钟数据
+	HourlyContext     *HourlyData  // 新增：1小时数据
 }
 
 // OIData Open Interest数据
@@ -36,6 +38,30 @@ type IntradayData struct {
 
 // LongerTermData 长期数据(4小时时间框架)
 type LongerTermData struct {
+	EMA20         float64
+	EMA50         float64
+	ATR3          float64
+	ATR14         float64
+	CurrentVolume float64
+	AverageVolume float64
+	MACDValues    []float64
+	RSI14Values   []float64
+}
+
+// 新增：15分钟数据结构
+type MidtermData struct {
+	EMA20         float64
+	EMA50         float64
+	ATR3          float64
+	ATR14         float64
+	CurrentVolume float64
+	AverageVolume float64
+	MACDValues    []float64
+	RSI14Values   []float64
+}
+
+// 新增：1小时数据结构
+type HourlyData struct {
 	EMA20         float64
 	EMA50         float64
 	ATR3          float64

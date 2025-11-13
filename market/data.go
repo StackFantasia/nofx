@@ -26,7 +26,7 @@ var (
 
 // Get 获取指定代币的市场数据
 func Get(symbol string) (*Data, error) {
-	var klines3m, klines4h []Kline
+	var klines3m, klines4h, klines15m, klines1h []Kline
 	var err error
 	// 标准化symbol
 	symbol = Normalize(symbol)
@@ -34,6 +34,18 @@ func Get(symbol string) (*Data, error) {
 	klines3m, err = WSMonitorCli.GetCurrentKlines(symbol, "3m") // 多获取一些用于计算
 	if err != nil {
 		return nil, fmt.Errorf("获取3分钟K线失败: %v", err)
+	}
+
+	// 获取15分钟K线数据
+	klines15m, err = WSMonitorCli.GetCurrentKlines(symbol, "15m")
+	if err != nil {
+		return nil, fmt.Errorf("获取15分钟K线失败: %v", err)
+	}
+
+	// 获取1小时K线数据
+	klines1h, err = WSMonitorCli.GetCurrentKlines(symbol, "1h")
+	if err != nil {
+		return nil, fmt.Errorf("获取1小时K线失败: %v", err)
 	}
 
 	// Data staleness detection: Prevent DOGEUSDT-style price freeze issues
@@ -51,6 +63,12 @@ func Get(symbol string) (*Data, error) {
 	// 检查数据是否为空
 	if len(klines3m) == 0 {
 		return nil, fmt.Errorf("3分钟K线数据为空")
+	}
+	if len(klines15m) == 0 {
+		return nil, fmt.Errorf("15分钟K线数据为空")
+	}
+	if len(klines1h) == 0 {
+		return nil, fmt.Errorf("1小时K线数据为空")
 	}
 	if len(klines4h) == 0 {
 		return nil, fmt.Errorf("4小时K线数据为空")
@@ -93,7 +111,8 @@ func Get(symbol string) (*Data, error) {
 
 	// 计算日内系列数据
 	intradayData := calculateIntradaySeries(klines3m)
-
+	midtermData := calculateMidtermData(klines15m) // 新增
+	hourlyData := calculateHourlyData(klines1h)    // 新增
 	// 计算长期数据
 	longerTermData := calculateLongerTermData(klines4h)
 
@@ -109,6 +128,8 @@ func Get(symbol string) (*Data, error) {
 		FundingRate:       fundingRate,
 		IntradaySeries:    intradayData,
 		LongerTermContext: longerTermData,
+		MidtermContext:    midtermData, // 新增
+		HourlyContext:     hourlyData,  // 新增
 	}, nil
 }
 
@@ -460,6 +481,40 @@ func Format(data *Data) string {
 		sb.WriteString(fmt.Sprintf("3m ATR (14‑period): %.3f\n\n", data.IntradaySeries.ATR14))
 	}
 
+	// 新增：15分钟数据
+	if data.MidtermContext != nil {
+		sb.WriteString("Midterm context (15‑minute timeframe):\n\n")
+		sb.WriteString(fmt.Sprintf("20‑Period EMA: %.3f vs. 50‑Period EMA: %.3f\n\n",
+			data.MidtermContext.EMA20, data.MidtermContext.EMA50))
+		sb.WriteString(fmt.Sprintf("3‑Period ATR: %.3f vs. 14‑Period ATR: %.3f\n\n",
+			data.MidtermContext.ATR3, data.MidtermContext.ATR14))
+		sb.WriteString(fmt.Sprintf("Current Volume: %.3f vs. Average Volume: %.3f\n\n",
+			data.MidtermContext.CurrentVolume, data.MidtermContext.AverageVolume))
+		if len(data.MidtermContext.MACDValues) > 0 {
+			sb.WriteString(fmt.Sprintf("MACD indicators: %s\n\n", formatFloatSlice(data.MidtermContext.MACDValues)))
+		}
+		if len(data.MidtermContext.RSI14Values) > 0 {
+			sb.WriteString(fmt.Sprintf("RSI indicators (14‑Period): %s\n\n", formatFloatSlice(data.MidtermContext.RSI14Values)))
+		}
+	}
+
+	// 新增：1小时数据
+	if data.HourlyContext != nil {
+		sb.WriteString("Hourly context (1‑hour timeframe):\n\n")
+		sb.WriteString(fmt.Sprintf("20‑Period EMA: %.3f vs. 50‑Period EMA: %.3f\n\n",
+			data.HourlyContext.EMA20, data.HourlyContext.EMA50))
+		sb.WriteString(fmt.Sprintf("3‑Period ATR: %.3f vs. 14‑Period ATR: %.3f\n\n",
+			data.HourlyContext.ATR3, data.HourlyContext.ATR14))
+		sb.WriteString(fmt.Sprintf("Current Volume: %.3f vs. Average Volume: %.3f\n\n",
+			data.HourlyContext.CurrentVolume, data.HourlyContext.AverageVolume))
+		if len(data.HourlyContext.MACDValues) > 0 {
+			sb.WriteString(fmt.Sprintf("MACD indicators: %s\n\n", formatFloatSlice(data.HourlyContext.MACDValues)))
+		}
+		if len(data.HourlyContext.RSI14Values) > 0 {
+			sb.WriteString(fmt.Sprintf("RSI indicators (14‑Period): %s\n\n", formatFloatSlice(data.HourlyContext.RSI14Values)))
+		}
+	}
+
 	if data.LongerTermContext != nil {
 		sb.WriteString("Longer‑term context (4‑hour timeframe):\n\n")
 
@@ -482,6 +537,86 @@ func Format(data *Data) string {
 	}
 
 	return sb.String()
+}
+
+// 新增：计算15分钟数据
+func calculateMidtermData(klines []Kline) *MidtermData {
+	data := &MidtermData{
+		MACDValues:  make([]float64, 0, 10),
+		RSI14Values: make([]float64, 0, 10),
+	}
+
+	data.EMA20 = calculateEMA(klines, 20)
+	data.EMA50 = calculateEMA(klines, 50)
+	data.ATR3 = calculateATR(klines, 3)
+	data.ATR14 = calculateATR(klines, 14)
+
+	if len(klines) > 0 {
+		data.CurrentVolume = klines[len(klines)-1].Volume
+		sum := 0.0
+		for _, k := range klines {
+			sum += k.Volume
+		}
+		data.AverageVolume = sum / float64(len(klines))
+	}
+
+	start := len(klines) - 10
+	if start < 0 {
+		start = 0
+	}
+
+	for i := start; i < len(klines); i++ {
+		if i >= 25 {
+			macd := calculateMACD(klines[:i+1])
+			data.MACDValues = append(data.MACDValues, macd)
+		}
+		if i >= 14 {
+			rsi14 := calculateRSI(klines[:i+1], 14)
+			data.RSI14Values = append(data.RSI14Values, rsi14)
+		}
+	}
+
+	return data
+}
+
+// 新增：计算1小时数据
+func calculateHourlyData(klines []Kline) *HourlyData {
+	data := &HourlyData{
+		MACDValues:  make([]float64, 0, 10),
+		RSI14Values: make([]float64, 0, 10),
+	}
+
+	data.EMA20 = calculateEMA(klines, 20)
+	data.EMA50 = calculateEMA(klines, 50)
+	data.ATR3 = calculateATR(klines, 3)
+	data.ATR14 = calculateATR(klines, 14)
+
+	if len(klines) > 0 {
+		data.CurrentVolume = klines[len(klines)-1].Volume
+		sum := 0.0
+		for _, k := range klines {
+			sum += k.Volume
+		}
+		data.AverageVolume = sum / float64(len(klines))
+	}
+
+	start := len(klines) - 10
+	if start < 0 {
+		start = 0
+	}
+
+	for i := start; i < len(klines); i++ {
+		if i >= 25 {
+			macd := calculateMACD(klines[:i+1])
+			data.MACDValues = append(data.MACDValues, macd)
+		}
+		if i >= 14 {
+			rsi14 := calculateRSI(klines[:i+1], 14)
+			data.RSI14Values = append(data.RSI14Values, rsi14)
+		}
+	}
+
+	return data
 }
 
 // formatPriceWithDynamicPrecision 根据价格区间动态选择精度
