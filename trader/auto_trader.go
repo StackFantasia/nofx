@@ -1526,6 +1526,14 @@ func (at *AutoTrader) checkPositionDrawdown() {
 		return
 	}
 
+	if len(positions) == 0 {
+		at.peakPnLCacheMutex.Lock()
+		at.peakPnLCache = make(map[string]float64)
+		at.peakPnLCacheMutex.Unlock()
+		log.Println("ℹ️ 无持仓，已重置峰值收益缓存（peakPnLCache）")
+		return
+	}
+
 	for _, pos := range positions {
 		symbol := pos["symbol"].(string)
 		side := pos["side"].(string)
@@ -1557,13 +1565,15 @@ func (at *AutoTrader) checkPositionDrawdown() {
 		peakPnLPct, exists := at.peakPnLCache[posKey]
 		at.peakPnLCacheMutex.RUnlock()
 
-		if !exists {
-			// 如果没有历史最高记录，使用当前盈亏作为初始值
-			peakPnLPct = currentPnLPct
-			at.UpdatePeakPnL(symbol, side, currentPnLPct)
-		} else {
-			// 更新峰值缓存
-			at.UpdatePeakPnL(symbol, side, currentPnLPct)
+		if currentPnLPct > 0 {
+			if !exists {
+				// 如果没有历史最高记录，使用当前盈亏作为初始值
+				peakPnLPct = currentPnLPct
+				at.UpdatePeakPnL(symbol, side, currentPnLPct)
+			} else {
+				// 更新峰值缓存
+				at.UpdatePeakPnL(symbol, side, currentPnLPct)
+			}
 		}
 
 		//// 计算回撤（从最高点下跌的幅度）
