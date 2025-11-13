@@ -302,7 +302,7 @@ func (at *AutoTrader) runCycle() error {
 
 	// 1. 检查是否需要停止交易
 	if time.Now().Before(at.stopUntil) {
-		remaining := at.stopUntil.Sub(time.Now())
+		remaining := time.Until(at.stopUntil)
 		log.Printf("⏸ 风险控制：暂停交易中，剩余 %.0f 分钟", remaining.Minutes())
 		record.Success = false
 		record.ErrorMessage = fmt.Sprintf("风险控制暂停中，剩余 %.0f 分钟", remaining.Minutes())
@@ -839,6 +839,8 @@ func (at *AutoTrader) executeCloseLongWithRecord(decision *decision.Decision, ac
 		actionRecord.OrderID = orderID
 	}
 
+	// 平仓后清理该持仓的缓存
+	at.ClearPeakPnLCache(decision.Symbol, "long")
 	log.Printf("  ✓ 平仓成功")
 	return nil
 }
@@ -865,6 +867,8 @@ func (at *AutoTrader) executeCloseShortWithRecord(decision *decision.Decision, a
 		actionRecord.OrderID = orderID
 	}
 
+	// 平仓后清理该持仓的缓存
+	at.ClearPeakPnLCache(decision.Symbol, "short")
 	log.Printf("  ✓ 平仓成功")
 	return nil
 }
@@ -1496,10 +1500,10 @@ func (at *AutoTrader) startDrawdownMonitor() {
 	go func() {
 		defer at.monitorWg.Done()
 
-		ticker := time.NewTicker(1 * time.Minute) // 每分钟检查一次
+		ticker := time.NewTicker(5 * time.Second) // 每5秒检查一次
 		defer ticker.Stop()
 
-		log.Println("📊 启动持仓回撤监控（每分钟检查一次）")
+		log.Println("📊 启动持仓回撤监控（每5秒检查一次）")
 
 		for {
 			select {
@@ -1527,10 +1531,10 @@ func (at *AutoTrader) checkPositionDrawdown() {
 		side := pos["side"].(string)
 		entryPrice := pos["entryPrice"].(float64)
 		markPrice := pos["markPrice"].(float64)
-		quantity := pos["positionAmt"].(float64)
-		if quantity < 0 {
-			quantity = -quantity // 空仓数量为负，转为正数
-		}
+		// quantity := pos["positionAmt"].(float64)
+		// if quantity < 0 {
+		// 	quantity = -quantity // 空仓数量为负，转为正数
+		// }
 
 		// 计算当前盈亏百分比
 		leverage := 10 // 默认值
@@ -1562,29 +1566,72 @@ func (at *AutoTrader) checkPositionDrawdown() {
 			at.UpdatePeakPnL(symbol, side, currentPnLPct)
 		}
 
-		// 计算回撤（从最高点下跌的幅度）
-		var drawdownPct float64
-		if peakPnLPct > 0 && currentPnLPct < peakPnLPct {
-			drawdownPct = ((peakPnLPct - currentPnLPct) / peakPnLPct) * 100
+		//// 计算回撤（从最高点下跌的幅度）
+		//var drawdownPct float64
+		//if peakPnLPct > 0 && currentPnLPct < peakPnLPct {
+		//	drawdownPct = ((peakPnLPct - currentPnLPct) / peakPnLPct) * 100
+		//}
+		//
+		//// 检查平仓条件：收益大于5%且回撤超过40%
+		//if currentPnLPct > 5.0 && drawdownPct >= 40.0 {
+		//	log.Printf("🚨 触发回撤平仓条件: %s %s | 当前收益: %.2f%% | 最高收益: %.2f%% | 回撤: %.2f%%",
+		//		symbol, side, currentPnLPct, peakPnLPct, drawdownPct)
+		//
+		//	// 执行平仓
+		//	if err := at.emergencyClosePosition(symbol, side); err != nil {
+		//		log.Printf("❌ 回撤平仓失败 (%s %s): %v", symbol, side, err)
+		//	} else {
+		//		log.Printf("✅ 回撤平仓成功: %s %s", symbol, side)
+		//		// 平仓后清理该持仓的缓存
+		//		at.ClearPeakPnLCache(symbol, side)
+		//	}
+		//} else if currentPnLPct > 5.0 {
+		//	// 记录接近平仓条件的情况（用于调试）
+		//	log.Printf("📊 回撤监控: %s %s | 收益: %.2f%% | 最高: %.2f%% | 回撤: %.2f%%",
+		//		symbol, side, currentPnLPct, peakPnLPct, drawdownPct)
+		//}
+
+		// 检查平仓条件
+		closeFlag := false
+		closeReason := ""
+
+		log.Printf("📊 止盈监控: %s %s | 收益: %.2f%% | 最高: %.2f%%", symbol, side, currentPnLPct, peakPnLPct)
+
+		if peakPnLPct <= -2.0 {
+			closeFlag = true
+			closeReason = "止损触发"
 		}
 
-		// 检查平仓条件：收益大于5%且回撤超过40%
-		if currentPnLPct > 5.0 && drawdownPct >= 40.0 {
-			log.Printf("🚨 触发回撤平仓条件: %s %s | 当前收益: %.2f%% | 最高收益: %.2f%% | 回撤: %.2f%%",
-				symbol, side, currentPnLPct, peakPnLPct, drawdownPct)
+		// 低档止盈：peakPnLPct大于3.0，但currentPnLPct小于等于2.0，则触发平仓
+		if peakPnLPct > 3.0 && currentPnLPct <= 2.0 {
+			closeFlag = true
+			closeReason = "低档止盈触发"
+		}
+
+		// 中档止盈：peakPnLPct大于5.0，但currentPnLPct小于等于peakPnLPct * 0.8，则触发平仓
+		if !closeFlag && peakPnLPct > 5.0 && currentPnLPct <= peakPnLPct*0.8 {
+			closeFlag = true
+			closeReason = "中档止盈触发"
+		}
+
+		// 高档止盈：peakPnLPct大于10.0，但currentPnLPct小于等于peakPnLPct * 0.75，则触发平仓
+		if !closeFlag && peakPnLPct > 10.0 && currentPnLPct <= peakPnLPct*0.75 {
+			closeFlag = true
+			closeReason = "高档止盈触发"
+		}
+
+		if closeFlag {
+			log.Printf("🚨 %s: %s %s | 当前收益: %.2f%% | 最高收益: %.2f%%",
+				closeReason, symbol, side, currentPnLPct, peakPnLPct)
 
 			// 执行平仓
 			if err := at.emergencyClosePosition(symbol, side); err != nil {
-				log.Printf("❌ 回撤平仓失败 (%s %s): %v", symbol, side, err)
+				log.Printf("❌ 止盈/止损平仓失败 (%s %s): %v", symbol, side, err)
 			} else {
-				log.Printf("✅ 回撤平仓成功: %s %s", symbol, side)
+				log.Printf("✅ 止盈/止损平仓成功: %s %s", symbol, side)
 				// 平仓后清理该持仓的缓存
 				at.ClearPeakPnLCache(symbol, side)
 			}
-		} else if currentPnLPct > 5.0 {
-			// 记录接近平仓条件的情况（用于调试）
-			log.Printf("📊 回撤监控: %s %s | 收益: %.2f%% | 最高: %.2f%% | 回撤: %.2f%%",
-				symbol, side, currentPnLPct, peakPnLPct, drawdownPct)
 		}
 	}
 }
