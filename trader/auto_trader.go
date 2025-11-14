@@ -1537,7 +1537,6 @@ func (at *AutoTrader) checkPositionDrawdown() {
 		at.peakPnLCacheMutex.Lock()
 		at.peakPnLCache = make(map[string]float64)
 		at.peakPnLCacheMutex.Unlock()
-		log.Println("ℹ️ 无持仓，已重置峰值收益缓存（peakPnLCache）")
 		return
 	}
 
