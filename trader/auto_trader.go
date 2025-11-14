@@ -1654,7 +1654,7 @@ func (at *AutoTrader) checkPositionDrawdown() {
 		log.Printf("📊 止盈监控: %s %s | 收益: %.2f%% | 最高: %.2f%% | 止损: %.2f%%",
 			symbol, side, currentPnLPct, peakPnLPct, dynamicStopLossThreshold)
 
-		if peakPnLPct <= dynamicStopLossThreshold {
+		if currentPnLPct <= dynamicStopLossThreshold {
 			closeFlag = true
 			closeReason = "止损触发"
 		}
