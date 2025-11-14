@@ -105,6 +105,8 @@ type AutoTrader struct {
 	monitorWg             sync.WaitGroup     // 用于等待监控goroutine结束
 	peakPnLCache          map[string]float64 // 最高收益缓存 (symbol -> 峰值盈亏百分比)
 	peakPnLCacheMutex     sync.RWMutex       // 缓存读写锁
+	stopLossCache         map[string]float64 // 最高收益缓存 (symbol -> 止损阈值)
+	stopLossCacheMutex    sync.RWMutex       // 缓存读写锁
 	lastBalanceSyncTime   time.Time          // 上次余额同步时间
 	database              any                // 数据库引用（用于自动更新余额）
 	userID                string             // 用户ID
@@ -738,6 +740,24 @@ func (at *AutoTrader) executeOpenLongWithRecord(decision *decision.Decision, act
 		log.Printf("  ⚠ 设置止盈失败: %v", err)
 	}
 
+	// ===== 新增：保存该仓位对应的动态止损阈值 =====
+	// 以 decision.PositionSizeUSD 作为 "size" 标识
+	marginUsed := decision.PositionSizeUSD / float64(decision.Leverage)
+	// 读取账户总权益用于计算占比（容错：若失败使用 availableBalance 作为退路）
+	totalEquity := 0.0
+	if bal, e := at.trader.GetBalance(); e == nil {
+		if wallet, ok := bal["totalWalletBalance"].(float64); ok {
+			totalEquity = wallet
+		}
+		if unreal, ok := bal["totalUnrealizedProfit"].(float64); ok {
+			totalEquity += unreal
+		}
+	}
+	threshold := at.getDrawdownStopLossThreshold(marginUsed, totalEquity)
+	at.UpdateStopLossCache(posKey, threshold)
+	log.Printf("  ℹ 已保存止损阈值: %s size=%.2f → threshold=%.2f%%", decision.Symbol, decision.PositionSizeUSD, threshold)
+	// ===== 新增结束 =====
+
 	return nil
 }
 
@@ -817,6 +837,22 @@ func (at *AutoTrader) executeOpenShortWithRecord(decision *decision.Decision, ac
 	if err := at.trader.SetTakeProfit(decision.Symbol, "SHORT", quantity, decision.TakeProfit); err != nil {
 		log.Printf("  ⚠ 设置止盈失败: %v", err)
 	}
+
+	// ===== 新增：保存该仓位对应的动态止损阈值 =====
+	marginUsed := decision.PositionSizeUSD / float64(decision.Leverage)
+	totalEquity := 0.0
+	if bal, e := at.trader.GetBalance(); e == nil {
+		if wallet, ok := bal["totalWalletBalance"].(float64); ok {
+			totalEquity = wallet
+		}
+		if unreal, ok := bal["totalUnrealizedProfit"].(float64); ok {
+			totalEquity += unreal
+		}
+	}
+	threshold := at.getDrawdownStopLossThreshold(marginUsed, totalEquity)
+	at.UpdateStopLossCache(posKey, threshold)
+	log.Printf("  ℹ 已保存止损阈值: %s size=%.2f → threshold=%.2f%%", decision.Symbol, decision.PositionSizeUSD, threshold)
+	// ===== 新增结束 =====
 
 	return nil
 }
@@ -1242,7 +1278,7 @@ func (at *AutoTrader) GetStatus() map[string]interface{} {
 }
 
 // GetAccountInfo 获取账户信息（用于API）
-func (at *AutoTrader) GetAccountInfo() (map[string]interface{}, error) {
+func (at *AutoTrader) GetAccountInfo() (map[string]any, error) {
 	balance, err := at.trader.GetBalance()
 	if err != nil {
 		return nil, fmt.Errorf("获取余额失败: %w", err)
@@ -1332,7 +1368,7 @@ func (at *AutoTrader) GetAccountInfo() (map[string]interface{}, error) {
 }
 
 // GetPositions 获取持仓列表（用于API）
-func (at *AutoTrader) GetPositions() ([]map[string]interface{}, error) {
+func (at *AutoTrader) GetPositions() ([]map[string]any, error) {
 	positions, err := at.trader.GetPositions()
 	if err != nil {
 		return nil, fmt.Errorf("获取持仓失败: %w", err)
@@ -1611,9 +1647,14 @@ func (at *AutoTrader) checkPositionDrawdown() {
 		closeFlag := false
 		closeReason := ""
 
-		log.Printf("📊 止盈监控: %s %s | 收益: %.2f%% | 最高: %.2f%%", symbol, side, currentPnLPct, peakPnLPct)
+		at.stopLossCacheMutex.RLock()
+		dynamicStopLossThreshold := at.GetStopLossCache(posKey)
+		at.peakPnLCacheMutex.RUnlock()
 
-		if peakPnLPct <= -2.0 {
+		log.Printf("📊 止盈监控: %s %s | 收益: %.2f%% | 最高: %.2f%% | 止损: %.2f%%",
+			symbol, side, currentPnLPct, peakPnLPct, dynamicStopLossThreshold)
+
+		if peakPnLPct <= dynamicStopLossThreshold {
 			closeFlag = true
 			closeReason = "止损触发"
 		}
@@ -1647,6 +1688,30 @@ func (at *AutoTrader) checkPositionDrawdown() {
 				log.Printf("✅ 止盈/止损平仓成功: %s %s", symbol, side)
 			}
 		}
+	}
+}
+
+// getDrawdownStopLossThreshold 根据持仓保证金占比动态计算止损阈值
+// 仓位占用保证金 ≥ 50% → 止损 -3.0%
+// 20% ≤ 仓位占用 < 50% → 止损 -4.0%
+// 仓位占用 < 20% → 止损 -5.0%
+func (at *AutoTrader) getDrawdownStopLossThreshold(marginUsed, totalEquity float64) float64 {
+	if totalEquity <= 0 {
+		return -4.0 // 默认值
+	}
+
+	marginUsedRatio := (marginUsed / totalEquity) * 100
+
+	switch {
+	case marginUsedRatio >= 50.0:
+		// 高风险：仓位占比 ≥ 50%，激进止损
+		return -3.0
+	case marginUsedRatio >= 20.0:
+		// 中等风险：仓位占比 20-50%，适中止损
+		return -4.0
+	default:
+		// 低风险：仓位占比 < 20%，宽松止损
+		return -5.0
 	}
 }
 
@@ -1824,4 +1889,36 @@ func (at *AutoTrader) ClearPeakPnLCache(symbol, side string) {
 
 	posKey := symbol + "_" + side
 	delete(at.peakPnLCache, posKey)
+
+	// 同步删除与该 symbol 相关的 stopLossThresholds（防止缓存遗留）
+	at.DeleteStopLossCache(posKey)
+
+}
+
+// 更新/保存某仓位对应的止损阈值
+func (at *AutoTrader) UpdateStopLossCache(posKey string, threshold float64) {
+	at.stopLossCacheMutex.Lock()
+	defer at.stopLossCacheMutex.Unlock()
+	if at.stopLossCache == nil {
+		at.stopLossCache = make(map[string]float64)
+	}
+	at.stopLossCache[posKey] = threshold
+}
+
+// 根据 symbol 前缀删除止损阈值（如仓位全部清空时使用）
+func (at *AutoTrader) DeleteStopLossCache(posKey string) {
+	at.stopLossCacheMutex.Lock()
+	defer at.stopLossCacheMutex.Unlock()
+	delete(at.stopLossCache, posKey)
+}
+
+// 读取某个 key 的阈值（未找到返回 -4.0 且 false）
+func (at *AutoTrader) GetStopLossCache(posKey string) float64 {
+	at.stopLossCacheMutex.RLock()
+	defer at.stopLossCacheMutex.RUnlock()
+	if at.stopLossCache == nil {
+		return -4.0
+	}
+	v := at.stopLossCache[posKey]
+	return v
 }
