@@ -1,11 +1,5 @@
 # 🤖 NOFX - Agentic Trading OS
 
-[![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?style=flat&logo=go)](https://golang.org/)
-[![React](https://img.shields.io/badge/React-18+-61DAFB?style=flat&logo=react)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=flat&logo=typescript)](https://www.typescriptlang.org/)
-[![License](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
-[![Backed by Amber.ac](https://img.shields.io/badge/Backed%20by-Amber.ac-orange.svg)](https://amber.ac)
-
 **Languages:** [English](README.md) | [中文](docs/i18n/zh-CN/README.md) | [Українська](docs/i18n/uk/README.md) | [Русский](docs/i18n/ru/README.md) | [日本語](docs/i18n/ja/README.md)
 
 **📚 Documentation:** [Docs Home](docs/README.md) | [Getting Started](docs/getting-started/README.md) | [Prompt Writing Guide](docs/prompt-guide.md) ([中文](docs/prompt-guide.zh-CN.md)) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [Security](SECURITY.md)
@@ -34,7 +28,6 @@
 - [📈 Performance Tips](#-performance-optimization-tips)
 - [🔄 Changelog](#-changelog)
 - [📄 License](#-license)
-- [🤝 Contributing](#-contributing)
 
 ---
 
@@ -48,31 +41,26 @@
 - **Multi-Agent Self-Play & Self-Evolution**: Strategies automatically compete and select the best, continuously iterating based on account-level PnL and risk constraints
 - **Integrated Execution & Risk Control**: Low-latency routing, slippage/risk control sandbox, account-level limits, one-click market switching
 
-### 🏢 Backed by [Amber.ac](https://amber.ac)
-
-### 👥 Core Team
-
-- **Tinkle** - [@Web3Tinkle](https://x.com/Web3Tinkle)
-
-### 💼 Seed Funding Round Open
-
-We are currently raising our **seed round**.
-
-**For investment inquiries**, please DM **Tinkle** via Twitter.
-
----
-
 > ⚠️ **Risk Warning**: This system is experimental. AI auto-trading carries significant risks. Strongly recommended for learning/research purposes or testing with small amounts only!
 
 ## 👥 Developer Community
 
-Join our Telegram developer community to discuss, share ideas, and get support:
+Join Telegram developer community to discuss, share ideas, and get support:
 
 **💬 [NOFX Developer Community](https://t.me/nofx_dev_community)**
 
 ---
 
 ## 🆕 What's New (Latest Update)
+
+### 🎯 Focus on AI Reasoning Accuracy to Maximize Win Rate
+
+This fork is deeply optimized from the original project, with the core philosophy of improving trading win rate through enhanced AI reasoning and decision quality. Key improvements include:
+
+- **Enhanced Prompt Engineering**: Optimized AI input prompts with clearer market data structure and decision framework
+- **Improved Risk Assessment**: Strengthened stop-loss/take-profit logic for more rational risk management
+- **Refined Data Analysis**: Providing AI with more accurate technical indicators and market signal interpretation
+- **Quality Over Quantity**: Prioritizing decision accuracy over trading frequency
 
 ### 🚀 Multi-Exchange Support!
 
@@ -256,7 +244,7 @@ Before using this system, you need a Binance Futures account. **Use our referral
 5. **Create API Key**:
    - Go to Account → API Management
    - Create new API key, **enable "Futures" permission**
-   - Save API Key and Secret Key (~~needed for config.json~~) *needed for web interface*
+   - Save API Key and Secret Key needed for web interface
    - **Important**: Whitelist your IP address for security
 
 ### Fee Discount Benefits:
@@ -284,7 +272,7 @@ cp config.json.example config.json
 nano config.json  # or use any editor
 ```
 
-⚠️ **Note**: Basic config.json is still needed for some settings, but ~~trader configurations~~ are now done through the web interface.
+⚠️ **Note**: Basic config.json is still needed for some settings, but trader configurations are now done through the web interface.
 
 #### Step 2: One-Click Start
 ```bash
@@ -418,6 +406,12 @@ Before configuring the system, you need to obtain AI API keys. Choose one of the
 
 ### 5. Start the System
 
+#### 🚀 Starting the System (2 steps)
+
+The system has **2 parts** that run separately:
+1. **Backend** (AI trading brain + API)
+2. **Frontend** (Web dashboard for monitoring)
+
 #### **Step 1: Start the Backend**
 
 ```bash
@@ -482,7 +476,7 @@ Open your browser and visit: **🌐 http://localhost:3000**
 - Use Start/Stop buttons to control them
 - Monitor performance in real-time
 
-**✅ No more JSON file editing - everything is done through the web interface!**
+**✅ everything is done through the web interface!**
 
 ---
 
@@ -570,37 +564,6 @@ Hyperliquid supports **Agent Wallets** - secure sub-wallets specifically for tra
    - Main Wallet Address: `0xYourMainWalletAddress` (with `0x`)
    - Agent Private Key: `YourAgentPrivateKeyWithout0x` (remove `0x` prefix)
 
----
-
-~~Configure `config.json` for Hyperliquid~~ *Configure through web interface*
-
-```json
-{
-  "traders": [
-    {
-      "id": "hyperliquid_trader",
-      "name": "My Hyperliquid Trader",
-      "enabled": true,
-      "ai_model": "deepseek",
-      "exchange": "hyperliquid",
-      "hyperliquid_private_key": "your_private_key_without_0x",
-      "hyperliquid_wallet_addr": "your_ethereum_address",
-      "hyperliquid_testnet": false,
-      "deepseek_key": "sk-xxxxxxxxxxxxx",
-      "initial_balance": 1000.0,
-      "scan_interval_minutes": 3
-    }
-  ],
-  "use_default_coins": true,
-  "api_server_port": 8080
-}
-```
-
-**Key Differences from Binance Config:**
-- Replace `binance_api_key` + `binance_secret_key` with `hyperliquid_private_key`
-- Add `"exchange": "hyperliquid"` field
-- Set `hyperliquid_testnet: false` for mainnet (or `true` for testnet)
-
 **⚠️ Security Warning**: Never share your private key! Use a dedicated wallet for trading, not your main wallet.
 
 ---
@@ -626,42 +589,6 @@ Hyperliquid supports **Agent Wallets** - secure sub-wallets specifically for tra
    - Main Wallet address (User)
    - API Wallet address (Signer)
    - API Wallet Private Key (⚠️ shown only once!)
-
-**Step 2**: ~~Configure `config.json` for Aster~~ *Configure through web interface*
-
-```json
-{
-  "traders": [
-    {
-      "id": "aster_deepseek",
-      "name": "Aster DeepSeek Trader",
-      "enabled": true,
-      "ai_model": "deepseek",
-      "exchange": "aster",
-
-      "aster_user": "0xYOUR_MAIN_WALLET_ADDRESS_HERE",
-      "aster_signer": "0xYOUR_API_WALLET_SIGNER_ADDRESS_HERE",
-      "aster_private_key": "your_api_wallet_private_key_without_0x_prefix",
-
-      "deepseek_key": "sk-xxxxxxxxxxxxx",
-      "initial_balance": 1000.0,
-      "scan_interval_minutes": 3
-    }
-  ],
-  "use_default_coins": true,
-  "api_server_port": 8080,
-  "leverage": {
-    "btc_eth_leverage": 5,
-    "altcoin_leverage": 5
-  }
-}
-```
-
-**Key Configuration Fields:**
-- `"exchange": "aster"` - Set exchange to Aster
-- `aster_user` - Your main wallet address
-- `aster_signer` - API wallet address (from Step 1)
-- `aster_private_key` - API wallet private key (without `0x` prefix)
 
 **📖 For detailed setup instructions, see**: [Aster Integration Guide](ASTER_INTEGRATION.md)
 
@@ -745,10 +672,7 @@ For running multiple AI traders competing against each other:
 | `oi_top_api_url` | Open interest API<br>*Optional supplement data* | `""` (empty) | ❌ No |
 | `api_server_port` | Web dashboard port | `8080` | ✅ Yes |
 
-~~**Default Trading Coins** (when `use_default_coins: true`):
-- BTC, ETH, SOL, BNB, XRP, DOGE, ADA, HYPE~~
-
-*Note: Trading coins are now configured through the web interface*
+*Note: Trading coins are configured through the web interface*
 
 ---
 
@@ -758,16 +682,7 @@ For running multiple AI traders competing against each other:
 
 The leverage settings control the maximum leverage the AI can use for each trade. This is crucial for risk management, especially for Binance subaccounts which have leverage restrictions.
 
-~~**Configuration format:**~~
-
-```json
-"leverage": {
-  "btc_eth_leverage": 5,    // Maximum leverage for BTC and ETH
-  "altcoin_leverage": 5      // Maximum leverage for all other coins
-}
-```
-
-*Note: Leverage is now configured through the web interface*
+**Note: Leverage is configured through the web interface**
 
 **⚠️ Important: Binance Subaccount Restrictions**
 
@@ -783,26 +698,6 @@ The leverage settings control the maximum leverage the AI can use for each trade
 | **Main (Conservative)** | `10` | `10` | 🟡 Medium |
 | **Main (Aggressive)** | `20` | `15` | 🔴 High |
 | **Main (Maximum)** | `50` | `20` | 🔴🔴 Very High |
-
-**Examples:**
-
-~~**Safe configuration (subaccount or conservative):**~~
-```json
-"leverage": {
-  "btc_eth_leverage": 5,
-  "altcoin_leverage": 5
-}
-```
-
-~~**Aggressive configuration (main account only):**~~
-```json
-"leverage": {
-  "btc_eth_leverage": 20,
-  "altcoin_leverage": 15
-}
-```
-
-*Note: Leverage configuration is now done through the web interface*
 
 **How AI uses leverage:**
 
@@ -848,99 +743,7 @@ This makes it beginner-friendly! You can even omit this field entirely.
 
 ---
 
-### 6. Run the System
-
-#### 🚀 Starting the System (2 steps)
-
-The system has **2 parts** that run separately:
-1. **Backend** (AI trading brain + API)
-2. **Frontend** (Web dashboard for monitoring)
-
----
-
-#### **Step 1: Start the Backend**
-
-Open a terminal and run:
-
-```bash
-# Build the program (first time only, or after code changes)
-go build -o nofx
-
-# Start the backend
-./nofx
-```
-
-**What you should see:**
-
-```
-🚀 启动自动交易系统...
-✓ Trader [my_trader] 已初始化
-✓ API服务器启动在端口 8080
-📊 开始交易监控...
-```
-
-**⚠️ If you see errors:**
-
-| Error Message | Solution |
-|--------------|----------|
-| `invalid API key` | Check your Binance API key in config.json |
-| `TA-Lib not found` | Run `brew install ta-lib` (macOS) |
-| `port 8080 already in use` | ~~Change `api_server_port` in config.json~~ *Change `API_PORT` in .env file* |
-| `DeepSeek API error` | Verify your DeepSeek API key and balance |
-
-**✅ Backend is running correctly when you see:**
-- No error messages
-- "开始交易监控..." appears
-- System shows account balance
-- Keep this terminal window open!
-
----
-
-#### **Step 2: Start the Frontend**
-
-Open a **NEW terminal window** (keep the first one running!), then:
-
-```bash
-cd web
-npm run dev
-```
-
-**What you should see:**
-
-```
-VITE v5.x.x  ready in xxx ms
-
-➜  Local:   http://localhost:3000/
-➜  Network: use --host to expose
-```
-
-**✅ Frontend is running when you see:**
-- "Local: http://localhost:3000/" message
-- No error messages
-- Keep this terminal window open too!
-
----
-
-#### **Step 3: Access the Dashboard**
-
-Open your web browser and visit:
-
-**🌐 http://localhost:3000**
-
-**What you'll see:**
-- 📊 Real-time account balance
-- 📈 Open positions (if any)
-- 🤖 AI decision logs
-- 📉 Equity curve chart
-
-**First-time tips:**
-- It may take 3-5 minutes for the first AI decision
-- Initial decisions might say "观望" (wait) - this is normal
-- AI needs to analyze market conditions first
-
----
-
-### 7. Monitor the System
+### 6. Monitor the System
 
 **What to watch:**
 
@@ -966,7 +769,7 @@ Should return: `{"status":"ok"}`
 
 ---
 
-### 8. Stop the System
+### 7. Stop the System
 
 **Graceful Shutdown (Recommended):**
 
@@ -1278,7 +1081,7 @@ sudo apt-get install libta-lib0-dev
 **Solution**:
 - Coin pool API is optional
 - If API fails, system uses default mainstream coins (BTC, ETH, etc.)
-- ~~Check API URL and auth parameter in config.json~~ *Check configuration in web interface*
+- Check configuration in web interface
 
 ---
 
@@ -1321,52 +1124,3 @@ This project is licensed under the **GNU Affero General Public License v3.0 (AGP
 - ✅ All derivatives must also be licensed under AGPL-3.0
 
 For commercial licensing or questions, please contact the maintainers.
-
----
-
-## 🤝 Contributing
-
-We welcome contributions from the community! See our comprehensive guides:
-
-- **📖 [Contributing Guide](CONTRIBUTING.md)** - Complete development workflow, code standards, and PR process
-- **🤝 [Code of Conduct](CODE_OF_CONDUCT.md)** - Community guidelines and standards
-- **💰 [Bounty Program](docs/community/bounty-guide.md)** - Earn rewards for contributions
-- **🔒 [Security Policy](SECURITY.md)** - Report vulnerabilities responsibly
-
-**Quick Start:**
-1. Fork the project
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open Pull Request
-
----
-
-## 📬 Contact
-
-
-### 🐛 Technical Support
-- **GitHub Issues**: [Submit an Issue](https://github.com/tinkle-community/nofx/issues)
-- **Developer Community**: [Telegram Group](https://t.me/nofx_dev_community)
-
----
-
-## 🙏 Acknowledgments
-
-- [Binance API](https://binance-docs.github.io/apidocs/futures/en/) - Binance Futures API
-- [DeepSeek](https://platform.deepseek.com/) - DeepSeek AI API
-- [Qwen](https://dashscope.console.aliyun.com/) - Alibaba Cloud Qwen
-- [TA-Lib](https://ta-lib.org/) - Technical indicator library
-- [Recharts](https://recharts.org/) - React chart library
-
----
-
-**Last Updated**: 2025-10-30 (v3.0.0)
-
-**⚡ Explore the possibilities of quantitative trading with the power of AI!**
-
----
-
-## ⭐ Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=tinkle-community/nofx&type=Date)](https://star-history.com/#tinkle-community/nofx&Date)

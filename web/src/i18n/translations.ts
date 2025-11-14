@@ -170,7 +170,9 @@ export const translations = {
     configureAIModels: 'Configure AI Models',
     configureExchanges: 'Configure Exchanges',
     aiScanInterval: 'AI Scan Decision Interval (minutes)',
-    scanIntervalRecommend: 'Recommended: 3-10 minutes',
+    scanIntervalRecommend: 'Recommended: 1+ minutes (3-10 optimal)',
+    scanIntervalCostWarning:
+      'Shorter scan intervals significantly increase AI API call frequency and costs (approximately 3x compared to 3-minute intervals). Recommended for testing or high-frequency strategies only.',
     useTestnet: 'Use Testnet',
     enabled: 'Enabled',
     save: 'Save',
@@ -1016,7 +1018,9 @@ export const translations = {
     configureAIModels: '配置AI模型',
     configureExchanges: '配置交易所',
     aiScanInterval: 'AI 扫描决策间隔 (分钟)',
-    scanIntervalRecommend: '建议: 3-10分钟',
+    scanIntervalRecommend: '建议: 1分钟起 (3-10最佳)',
+    scanIntervalCostWarning:
+      '更短的扫描间隔会显著增加 AI API 调用频率和成本（约为 3 分钟间隔的 3 倍）。建议仅在测试或高频策略时使用。',
     useTestnet: '使用测试网',
     enabled: '启用',
     save: '保存',
@@ -1309,7 +1313,8 @@ export const translations = {
     signIn: '登录',
     signUp: '注册',
     registrationClosed: '注册已关闭',
-    registrationClosedMessage: '平台当前不开放新用户注册，如需访问请联系管理员获取账号。',
+    registrationClosedMessage:
+      '平台当前不开放新用户注册，如需访问请联系管理员获取账号。',
 
     // Hero Section
     githubStarsInDays: '3 天内 2.5K+ GitHub Stars',

@@ -533,7 +533,7 @@ func (s *Server) handleCreateTrader(c *gin.Context) {
 
 	// 设置扫描间隔默认值
 	scanIntervalMinutes := req.ScanIntervalMinutes
-	if scanIntervalMinutes < 3 {
+	if scanIntervalMinutes <= 0 {
 		scanIntervalMinutes = 3 // 默认3分钟，且不允许小于3
 	}
 
@@ -736,8 +736,6 @@ func (s *Server) handleUpdateTrader(c *gin.Context) {
 	scanIntervalMinutes := req.ScanIntervalMinutes
 	if scanIntervalMinutes <= 0 {
 		scanIntervalMinutes = existingTrader.ScanIntervalMinutes // 保持原值
-	} else if scanIntervalMinutes < 3 {
-		scanIntervalMinutes = 3
 	}
 
 	// 设置提示词模板，允许更新
@@ -1246,7 +1244,7 @@ func (s *Server) handleGetTraderConfig(c *gin.Context) {
 	// 返回完整的模型ID，不做转换，保持与前端模型列表一致
 	aiModelID := traderConfig.AIModelID
 
-	result := map[string]interface{}{
+	result := map[string]any{
 		"trader_id":              traderConfig.ID,
 		"trader_name":            traderConfig.Name,
 		"ai_model":               aiModelID,
@@ -1953,9 +1951,22 @@ func (s *Server) handleGetSupportedModels(c *gin.Context) {
 	models, err := s.database.GetAIModels("default")
 	if err != nil {
 		log.Printf("❌ 获取支持的AI模型失败: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "获取支持的AI模型失败"})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "获取支持的AI模型失败",
+			"details": err.Error(),
+		})
 		return
 	}
+
+	// 检查数据完整性
+	if len(models) == 0 {
+		log.Printf("⚠️  警告: 系统支持的AI模型列表为空！这可能导致用户无法配置AI模型")
+		log.Printf("💡 提示: 请检查数据库中 user_id='default' 的 ai_models 数据")
+		c.JSON(http.StatusOK, []interface{}{}) // 返回空数组而不是 null
+		return
+	}
+
+	log.Printf("✅ 成功返回 %d 个支持的AI模型", len(models))
 
 	c.JSON(http.StatusOK, models)
 }

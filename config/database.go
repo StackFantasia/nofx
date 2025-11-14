@@ -92,8 +92,89 @@ func NewDatabase(dbPath string) (*Database, error) {
 		return nil, fmt.Errorf("初始化默认数据失败: %w", err)
 	}
 
+	// 健康检查：确保 default 用户数据完整
+	if err := database.verifyAndRepairDefaultData(); err != nil {
+		log.Printf("⚠️  数据库健康检查警告: %v", err)
+	}
+
 	log.Printf("✅ 数据库已启用 WAL 模式和 FULL 同步,数据持久性得到保证")
 	return database, nil
+}
+
+// verifyAndRepairDefaultData 验证并修复 default 用户数据
+// 这是一个健康检查函数，确保系统支持的模型和交易所数据始终存在
+func (d *Database) verifyAndRepairDefaultData() error {
+	log.Println("🔍 执行数据库健康检查...")
+
+	// 检查并修复 AI 模型数据
+	var modelCount int
+	err := d.db.QueryRow(`SELECT COUNT(*) FROM ai_models WHERE user_id = 'default'`).Scan(&modelCount)
+	if err != nil {
+		return fmt.Errorf("查询AI模型数据失败: %w", err)
+	}
+
+	if modelCount == 0 {
+		log.Println("⚠️  发现 AI 模型数据缺失，正在自动修复...")
+
+		// 重新插入默认的AI模型
+		aiModels := []struct {
+			id, name, provider string
+		}{
+			{"deepseek", "DeepSeek", "deepseek"},
+			{"qwen", "Qwen", "qwen"},
+		}
+
+		for _, model := range aiModels {
+			_, err := d.db.Exec(`
+				INSERT INTO ai_models (id, user_id, name, provider, enabled, created_at, updated_at)
+				VALUES (?, 'default', ?, ?, 0, datetime('now'), datetime('now'))
+			`, model.id, model.name, model.provider)
+			if err != nil {
+				log.Printf("❌ 插入AI模型 %s 失败: %v", model.id, err)
+			} else {
+				log.Printf("✅ 已修复AI模型: %s", model.name)
+			}
+		}
+	} else {
+		log.Printf("✅ AI 模型数据完整 (共 %d 条)", modelCount)
+	}
+
+	// 检查并修复交易所数据
+	var exchangeCount int
+	err = d.db.QueryRow(`SELECT COUNT(*) FROM exchanges WHERE user_id = 'default'`).Scan(&exchangeCount)
+	if err != nil {
+		return fmt.Errorf("查询交易所数据失败: %w", err)
+	}
+
+	if exchangeCount == 0 {
+		log.Println("⚠️  发现交易所数据缺失，正在自动修复...")
+
+		// 重新插入默认的交易所（type字段与initDefaultData保持一致）
+		exchanges := []struct {
+			id, name, typ string
+		}{
+			{"binance", "Binance Futures", "binance"},
+			{"hyperliquid", "Hyperliquid", "hyperliquid"},
+			{"aster", "Aster DEX", "aster"},
+		}
+
+		for _, exchange := range exchanges {
+			_, err := d.db.Exec(`
+				INSERT INTO exchanges (id, user_id, name, type, enabled, created_at, updated_at)
+				VALUES (?, 'default', ?, ?, 0, datetime('now'), datetime('now'))
+			`, exchange.id, exchange.name, exchange.typ)
+			if err != nil {
+				log.Printf("❌ 插入交易所 %s 失败: %v", exchange.id, err)
+			} else {
+				log.Printf("✅ 已修复交易所: %s", exchange.name)
+			}
+		}
+	} else {
+		log.Printf("✅ 交易所数据完整 (共 %d 条)", exchangeCount)
+	}
+
+	log.Println("✅ 数据库健康检查完成")
+	return nil
 }
 
 // createTables 创建数据库表

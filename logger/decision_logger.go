@@ -3,7 +3,6 @@ package logger
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"math"
 	"os"
 	"path/filepath"
@@ -14,6 +13,7 @@ import (
 type DecisionRecord struct {
 	Timestamp      time.Time          `json:"timestamp"`       // 决策时间
 	CycleNumber    int                `json:"cycle_number"`    // 周期编号
+	Exchange       string             `json:"exchange"`        // 交易所类型 (binance/hyperliquid/aster)
 	SystemPrompt   string             `json:"system_prompt"`   // 系统提示词（发送给AI的系统prompt）
 	InputPrompt    string             `json:"input_prompt"`    // 发送给AI的输入prompt
 	CoTTrace       string             `json:"cot_trace"`       // AI思维链（输出）
@@ -112,7 +112,7 @@ func (l *DecisionLogger) LogDecision(record *DecisionRecord) error {
 	}
 
 	// 写入文件（使用安全权限：只有所有者可读写）
-	if err := ioutil.WriteFile(filepath, data, 0600); err != nil {
+	if err := os.WriteFile(filepath, data, 0600); err != nil {
 		return fmt.Errorf("写入决策记录失败: %w", err)
 	}
 
@@ -122,7 +122,7 @@ func (l *DecisionLogger) LogDecision(record *DecisionRecord) error {
 
 // GetLatestRecords 获取最近N条记录（按时间正序：从旧到新）
 func (l *DecisionLogger) GetLatestRecords(n int) ([]*DecisionRecord, error) {
-	files, err := ioutil.ReadDir(l.logDir)
+	files, err := os.ReadDir(l.logDir)
 	if err != nil {
 		return nil, fmt.Errorf("读取日志目录失败: %w", err)
 	}
@@ -137,7 +137,7 @@ func (l *DecisionLogger) GetLatestRecords(n int) ([]*DecisionRecord, error) {
 		}
 
 		filepath := filepath.Join(l.logDir, file.Name())
-		data, err := ioutil.ReadFile(filepath)
+		data, err := os.ReadFile(filepath)
 		if err != nil {
 			continue
 		}
@@ -171,7 +171,7 @@ func (l *DecisionLogger) GetRecordByDate(date time.Time) ([]*DecisionRecord, err
 
 	var records []*DecisionRecord
 	for _, filepath := range files {
-		data, err := ioutil.ReadFile(filepath)
+		data, err := os.ReadFile(filepath)
 		if err != nil {
 			continue
 		}
@@ -191,7 +191,7 @@ func (l *DecisionLogger) GetRecordByDate(date time.Time) ([]*DecisionRecord, err
 func (l *DecisionLogger) CleanOldRecords(days int) error {
 	cutoffTime := time.Now().AddDate(0, 0, -days)
 
-	files, err := ioutil.ReadDir(l.logDir)
+	files, err := os.ReadDir(l.logDir)
 	if err != nil {
 		return fmt.Errorf("读取日志目录失败: %w", err)
 	}
@@ -202,9 +202,22 @@ func (l *DecisionLogger) CleanOldRecords(days int) error {
 			continue
 		}
 
-		if file.ModTime().Before(cutoffTime) {
-			filepath := filepath.Join(l.logDir, file.Name())
-			if err := os.Remove(filepath); err != nil {
+		// 使用 DirEntry.Info() 获取 FileInfo，再用 ModTime()
+		info, err := file.Info()
+		if err != nil {
+			// 如果 Info() 失败，回退到 os.Stat（更兼容）
+			fp := filepath.Join(l.logDir, file.Name())
+			if fi, err2 := os.Stat(fp); err2 == nil {
+				info = fi
+			} else {
+				// 无法获取文件信息则跳过该文件
+				continue
+			}
+		}
+
+		if info.ModTime().Before(cutoffTime) {
+			fp := filepath.Join(l.logDir, file.Name())
+			if err := os.Remove(fp); err != nil {
 				fmt.Printf("⚠ 删除旧记录失败 %s: %v\n", file.Name(), err)
 				continue
 			}
@@ -221,7 +234,7 @@ func (l *DecisionLogger) CleanOldRecords(days int) error {
 
 // GetStatistics 获取统计信息
 func (l *DecisionLogger) GetStatistics() (*Statistics, error) {
-	files, err := ioutil.ReadDir(l.logDir)
+	files, err := os.ReadDir(l.logDir)
 	if err != nil {
 		return nil, fmt.Errorf("读取日志目录失败: %w", err)
 	}
@@ -234,7 +247,7 @@ func (l *DecisionLogger) GetStatistics() (*Statistics, error) {
 		}
 
 		filepath := filepath.Join(l.logDir, file.Name())
-		data, err := ioutil.ReadFile(filepath)
+		data, err := os.ReadFile(filepath)
 		if err != nil {
 			continue
 		}
@@ -324,6 +337,25 @@ type SymbolPerformance struct {
 	AvgPnL        float64 `json:"avg_pn_l"`       // 平均盈亏
 }
 
+// getTakerFeeRate 获取交易所的Taker费率
+// 基于公开信息：
+// - Aster: Maker 0.010%, Taker 0.035%
+// - Hyperliquid: Maker 0.015%, Taker 0.045%
+// - Binance Futures: Maker 0.020%, Taker 0.050% (默认费率)
+func getTakerFeeRate(exchange string) float64 {
+	switch exchange {
+	case "aster":
+		return 0.00035 // 0.035%
+	case "hyperliquid":
+		return 0.00045 // 0.045%
+	case "binance":
+		return 0.0005 // 0.050%
+	default:
+		// 对于未知交易所，使用保守估计（Binance费率）
+		return 0.0005
+	}
+}
+
 // AnalyzePerformance 分析最近N个周期的交易表现
 func (l *DecisionLogger) AnalyzePerformance(lookbackCycles int) (*PerformanceAnalysis, error) {
 	records, err := l.GetLatestRecords(lookbackCycles)
@@ -344,7 +376,7 @@ func (l *DecisionLogger) AnalyzePerformance(lookbackCycles int) (*PerformanceAna
 	}
 
 	// 追踪持仓状态：symbol_side -> {side, openPrice, openTime, quantity, leverage}
-	openPositions := make(map[string]map[string]interface{})
+	openPositions := make(map[string]map[string]any)
 
 	// 为了避免开仓记录在窗口外导致匹配失败，需要先从所有历史记录中找出未平仓的持仓
 	// 获取更多历史记录来构建完整的持仓状态（使用更大的窗口）
@@ -359,9 +391,10 @@ func (l *DecisionLogger) AnalyzePerformance(lookbackCycles int) (*PerformanceAna
 
 				symbol := action.Symbol
 				side := ""
-				if action.Action == "open_long" || action.Action == "close_long" || action.Action == "partial_close" || action.Action == "auto_close_long" {
+				switch action.Action {
+				case "open_long", "close_long", "partial_close", "auto_close_long":
 					side = "long"
-				} else if action.Action == "open_short" || action.Action == "close_short" || action.Action == "auto_close_short" {
+				case "open_short", "close_short", "auto_close_short":
 					side = "short"
 				}
 
@@ -405,9 +438,10 @@ func (l *DecisionLogger) AnalyzePerformance(lookbackCycles int) (*PerformanceAna
 
 			symbol := action.Symbol
 			side := ""
-			if action.Action == "open_long" || action.Action == "close_long" || action.Action == "partial_close" || action.Action == "auto_close_long" {
+			switch action.Action {
+			case "open_long", "close_long", "partial_close", "auto_close_long":
 				side = "long"
-			} else if action.Action == "open_short" || action.Action == "close_short" || action.Action == "auto_close_short" {
+			case "open_short", "close_short", "auto_close_short":
 				side = "short"
 			}
 
@@ -463,13 +497,21 @@ func (l *DecisionLogger) AnalyzePerformance(lookbackCycles int) (*PerformanceAna
 						actualQuantity = action.Quantity
 					}
 
-					// 计算本次平仓的盈亏（USDT）
+					// 计算本次平仓的盈亏（USDT）- 包含手续费
 					var pnl float64
 					if side == "long" {
 						pnl = actualQuantity * (action.Price - openPrice)
 					} else {
 						pnl = actualQuantity * (openPrice - action.Price)
 					}
+
+					// ⚠️ 扣除交易手续费（开仓 + 平仓各一次）
+					// 获取交易所费率（从record中获取，如果没有则使用默认值）
+					feeRate := getTakerFeeRate(record.Exchange)
+					openFee := actualQuantity * openPrice * feeRate     // 开仓手续费
+					closeFee := actualQuantity * action.Price * feeRate // 平仓手续费
+					totalFees := openFee + closeFee
+					pnl -= totalFees // 从盈亏中扣除手续费
 
 					// 🔧 BUG FIX：處理 partial_close 聚合邏輯
 					if action.Action == "partial_close" {

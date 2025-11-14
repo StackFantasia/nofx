@@ -10,6 +10,7 @@ import (
 	"nofx/market"
 	"nofx/mcp"
 	"nofx/pool"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -105,12 +106,12 @@ type AutoTrader struct {
 	peakPnLCache          map[string]float64 // 最高收益缓存 (symbol -> 峰值盈亏百分比)
 	peakPnLCacheMutex     sync.RWMutex       // 缓存读写锁
 	lastBalanceSyncTime   time.Time          // 上次余额同步时间
-	database              interface{}        // 数据库引用（用于自动更新余额）
+	database              any                // 数据库引用（用于自动更新余额）
 	userID                string             // 用户ID
 }
 
 // NewAutoTrader 创建自动交易器
-func NewAutoTrader(config AutoTraderConfig, database interface{}, userID string) (*AutoTrader, error) {
+func NewAutoTrader(config AutoTraderConfig, database any, userID string) (*AutoTrader, error) {
 	// 设置默认值
 	if config.ID == "" {
 		config.ID = "default_trader"
@@ -296,6 +297,7 @@ func (at *AutoTrader) runCycle() error {
 
 	// 创建决策记录
 	record := &logger.DecisionRecord{
+		Exchange:     at.config.Exchange, // 记录交易所类型，用于计算手续费
 		ExecutionLog: []string{},
 		Success:      true,
 	}
@@ -532,12 +534,12 @@ func (at *AutoTrader) buildTradingContext() (*decision.Context, error) {
 		unrealizedPnl := pos["unRealizedProfit"].(float64)
 		liquidationPrice := pos["liquidationPrice"].(float64)
 
-		// 计算占用保证金（估算）
+		// 计算占用保证金（基于开仓价）
 		leverage := 10 // 默认值，实际应该从持仓信息获取
 		if lev, ok := pos["leverage"].(float64); ok {
 			leverage = int(lev)
 		}
-		marginUsed := (quantity * markPrice) / float64(leverage)
+		marginUsed := (quantity * entryPrice) / float64(leverage)
 		totalMarginUsed += marginUsed
 
 		// 计算盈亏百分比（基于保证金，考虑杠杆）
@@ -639,17 +641,17 @@ func (at *AutoTrader) executeDecisionWithRecord(decision *decision.Decision, act
 		return at.executeOpenLongWithRecord(decision, actionRecord)
 	case "open_short":
 		return at.executeOpenShortWithRecord(decision, actionRecord)
-	case "close_long":
-		return at.executeCloseLongWithRecord(decision, actionRecord)
-	case "close_short":
-		return at.executeCloseShortWithRecord(decision, actionRecord)
+	// case "close_long":
+	// 	return at.executeCloseLongWithRecord(decision, actionRecord)
+	// case "close_short":
+	// 	return at.executeCloseShortWithRecord(decision, actionRecord)
 	case "update_stop_loss":
 		return at.executeUpdateStopLossWithRecord(decision, actionRecord)
 	case "update_take_profit":
 		return at.executeUpdateTakeProfitWithRecord(decision, actionRecord)
 	case "partial_close":
 		return at.executePartialCloseWithRecord(decision, actionRecord)
-	case "hold", "wait":
+	case "hold", "wait", "close_long", "close_short":
 		// 无需执行，仅记录
 		return nil
 	default:
@@ -891,7 +893,7 @@ func (at *AutoTrader) executeUpdateStopLossWithRecord(decision *decision.Decisio
 	}
 
 	// 查找目标持仓
-	var targetPosition map[string]interface{}
+	var targetPosition map[string]any
 	for _, pos := range positions {
 		symbol, _ := pos["symbol"].(string)
 		posAmt, _ := pos["positionAmt"].(float64)
@@ -975,7 +977,7 @@ func (at *AutoTrader) executeUpdateTakeProfitWithRecord(decision *decision.Decis
 	}
 
 	// 查找目标持仓
-	var targetPosition map[string]interface{}
+	var targetPosition map[string]any
 	for _, pos := range positions {
 		symbol, _ := pos["symbol"].(string)
 		posAmt, _ := pos["positionAmt"].(float64)
@@ -1120,7 +1122,7 @@ func (at *AutoTrader) executePartialCloseWithRecord(decision *decision.Decision,
 	}
 
 	// 执行平仓
-	var order map[string]interface{}
+	var order map[string]any
 	if positionSide == "LONG" {
 		order, err = at.trader.CloseLong(decision.Symbol, closeQuantity)
 	} else {
@@ -1271,7 +1273,7 @@ func (at *AutoTrader) GetAccountInfo() (map[string]interface{}, error) {
 	totalMarginUsed := 0.0
 	totalUnrealizedPnLCalculated := 0.0
 	for _, pos := range positions {
-		markPrice := pos["markPrice"].(float64)
+		entryPrice := pos["entryPrice"].(float64)
 		quantity := pos["positionAmt"].(float64)
 		if quantity < 0 {
 			quantity = -quantity
@@ -1283,7 +1285,7 @@ func (at *AutoTrader) GetAccountInfo() (map[string]interface{}, error) {
 		if lev, ok := pos["leverage"].(float64); ok {
 			leverage = int(lev)
 		}
-		marginUsed := (quantity * markPrice) / float64(leverage)
+		marginUsed := (quantity * entryPrice) / float64(leverage)
 		totalMarginUsed += marginUsed
 	}
 
@@ -1307,7 +1309,7 @@ func (at *AutoTrader) GetAccountInfo() (map[string]interface{}, error) {
 		marginUsedPct = (totalMarginUsed / totalEquity) * 100
 	}
 
-	return map[string]interface{}{
+	return map[string]any{
 		// 核心字段
 		"total_equity":      totalEquity,           // 账户净值 = wallet + unrealized
 		"wallet_balance":    totalWalletBalance,    // 钱包余额（不含未实现盈亏）
@@ -1334,7 +1336,7 @@ func (at *AutoTrader) GetPositions() ([]map[string]interface{}, error) {
 		return nil, fmt.Errorf("获取持仓失败: %w", err)
 	}
 
-	var result []map[string]interface{}
+	var result []map[string]any
 	for _, pos := range positions {
 		symbol := pos["symbol"].(string)
 		side := pos["side"].(string)
@@ -1352,13 +1354,13 @@ func (at *AutoTrader) GetPositions() ([]map[string]interface{}, error) {
 			leverage = int(lev)
 		}
 
-		// 计算占用保证金
-		marginUsed := (quantity * markPrice) / float64(leverage)
+		// 计算占用保证金（基于开仓价，而非当前价）
+		marginUsed := (quantity * entryPrice) / float64(leverage)
 
 		// 计算盈亏百分比（基于保证金）
 		pnlPct := calculatePnLPercentage(unrealizedPnl, marginUsed)
 
-		result = append(result, map[string]interface{}{
+		result = append(result, map[string]any{
 			"symbol":             symbol,
 			"side":               side,
 			"entry_price":        entryPrice,
@@ -1497,24 +1499,27 @@ func normalizeSymbol(symbol string) string {
 // 启动回撤监控
 func (at *AutoTrader) startDrawdownMonitor() {
 	at.monitorWg.Add(1)
-	go func() {
-		defer at.monitorWg.Done()
+	go at.drawdownMonitorLoop()
+}
 
-		ticker := time.NewTicker(5 * time.Second) // 每5秒检查一次
-		defer ticker.Stop()
+// drawdownMonitorLoop 回撤监控循环（在独立方法中，内部负责 Done）
+func (at *AutoTrader) drawdownMonitorLoop() {
+	defer at.monitorWg.Done()
 
-		log.Println("📊 启动持仓回撤监控（每5秒检查一次）")
+	ticker := time.NewTicker(3 * time.Second) // 每3秒检查一次
+	defer ticker.Stop()
 
-		for {
-			select {
-			case <-ticker.C:
-				at.checkPositionDrawdown()
-			case <-at.stopMonitorCh:
-				log.Println("⏹ 停止持仓回撤监控")
-				return
-			}
+	log.Println("📊 启动持仓回撤监控（每3秒检查一次）")
+
+	for {
+		select {
+		case <-ticker.C:
+			at.checkPositionDrawdown()
+		case <-at.stopMonitorCh:
+			log.Println("⏹ 停止持仓回撤监控")
+			return
 		}
-	}()
+	}
 }
 
 // 检查持仓回撤情况
@@ -1613,19 +1618,19 @@ func (at *AutoTrader) checkPositionDrawdown() {
 		}
 
 		// 低档止盈：peakPnLPct大于3.0，但currentPnLPct小于等于2.0，则触发平仓
-		if peakPnLPct > 3.0 && currentPnLPct <= 2.0 {
+		if peakPnLPct > 3.0 && currentPnLPct > 0 && currentPnLPct <= 2.0 {
 			closeFlag = true
 			closeReason = "低档止盈触发"
 		}
 
 		// 中档止盈：peakPnLPct大于5.0，但currentPnLPct小于等于peakPnLPct * 0.8，则触发平仓
-		if !closeFlag && peakPnLPct > 5.0 && currentPnLPct <= peakPnLPct*0.8 {
+		if !closeFlag && peakPnLPct > 5.0 && currentPnLPct > 0 && currentPnLPct <= peakPnLPct*0.8 {
 			closeFlag = true
 			closeReason = "中档止盈触发"
 		}
 
 		// 高档止盈：peakPnLPct大于10.0，但currentPnLPct小于等于peakPnLPct * 0.75，则触发平仓
-		if !closeFlag && peakPnLPct > 10.0 && currentPnLPct <= peakPnLPct*0.75 {
+		if !closeFlag && peakPnLPct > 10.0 && currentPnLPct > 0 && currentPnLPct <= peakPnLPct*0.75 {
 			closeFlag = true
 			closeReason = "高档止盈触发"
 		}
@@ -1635,37 +1640,150 @@ func (at *AutoTrader) checkPositionDrawdown() {
 				closeReason, symbol, side, currentPnLPct, peakPnLPct)
 
 			// 执行平仓
-			if err := at.emergencyClosePosition(symbol, side); err != nil {
+			if err := at.emergencyClosePosition(symbol, side, leverage); err != nil {
 				log.Printf("❌ 止盈/止损平仓失败 (%s %s): %v", symbol, side, err)
 			} else {
 				log.Printf("✅ 止盈/止损平仓成功: %s %s", symbol, side)
-				// 平仓后清理该持仓的缓存
-				at.ClearPeakPnLCache(symbol, side)
 			}
 		}
 	}
 }
 
 // 紧急平仓函数
-func (at *AutoTrader) emergencyClosePosition(symbol, side string) error {
+func (at *AutoTrader) emergencyClosePosition(symbol, side string, leverage int) error {
+	// 构造决策记录（尽量与 runCycle 中的记录格式保持一致）
+	record := &logger.DecisionRecord{
+		Exchange:     at.config.Exchange, // 记录交易所类型
+		ExecutionLog: []string{},
+		Success:      true,
+	}
+
+	// 尝试采集当前上下文快照（容错：若失败则记录错误信息）
+	ctx, err := at.buildTradingContext()
+	if err == nil && ctx != nil {
+		record.SystemPrompt = ""
+		record.InputPrompt = ""
+		record.CoTTrace = "emergency_close"
+		// 填充账户快照
+		record.AccountState = logger.AccountSnapshot{
+			TotalBalance:          ctx.Account.TotalEquity - ctx.Account.UnrealizedPnL,
+			AvailableBalance:      ctx.Account.AvailableBalance,
+			TotalUnrealizedProfit: ctx.Account.UnrealizedPnL,
+			PositionCount:         ctx.Account.PositionCount,
+			MarginUsedPct:         ctx.Account.MarginUsedPct,
+			InitialBalance:        at.initialBalance,
+		}
+		// 填充持仓快照
+		for _, p := range ctx.Positions {
+			record.Positions = append(record.Positions, logger.PositionSnapshot{
+				Symbol:           p.Symbol,
+				Side:             p.Side,
+				PositionAmt:      p.Quantity,
+				EntryPrice:       p.EntryPrice,
+				MarkPrice:        p.MarkPrice,
+				UnrealizedProfit: p.UnrealizedPnL,
+				Leverage:         float64(p.Leverage),
+				LiquidationPrice: p.LiquidationPrice,
+			})
+		}
+		// 候选币种列表
+		for _, c := range ctx.CandidateCoins {
+			record.CandidateCoins = append(record.CandidateCoins, c.Symbol)
+		}
+	} else {
+		record.ExecutionLog = append(record.ExecutionLog, fmt.Sprintf("⚠ 构建context失败: %v", err))
+	}
+
+	// 准备 action 记录
+	action := logger.DecisionAction{
+		Action:    fmt.Sprintf("close_%s", side),
+		Symbol:    symbol,
+		Quantity:  0,
+		Leverage:  leverage,
+		Price:     0,
+		Timestamp: time.Now(),
+		Success:   false,
+	}
+
+	// 尝试获取当前价格用于记录（非必要）
+	if md, e := market.Get(symbol); e == nil {
+		action.Price = md.CurrentPrice
+	}
+
 	switch side {
 	case "long":
 		order, err := at.trader.CloseLong(symbol, 0) // 0 = 全部平仓
 		if err != nil {
+			action.Error = err.Error()
+			record.ExecutionLog = append(record.ExecutionLog, fmt.Sprintf("❌ 紧急平多仓失败 (%s): %v", symbol, err))
+			record.Decisions = append(record.Decisions, action)
+			record.Success = false
+			_ = at.decisionLogger.LogDecision(record)
 			return err
 		}
+		// 记录order id（尽量兼容多种类型）
+		if order != nil {
+			action.OrderID = parseOrderID(order)
+		}
+		action.Success = true
+		record.ExecutionLog = append(record.ExecutionLog, fmt.Sprintf("✓ 紧急平多仓成功: %s 订单=%v", symbol, order["orderId"]))
+		// 清理缓存
+		at.ClearPeakPnLCache(symbol, "long")
 		log.Printf("✅ 紧急平多仓成功，订单ID: %v", order["orderId"])
 	case "short":
 		order, err := at.trader.CloseShort(symbol, 0) // 0 = 全部平仓
 		if err != nil {
+			action.Error = err.Error()
+			record.ExecutionLog = append(record.ExecutionLog, fmt.Sprintf("❌ 紧急平空仓失败 (%s): %v", symbol, err))
+			record.Decisions = append(record.Decisions, action)
+			record.Success = false
+			_ = at.decisionLogger.LogDecision(record)
 			return err
 		}
+		if order != nil {
+			action.OrderID = parseOrderID(order)
+		}
+		action.Success = true
+		record.ExecutionLog = append(record.ExecutionLog, fmt.Sprintf("✓ 紧急平空仓成功: %s 订单=%v", symbol, order["orderId"]))
+		// 清理缓存
+		at.ClearPeakPnLCache(symbol, "short")
 		log.Printf("✅ 紧急平空仓成功，订单ID: %v", order["orderId"])
 	default:
+		err := fmt.Errorf("未知的持仓方向: %s", side)
+		action.Error = err.Error()
+		record.ExecutionLog = append(record.ExecutionLog, fmt.Sprintf("❌ %v", err))
+		record.Decisions = append(record.Decisions, action)
+		record.Success = false
+		_ = at.decisionLogger.LogDecision(record)
 		return fmt.Errorf("未知的持仓方向: %s", side)
 	}
 
+	// 将 action 加入记录并保存
+	record.Decisions = append(record.Decisions, action)
+	if err := at.decisionLogger.LogDecision(record); err != nil {
+		log.Printf("⚠ 保存紧急平仓记录失败: %v", err)
+	}
+
 	return nil
+}
+
+// 辅助：从不同类型的 order["orderId"] 中解析出 int64（兼容 int64/float64/string）
+func parseOrderID(order map[string]any) int64 {
+	if order == nil {
+		return 0
+	}
+	if v, ok := order["orderId"].(int64); ok {
+		return v
+	}
+	if vf, ok := order["orderId"].(float64); ok {
+		return int64(vf)
+	}
+	if vs, ok := order["orderId"].(string); ok {
+		if id, err := strconv.ParseInt(vs, 10, 64); err == nil {
+			return id
+		}
+	}
+	return 0
 }
 
 // GetPeakPnLCache 获取最高收益缓存
