@@ -1647,9 +1647,7 @@ func (at *AutoTrader) checkPositionDrawdown() {
 		closeFlag := false
 		closeReason := ""
 
-		at.stopLossCacheMutex.RLock()
 		dynamicStopLossThreshold := at.GetStopLossCache(posKey)
-		at.peakPnLCacheMutex.RUnlock()
 
 		log.Printf("📊 止盈监控: %s %s | 收益: %.2f%% | 最高: %.2f%% | 止损: %.2f%%",
 			symbol, side, currentPnLPct, peakPnLPct, dynamicStopLossThreshold)
