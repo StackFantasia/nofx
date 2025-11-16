@@ -119,7 +119,7 @@ func (l *DecisionLogger) LogDecision(record *DecisionRecord) error {
 		record.Timestamp.Format("20060102_150405"),
 		record.CycleNumber)
 
-	filepath := filepath.Join(l.logDir, filename)
+	filePath := filepath.Join(l.logDir, filename)
 
 	// 序列化为JSON（带缩进，方便阅读）
 	data, err := json.MarshalIndent(record, "", "  ")
@@ -128,7 +128,7 @@ func (l *DecisionLogger) LogDecision(record *DecisionRecord) error {
 	}
 
 	// 写入文件（使用安全权限：只有所有者可读写）
-	if err := os.WriteFile(filepath, data, 0600); err != nil {
+	if err := os.WriteFile(filePath, data, 0600); err != nil {
 		return fmt.Errorf("写入决策记录失败: %w", err)
 	}
 
@@ -152,8 +152,8 @@ func (l *DecisionLogger) GetLatestRecords(n int) ([]*DecisionRecord, error) {
 			continue
 		}
 
-		filepath := filepath.Join(l.logDir, file.Name())
-		data, err := os.ReadFile(filepath)
+		filePath := filepath.Join(l.logDir, file.Name())
+		data, err := os.ReadFile(filePath)
 		if err != nil {
 			continue
 		}
@@ -186,8 +186,8 @@ func (l *DecisionLogger) GetRecordByDate(date time.Time) ([]*DecisionRecord, err
 	}
 
 	var records []*DecisionRecord
-	for _, filepath := range files {
-		data, err := os.ReadFile(filepath)
+	for _, filePath := range files {
+		data, err := os.ReadFile(filePath)
 		if err != nil {
 			continue
 		}
@@ -262,8 +262,8 @@ func (l *DecisionLogger) GetStatistics() (*Statistics, error) {
 			continue
 		}
 
-		filepath := filepath.Join(l.logDir, file.Name())
-		data, err := os.ReadFile(filepath)
+		filePath := filepath.Join(l.logDir, file.Name())
+		data, err := os.ReadFile(filePath)
 		if err != nil {
 			continue
 		}

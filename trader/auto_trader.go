@@ -85,7 +85,7 @@ type AutoTrader struct {
 	exchange              string // 交易平台名称
 	config                AutoTraderConfig
 	trader                Trader // 使用Trader接口（支持多平台）
-	mcpClient             mcp.AIClient
+	mcpClient             *mcp.Client
 	decisionLogger        logger.IDecisionLogger // 决策日志记录器
 	initialBalance        float64
 	dailyPnL              float64
@@ -134,12 +134,11 @@ func NewAutoTrader(config AutoTraderConfig, database any, userID string) (*AutoT
 	// 初始化AI
 	if config.AIModel == "custom" {
 		// 使用自定义API
-		mcpClient.SetAPIKey(config.CustomAPIKey, config.CustomAPIURL, config.CustomModelName)
+		mcpClient.SetCustomAPI(config.CustomAPIURL, config.CustomAPIKey, config.CustomModelName)
 		log.Printf("🤖 [%s] 使用自定义AI API: %s (模型: %s)", config.Name, config.CustomAPIURL, config.CustomModelName)
 	} else if config.UseQwen || config.AIModel == "qwen" {
 		// 使用Qwen (支持自定义URL和Model)
-		mcpClient = mcp.NewQwenClient()
-		mcpClient.SetAPIKey(config.QwenKey, config.CustomAPIURL, config.CustomModelName)
+		mcpClient.SetQwenAPIKey(config.QwenKey, config.CustomAPIURL, config.CustomModelName)
 		if config.CustomAPIURL != "" || config.CustomModelName != "" {
 			log.Printf("🤖 [%s] 使用阿里云Qwen AI (自定义URL: %s, 模型: %s)", config.Name, config.CustomAPIURL, config.CustomModelName)
 		} else {
@@ -147,8 +146,7 @@ func NewAutoTrader(config AutoTraderConfig, database any, userID string) (*AutoT
 		}
 	} else {
 		// 默认使用DeepSeek (支持自定义URL和Model)
-		mcpClient = mcp.NewDeepSeekClient()
-		mcpClient.SetAPIKey(config.DeepSeekKey, config.CustomAPIURL, config.CustomModelName)
+		mcpClient.SetDeepSeekAPIKey(config.DeepSeekKey, config.CustomAPIURL, config.CustomModelName)
 		if config.CustomAPIURL != "" || config.CustomModelName != "" {
 			log.Printf("🤖 [%s] 使用DeepSeek AI (自定义URL: %s, 模型: %s)", config.Name, config.CustomAPIURL, config.CustomModelName)
 		} else {
@@ -315,7 +313,10 @@ func (at *AutoTrader) runCycle() error {
 		log.Printf("⏸ 风险控制：暂停交易中，剩余 %.0f 分钟", remaining.Minutes())
 		record.Success = false
 		record.ErrorMessage = fmt.Sprintf("风险控制暂停中，剩余 %.0f 分钟", remaining.Minutes())
-		at.decisionLogger.LogDecision(record)
+		err := at.decisionLogger.LogDecision(record)
+		if err != nil {
+			return nil
+		}
 		return nil
 	}
 
@@ -331,7 +332,10 @@ func (at *AutoTrader) runCycle() error {
 	if err != nil {
 		record.Success = false
 		record.ErrorMessage = fmt.Sprintf("构建交易上下文失败: %v", err)
-		at.decisionLogger.LogDecision(record)
+		err := at.decisionLogger.LogDecision(record)
+		if err != nil {
+			return fmt.Errorf("构建交易上下文失败: %w", err)
+		}
 		return fmt.Errorf("构建交易上下文失败: %w", err)
 	}
 
@@ -405,22 +409,22 @@ func (at *AutoTrader) runCycle() error {
 
 	// 5. 调用AI获取完整决策
 	log.Printf("🤖 正在请求AI分析并决策... [模板: %s]", at.systemPromptTemplate)
-	decision, err := decision.GetFullDecisionWithCustomPrompt(ctx, at.mcpClient, at.customPrompt, at.overrideBasePrompt, at.systemPromptTemplate)
+	aiDecision, err := decision.GetFullDecisionWithCustomPrompt(ctx, at.mcpClient, at.customPrompt, at.overrideBasePrompt, at.systemPromptTemplate)
 
-	if decision != nil && decision.AIRequestDurationMs > 0 {
-		record.AIRequestDurationMs = decision.AIRequestDurationMs
+	if aiDecision != nil && aiDecision.AIRequestDurationMs > 0 {
+		record.AIRequestDurationMs = aiDecision.AIRequestDurationMs
 		log.Printf("⏱️ AI调用耗时: %.2f 秒", float64(record.AIRequestDurationMs)/1000)
 		record.ExecutionLog = append(record.ExecutionLog,
 			fmt.Sprintf("AI调用耗时: %d ms", record.AIRequestDurationMs))
 	}
 
 	// 即使有错误，也保存思维链、决策和输入prompt（用于debug）
-	if decision != nil {
-		record.SystemPrompt = decision.SystemPrompt // 保存系统提示词
-		record.InputPrompt = decision.UserPrompt
-		record.CoTTrace = decision.CoTTrace
-		if len(decision.Decisions) > 0 {
-			decisionJSON, _ := json.MarshalIndent(decision.Decisions, "", "  ")
+	if aiDecision != nil {
+		record.SystemPrompt = aiDecision.SystemPrompt // 保存系统提示词
+		record.InputPrompt = aiDecision.UserPrompt
+		record.CoTTrace = aiDecision.CoTTrace
+		if len(aiDecision.Decisions) > 0 {
+			decisionJSON, _ := json.MarshalIndent(aiDecision.Decisions, "", "  ")
 			record.DecisionJSON = string(decisionJSON)
 		}
 	}
@@ -430,23 +434,26 @@ func (at *AutoTrader) runCycle() error {
 		record.ErrorMessage = fmt.Sprintf("获取AI决策失败: %v", err)
 
 		// 打印系统提示词和AI思维链（即使有错误，也要输出以便调试）
-		if decision != nil {
+		if aiDecision != nil {
 			log.Print("\n" + strings.Repeat("=", 70) + "\n")
 			log.Printf("📋 系统提示词 [模板: %s] (错误情况)", at.systemPromptTemplate)
 			log.Println(strings.Repeat("=", 70))
-			log.Println(decision.SystemPrompt)
+			log.Println(aiDecision.SystemPrompt)
 			log.Println(strings.Repeat("=", 70))
 
-			if decision.CoTTrace != "" {
+			if aiDecision.CoTTrace != "" {
 				log.Print("\n" + strings.Repeat("-", 70) + "\n")
 				log.Println("💭 AI思维链分析（错误情况）:")
 				log.Println(strings.Repeat("-", 70))
-				log.Println(decision.CoTTrace)
+				log.Println(aiDecision.CoTTrace)
 				log.Println(strings.Repeat("-", 70))
 			}
 		}
 
-		at.decisionLogger.LogDecision(record)
+		err := at.decisionLogger.LogDecision(record)
+		if err != nil {
+			return fmt.Errorf("获取AI决策失败: %w", err)
+		}
 		return fmt.Errorf("获取AI决策失败: %w", err)
 	}
 
@@ -479,38 +486,40 @@ func (at *AutoTrader) runCycle() error {
 	log.Print(strings.Repeat("-", 70))
 
 	// 8. 对决策排序：确保先平仓后开仓（防止仓位叠加超限）
-	sortedDecisions := sortDecisionsByPriority(decision.Decisions)
+	if aiDecision != nil {
+		sortedDecisions := sortDecisionsByPriority(aiDecision.Decisions)
 
-	log.Println("🔄 执行顺序（已优化）: 先平仓→后开仓")
-	for i, d := range sortedDecisions {
-		log.Printf("  [%d] %s %s", i+1, d.Symbol, d.Action)
-	}
-	log.Println()
-
-	// 执行决策并记录结果
-	for _, d := range sortedDecisions {
-		actionRecord := logger.DecisionAction{
-			Action:    d.Action,
-			Symbol:    d.Symbol,
-			Quantity:  0,
-			Leverage:  d.Leverage,
-			Price:     0,
-			Timestamp: time.Now(),
-			Success:   false,
+		log.Println("🔄 执行顺序（已优化）: 先平仓→后开仓")
+		for i, d := range sortedDecisions {
+			log.Printf("  [%d] %s %s", i+1, d.Symbol, d.Action)
 		}
+		log.Println()
 
-		if err := at.executeDecisionWithRecord(&d, &actionRecord); err != nil {
-			log.Printf("❌ 执行决策失败 (%s %s): %v", d.Symbol, d.Action, err)
-			actionRecord.Error = err.Error()
-			record.ExecutionLog = append(record.ExecutionLog, fmt.Sprintf("❌ %s %s 失败: %v", d.Symbol, d.Action, err))
-		} else {
-			actionRecord.Success = true
-			record.ExecutionLog = append(record.ExecutionLog, fmt.Sprintf("✓ %s %s 成功", d.Symbol, d.Action))
-			// 成功执行后短暂延迟
-			time.Sleep(1 * time.Second)
+		// 执行决策并记录结果
+		for _, d := range sortedDecisions {
+			actionRecord := logger.DecisionAction{
+				Action:    d.Action,
+				Symbol:    d.Symbol,
+				Quantity:  0,
+				Leverage:  d.Leverage,
+				Price:     0,
+				Timestamp: time.Now(),
+				Success:   false,
+			}
+
+			if err := at.executeDecisionWithRecord(&d, &actionRecord); err != nil {
+				log.Printf("❌ 执行决策失败 (%s %s): %v", d.Symbol, d.Action, err)
+				actionRecord.Error = err.Error()
+				record.ExecutionLog = append(record.ExecutionLog, fmt.Sprintf("❌ %s %s 失败: %v", d.Symbol, d.Action, err))
+			} else {
+				actionRecord.Success = true
+				record.ExecutionLog = append(record.ExecutionLog, fmt.Sprintf("✓ %s %s 成功", d.Symbol, d.Action))
+				// 成功执行后短暂延迟
+				time.Sleep(1 * time.Second)
+			}
+
+			record.Decisions = append(record.Decisions, actionRecord)
 		}
-
-		record.Decisions = append(record.Decisions, actionRecord)
 	}
 
 	// 9. 更新持仓快照（用于下一周期检测被动平仓）
