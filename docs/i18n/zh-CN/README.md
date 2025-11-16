@@ -279,8 +279,8 @@ nano config.json  # 或使用其他编辑器
 #### 步骤2：一键启动
 ```bash
 # 方式1：使用便捷脚本（推荐）
-chmod +x start.sh
-./start.sh start --build
+chmod +x scripts/start.sh
+./scripts/start.sh start --build
 
 
 # 方式2：直接使用docker compose
@@ -295,10 +295,10 @@ docker compose up -d --build
 
 #### 管理你的系统
 ```bash
-./start.sh logs      # 查看日志
-./start.sh status    # 检查状态
-./start.sh stop      # 停止服务
-./start.sh restart   # 重启服务
+./scripts/start.sh logs      # 查看日志
+./scripts/start.sh status    # 检查状态
+./scripts/start.sh stop      # 停止服务
+./scripts/start.sh restart   # 重启服务
 ```
 
 **📖 详细的Docker部署教程、故障排查和高级配置：**

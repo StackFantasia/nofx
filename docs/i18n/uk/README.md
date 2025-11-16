@@ -361,8 +361,8 @@ nano config.json  # або використайте будь-який редак
 #### Крок 2: Запуск в один клік
 ```bash
 # Варіант 1: Використайте зручний скрипт (Рекомендується)
-chmod +x start.sh
-./start.sh start --build
+chmod +x scripts/start.sh
+./scripts/start.sh start --build
 
 # Варіант 2: Використайте docker compose безпосередньо
 # Цей проект використовує синтаксис Docker Compose V2 (з пробілами)
@@ -377,10 +377,10 @@ docker compose up -d --build
 
 #### Керування вашою системою
 ```bash
-./start.sh logs      # Переглянути логи
-./start.sh status    # Перевірити статус
-./start.sh stop      # Зупинити сервіси
-./start.sh restart   # Перезапустити сервіси
+./scripts/start.sh logs      # Переглянути логи
+./scripts/start.sh status    # Перевірити статус
+./scripts/start.sh stop      # Зупинити сервіси
+./scripts/start.sh restart   # Перезапустити сервіси
 ```
 
 **📖 Детальний посібник з розгортання Docker, усунення несправностей та розширеної конфігурації:**
