@@ -267,8 +267,8 @@ export function AITradersPage({ onTraderSelect }: AITradersPageProps) {
     if (!editingTrader) return
 
     try {
-      const model = enabledModels?.find((m) => m.id === data.ai_model_id)
-      const exchange = enabledExchanges?.find((e) => e.id === data.exchange_id)
+      const model = allModels?.find((m) => m.id === data.ai_model_id)
+      const exchange = allExchanges?.find((e) => e.id === data.exchange_id)
 
       if (!model) {
         toast.error(t('modelConfigNotExist', language))
