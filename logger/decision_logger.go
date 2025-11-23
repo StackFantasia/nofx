@@ -81,9 +81,9 @@ type DecisionAction struct {
 	Error     string    `json:"error"`     // 错误信息
 
 	// 调整参数（用于前端显示）
-	NewStopLoss     float64 `json:"new_stop_loss,omitempty"`     // 新止损价格（update_stop_loss 时使用）
-	NewTakeProfit   float64 `json:"new_take_profit,omitempty"`   // 新止盈价格（update_take_profit 时使用）
-	ClosePercentage float64 `json:"close_percentage,omitempty"`  // 平仓百分比（partial_close 时使用，0-100）
+	NewStopLoss     float64 `json:"new_stop_loss,omitempty"`    // 新止损价格（update_stop_loss 时使用）
+	NewTakeProfit   float64 `json:"new_take_profit,omitempty"`  // 新止盈价格（update_take_profit 时使用）
+	ClosePercentage float64 `json:"close_percentage,omitempty"` // 平仓百分比（partial_close 时使用，0-100）
 }
 
 // IDecisionLogger 决策日志记录器接口
@@ -116,13 +116,13 @@ type IDecisionLogger interface {
 
 // OpenPosition 记录开仓信息（用于主动维护缓存）
 type OpenPosition struct {
-	Symbol    string
-	Side      string  // long/short
-	Quantity  float64
+	Symbol     string
+	Side       string // long/short
+	Quantity   float64
 	EntryPrice float64
-	Leverage  int
-	OpenTime  time.Time
-	Exchange  string
+	Leverage   int
+	OpenTime   time.Time
+	Exchange   string
 }
 
 // EquityPoint 账户净值记录点
@@ -135,12 +135,12 @@ type EquityPoint struct {
 type DecisionLogger struct {
 	logDir        string
 	cycleNumber   int
-	tradesCache   []TradeOutcome       // 交易缓存（最新的在前）
-	tradeCacheSet map[string]bool      // 已缓存交易的 Set（去重用）
-	equityCache   []EquityPoint        // 净值历史缓存（最新的在前）
-	cacheMutex    sync.RWMutex         // 缓存读写锁
-	maxCacheSize  int                  // 最大缓存条数
-	maxEquitySize int                  // 最大净值缓存条数
+	tradesCache   []TradeOutcome           // 交易缓存（最新的在前）
+	tradeCacheSet map[string]bool          // 已缓存交易的 Set（去重用）
+	equityCache   []EquityPoint            // 净值历史缓存（最新的在前）
+	cacheMutex    sync.RWMutex             // 缓存读写锁
+	maxCacheSize  int                      // 最大缓存条数
+	maxEquitySize int                      // 最大净值缓存条数
 	openPositions map[string]*OpenPosition // 当前开仓（用于主动维护）
 	positionMutex sync.RWMutex             // 持仓读写锁
 }
@@ -531,7 +531,7 @@ func (l *DecisionLogger) AnalyzePerformance(lookbackCycles int) (*PerformanceAna
 	}
 
 	// 追踪持仓状态：symbol_side -> {side, openPrice, openTime, quantity, leverage}
-	openPositions := make(map[string]map[string]interface{})
+	openPositions := make(map[string]map[string]any)
 
 	// 为了避免开仓记录在窗口外导致匹配失败，需要先从所有历史记录中找出未平仓的持仓
 	// 获取更多历史记录来构建完整的持仓状态（使用更大的窗口）
@@ -567,7 +567,7 @@ func (l *DecisionLogger) AnalyzePerformance(lookbackCycles int) (*PerformanceAna
 				switch action.Action {
 				case "open_long", "open_short":
 					// 记录开仓
-					openPositions[posKey] = map[string]interface{}{
+					openPositions[posKey] = map[string]any{
 						"side":      side,
 						"openPrice": action.Price,
 						"openTime":  action.Timestamp,
@@ -614,7 +614,7 @@ func (l *DecisionLogger) AnalyzePerformance(lookbackCycles int) (*PerformanceAna
 			switch action.Action {
 			case "open_long", "open_short":
 				// 更新开仓记录（可能已经在预填充时记录过了）
-				openPositions[posKey] = map[string]interface{}{
+				openPositions[posKey] = map[string]any{
 					"side":               side,
 					"openPrice":          action.Price,
 					"openTime":           action.Timestamp,
@@ -661,7 +661,7 @@ func (l *DecisionLogger) AnalyzePerformance(lookbackCycles int) (*PerformanceAna
 					// ⚠️ 扣除交易手续费（开仓 + 平仓各一次）
 					// 获取交易所费率（从record中获取，如果没有则使用默认值）
 					feeRate := getTakerFeeRate(record.Exchange)
-					openFee := actualQuantity * openPrice * feeRate   // 开仓手续费
+					openFee := actualQuantity * openPrice * feeRate     // 开仓手续费
 					closeFee := actualQuantity * action.Price * feeRate // 平仓手续费
 					totalFees := openFee + closeFee
 					pnl -= totalFees // 从盈亏中扣除手续费
@@ -1465,8 +1465,9 @@ func (l *DecisionLogger) calculateSharpeRatioFromEquity() float64 {
 // 4. PromptHash 过滤：可选，默认显示所有交易（filterByPrompt=false）
 //
 // 参数:
-//   tradeLimit: 返回给前端的交易列表长度（用户显示偏好，如 10/20/50/100）
-//   filterByPrompt: 是否按当前 PromptHash 过滤交易（默认 false 显示所有）
+//
+//	tradeLimit: 返回给前端的交易列表长度（用户显示偏好，如 10/20/50/100）
+//	filterByPrompt: 是否按当前 PromptHash 过滤交易（默认 false 显示所有）
 //
 // 返回:
 //   - total_trades: 分析的交易总数（固定基于 AIAnalysisSampleSize 或缓存全部）

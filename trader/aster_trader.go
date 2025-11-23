@@ -105,10 +105,10 @@ func (t *AsterTrader) getPrecision(symbol string) (SymbolPrecision, error) {
 	body, _ := io.ReadAll(resp.Body)
 	var info struct {
 		Symbols []struct {
-			Symbol            string                   `json:"symbol"`
-			PricePrecision    int                      `json:"pricePrecision"`
-			QuantityPrecision int                      `json:"quantityPrecision"`
-			Filters           []map[string]interface{} `json:"filters"`
+			Symbol            string           `json:"symbol"`
+			PricePrecision    int              `json:"pricePrecision"`
+			QuantityPrecision int              `json:"quantityPrecision"`
+			Filters           []map[string]any `json:"filters"`
 		} `json:"symbols"`
 	}
 
@@ -210,7 +210,7 @@ func (t *AsterTrader) formatFloatWithPrecision(value float64, precision int) str
 }
 
 // normalizeAndStringify 对参数进行规范化并序列化为JSON字符串（按key排序）
-func (t *AsterTrader) normalizeAndStringify(params map[string]interface{}) (string, error) {
+func (t *AsterTrader) normalizeAndStringify(params map[string]any) (string, error) {
 	normalized, err := t.normalize(params)
 	if err != nil {
 		return "", err
@@ -223,15 +223,15 @@ func (t *AsterTrader) normalizeAndStringify(params map[string]interface{}) (stri
 }
 
 // normalize 递归规范化参数（按key排序，所有值转为字符串）
-func (t *AsterTrader) normalize(v interface{}) (interface{}, error) {
+func (t *AsterTrader) normalize(v any) (any, error) {
 	switch val := v.(type) {
-	case map[string]interface{}:
+	case map[string]any:
 		keys := make([]string, 0, len(val))
 		for k := range val {
 			keys = append(keys, k)
 		}
 		sort.Strings(keys)
-		newMap := make(map[string]interface{}, len(keys))
+		newMap := make(map[string]any, len(keys))
 		for _, k := range keys {
 			nv, err := t.normalize(val[k])
 			if err != nil {
@@ -240,8 +240,8 @@ func (t *AsterTrader) normalize(v interface{}) (interface{}, error) {
 			newMap[k] = nv
 		}
 		return newMap, nil
-	case []interface{}:
-		out := make([]interface{}, 0, len(val))
+	case []any:
+		out := make([]any, 0, len(val))
 		for _, it := range val {
 			nv, err := t.normalize(it)
 			if err != nil {
@@ -267,7 +267,7 @@ func (t *AsterTrader) normalize(v interface{}) (interface{}, error) {
 }
 
 // sign 对请求参数进行签名
-func (t *AsterTrader) sign(params map[string]interface{}, nonce uint64) error {
+func (t *AsterTrader) sign(params map[string]any, nonce uint64) error {
 	// 添加时间戳和接收窗口
 	params["recvWindow"] = "50000"
 	params["timestamp"] = strconv.FormatInt(time.Now().UnixNano()/int64(time.Millisecond), 10)
@@ -328,14 +328,14 @@ func (t *AsterTrader) sign(params map[string]interface{}, nonce uint64) error {
 }
 
 // request 发送HTTP请求（带重试机制）
-func (t *AsterTrader) request(method, endpoint string, params map[string]interface{}) ([]byte, error) {
+func (t *AsterTrader) request(method, endpoint string, params map[string]any) ([]byte, error) {
 	const maxRetries = 3
 	var lastErr error
 
 	for attempt := 1; attempt <= maxRetries; attempt++ {
 		// 每次重试都生成新的nonce和签名
 		nonce := t.genNonce()
-		paramsCopy := make(map[string]interface{})
+		paramsCopy := make(map[string]any)
 		for k, v := range params {
 			paramsCopy[k] = v
 		}
@@ -371,7 +371,7 @@ func (t *AsterTrader) request(method, endpoint string, params map[string]interfa
 }
 
 // doRequest 执行实际的HTTP请求
-func (t *AsterTrader) doRequest(method, endpoint string, params map[string]interface{}) ([]byte, error) {
+func (t *AsterTrader) doRequest(method, endpoint string, params map[string]any) ([]byte, error) {
 	fullURL := t.baseURL + endpoint
 	method = strings.ToUpper(method)
 
@@ -432,14 +432,14 @@ func (t *AsterTrader) doRequest(method, endpoint string, params map[string]inter
 }
 
 // GetBalance 获取账户余额
-func (t *AsterTrader) GetBalance() (map[string]interface{}, error) {
-	params := make(map[string]interface{})
+func (t *AsterTrader) GetBalance() (map[string]any, error) {
+	params := make(map[string]any)
 	body, err := t.request("GET", "/fapi/v3/balance", params)
 	if err != nil {
 		return nil, err
 	}
 
-	var balances []map[string]interface{}
+	var balances []map[string]any
 	if err := json.Unmarshal(body, &balances); err != nil {
 		return nil, err
 	}
@@ -477,7 +477,7 @@ func (t *AsterTrader) GetBalance() (map[string]interface{}, error) {
 	if err != nil {
 		log.Printf("⚠️  获取持仓信息失败: %v", err)
 		// fallback: 无法获取持仓时使用简单计算
-		return map[string]interface{}{
+		return map[string]any{
 			"totalWalletBalance":    crossWalletBalance,
 			"availableBalance":      availableBalance,
 			"totalUnrealizedProfit": crossUnPnl,
@@ -512,7 +512,7 @@ func (t *AsterTrader) GetBalance() (map[string]interface{}, error) {
 	totalEquity := availableBalance + totalMarginUsed
 	totalWalletBalance := totalEquity - realUnrealizedPnl
 
-	return map[string]interface{}{
+	return map[string]any{
 		"totalWalletBalance":    totalWalletBalance, // 钱包余额（不含未实现盈亏）
 		"availableBalance":      availableBalance,   // 可用余额
 		"totalUnrealizedProfit": realUnrealizedPnl,  // 未实现盈亏（从持仓累加）
@@ -520,19 +520,19 @@ func (t *AsterTrader) GetBalance() (map[string]interface{}, error) {
 }
 
 // GetPositions 获取持仓信息
-func (t *AsterTrader) GetPositions() ([]map[string]interface{}, error) {
-	params := make(map[string]interface{})
+func (t *AsterTrader) GetPositions() ([]map[string]any, error) {
+	params := make(map[string]any)
 	body, err := t.request("GET", "/fapi/v3/positionRisk", params)
 	if err != nil {
 		return nil, err
 	}
 
-	var positions []map[string]interface{}
+	var positions []map[string]any
 	if err := json.Unmarshal(body, &positions); err != nil {
 		return nil, err
 	}
 
-	result := []map[string]interface{}{}
+	result := []map[string]any{}
 	for _, pos := range positions {
 		posAmtStr, ok := pos["positionAmt"].(string)
 		if !ok {
@@ -558,7 +558,7 @@ func (t *AsterTrader) GetPositions() ([]map[string]interface{}, error) {
 		}
 
 		// 返回与Binance相同的字段名
-		result = append(result, map[string]interface{}{
+		result = append(result, map[string]any{
 			"symbol":           pos["symbol"],
 			"side":             side,
 			"positionAmt":      posAmt,
@@ -574,7 +574,7 @@ func (t *AsterTrader) GetPositions() ([]map[string]interface{}, error) {
 }
 
 // OpenLong 开多单
-func (t *AsterTrader) OpenLong(symbol string, quantity float64, leverage int) (map[string]interface{}, error) {
+func (t *AsterTrader) OpenLong(symbol string, quantity float64, leverage int) (map[string]any, error) {
 	// 开仓前先取消所有挂单,防止残留挂单导致仓位叠加
 	if err := t.CancelAllOrders(symbol); err != nil {
 		log.Printf("  ⚠ 取消挂单失败(继续开仓): %v", err)
@@ -617,7 +617,7 @@ func (t *AsterTrader) OpenLong(symbol string, quantity float64, leverage int) (m
 	log.Printf("  📏 精度处理: 价格 %.8f -> %s (精度=%d), 数量 %.8f -> %s (精度=%d)",
 		limitPrice, priceStr, prec.PricePrecision, quantity, qtyStr, prec.QuantityPrecision)
 
-	params := map[string]interface{}{
+	params := map[string]any{
 		"symbol":       symbol,
 		"positionSide": "BOTH",
 		"type":         "LIMIT",
@@ -632,7 +632,7 @@ func (t *AsterTrader) OpenLong(symbol string, quantity float64, leverage int) (m
 		return nil, err
 	}
 
-	var result map[string]interface{}
+	var result map[string]any
 	if err := json.Unmarshal(body, &result); err != nil {
 		return nil, err
 	}
@@ -641,7 +641,7 @@ func (t *AsterTrader) OpenLong(symbol string, quantity float64, leverage int) (m
 }
 
 // OpenShort 开空单
-func (t *AsterTrader) OpenShort(symbol string, quantity float64, leverage int) (map[string]interface{}, error) {
+func (t *AsterTrader) OpenShort(symbol string, quantity float64, leverage int) (map[string]any, error) {
 	// 开仓前先取消所有挂单,防止残留挂单导致仓位叠加
 	if err := t.CancelAllOrders(symbol); err != nil {
 		log.Printf("  ⚠ 取消挂单失败(继续开仓): %v", err)
@@ -684,7 +684,7 @@ func (t *AsterTrader) OpenShort(symbol string, quantity float64, leverage int) (
 	log.Printf("  📏 精度处理: 价格 %.8f -> %s (精度=%d), 数量 %.8f -> %s (精度=%d)",
 		limitPrice, priceStr, prec.PricePrecision, quantity, qtyStr, prec.QuantityPrecision)
 
-	params := map[string]interface{}{
+	params := map[string]any{
 		"symbol":       symbol,
 		"positionSide": "BOTH",
 		"type":         "LIMIT",
@@ -699,7 +699,7 @@ func (t *AsterTrader) OpenShort(symbol string, quantity float64, leverage int) (
 		return nil, err
 	}
 
-	var result map[string]interface{}
+	var result map[string]any
 	if err := json.Unmarshal(body, &result); err != nil {
 		return nil, err
 	}
@@ -708,7 +708,7 @@ func (t *AsterTrader) OpenShort(symbol string, quantity float64, leverage int) (
 }
 
 // CloseLong 平多单
-func (t *AsterTrader) CloseLong(symbol string, quantity float64) (map[string]interface{}, error) {
+func (t *AsterTrader) CloseLong(symbol string, quantity float64) (map[string]any, error) {
 	// 如果数量为0，获取全部持仓数量
 	if quantity == 0 {
 		positions, err := t.GetPositions()
@@ -757,7 +757,7 @@ func (t *AsterTrader) CloseLong(symbol string, quantity float64) (map[string]int
 	log.Printf("  📏 精度处理: 价格 %.8f -> %s (精度=%d), 数量 %.8f -> %s (精度=%d)",
 		limitPrice, priceStr, prec.PricePrecision, quantity, qtyStr, prec.QuantityPrecision)
 
-	params := map[string]interface{}{
+	params := map[string]any{
 		"symbol":       symbol,
 		"positionSide": "BOTH",
 		"type":         "LIMIT",
@@ -772,7 +772,7 @@ func (t *AsterTrader) CloseLong(symbol string, quantity float64) (map[string]int
 		return nil, err
 	}
 
-	var result map[string]interface{}
+	var result map[string]any
 	if err := json.Unmarshal(body, &result); err != nil {
 		return nil, err
 	}
@@ -791,7 +791,7 @@ func (t *AsterTrader) CloseLong(symbol string, quantity float64) (map[string]int
 }
 
 // CloseShort 平空单
-func (t *AsterTrader) CloseShort(symbol string, quantity float64) (map[string]interface{}, error) {
+func (t *AsterTrader) CloseShort(symbol string, quantity float64) (map[string]any, error) {
 	// 如果数量为0，获取全部持仓数量
 	if quantity == 0 {
 		positions, err := t.GetPositions()
@@ -841,7 +841,7 @@ func (t *AsterTrader) CloseShort(symbol string, quantity float64) (map[string]in
 	log.Printf("  📏 精度处理: 价格 %.8f -> %s (精度=%d), 数量 %.8f -> %s (精度=%d)",
 		limitPrice, priceStr, prec.PricePrecision, quantity, qtyStr, prec.QuantityPrecision)
 
-	params := map[string]interface{}{
+	params := map[string]any{
 		"symbol":       symbol,
 		"positionSide": "BOTH",
 		"type":         "LIMIT",
@@ -856,7 +856,7 @@ func (t *AsterTrader) CloseShort(symbol string, quantity float64) (map[string]in
 		return nil, err
 	}
 
-	var result map[string]interface{}
+	var result map[string]any
 	if err := json.Unmarshal(body, &result); err != nil {
 		return nil, err
 	}
@@ -883,7 +883,7 @@ func (t *AsterTrader) SetMarginMode(symbol string, isCrossMargin bool) error {
 		marginType = "ISOLATED"
 	}
 
-	params := map[string]interface{}{
+	params := map[string]any{
 		"symbol":     symbol,
 		"marginType": marginType,
 	}
@@ -923,7 +923,7 @@ func (t *AsterTrader) SetMarginMode(symbol string, isCrossMargin bool) error {
 
 // SetLeverage 设置杠杆倍数
 func (t *AsterTrader) SetLeverage(symbol string, leverage int) error {
-	params := map[string]interface{}{
+	params := map[string]any{
 		"symbol":   symbol,
 		"leverage": leverage,
 	}
@@ -946,7 +946,7 @@ func (t *AsterTrader) GetMarketPrice(symbol string) (float64, error) {
 		return 0, fmt.Errorf("HTTP %d: %s", resp.StatusCode, string(body))
 	}
 
-	var result map[string]interface{}
+	var result map[string]any
 	if err := json.Unmarshal(body, &result); err != nil {
 		return 0, err
 	}
@@ -994,7 +994,7 @@ func (t *AsterTrader) SetStopLoss(symbol string, positionSide string, quantity, 
 	}
 	limitPriceStr := t.formatFloatWithPrecision(formattedLimitPrice, prec.PricePrecision)
 
-	params := map[string]interface{}{
+	params := map[string]any{
 		"symbol":       symbol,
 		"positionSide": "BOTH",
 		"type":         "STOP",
@@ -1044,7 +1044,7 @@ func (t *AsterTrader) SetTakeProfit(symbol string, positionSide string, quantity
 	}
 	limitPriceStr := t.formatFloatWithPrecision(formattedLimitPrice, prec.PricePrecision)
 
-	params := map[string]interface{}{
+	params := map[string]any{
 		"symbol":       symbol,
 		"positionSide": "BOTH",
 		"type":         "TAKE_PROFIT",
@@ -1062,7 +1062,7 @@ func (t *AsterTrader) SetTakeProfit(symbol string, positionSide string, quantity
 // CancelStopLossOrders 仅取消止损单（不影响止盈单）
 func (t *AsterTrader) CancelStopLossOrders(symbol string) error {
 	// 获取该币种的所有未完成订单
-	params := map[string]interface{}{
+	params := map[string]any{
 		"symbol": symbol,
 	}
 
@@ -1071,7 +1071,7 @@ func (t *AsterTrader) CancelStopLossOrders(symbol string) error {
 		return fmt.Errorf("获取未完成订单失败: %w", err)
 	}
 
-	var orders []map[string]interface{}
+	var orders []map[string]any
 	if err := json.Unmarshal(body, &orders); err != nil {
 		return fmt.Errorf("解析订单数据失败: %w", err)
 	}
@@ -1086,7 +1086,7 @@ func (t *AsterTrader) CancelStopLossOrders(symbol string) error {
 		if orderType == "STOP_MARKET" || orderType == "STOP" {
 			orderID, _ := order["orderId"].(float64)
 			positionSide, _ := order["positionSide"].(string)
-			cancelParams := map[string]interface{}{
+			cancelParams := map[string]any{
 				"symbol":  symbol,
 				"orderId": int64(orderID),
 			}
@@ -1121,7 +1121,7 @@ func (t *AsterTrader) CancelStopLossOrders(symbol string) error {
 // CancelTakeProfitOrders 仅取消止盈单（不影响止损单）
 func (t *AsterTrader) CancelTakeProfitOrders(symbol string) error {
 	// 获取该币种的所有未完成订单
-	params := map[string]interface{}{
+	params := map[string]any{
 		"symbol": symbol,
 	}
 
@@ -1130,7 +1130,7 @@ func (t *AsterTrader) CancelTakeProfitOrders(symbol string) error {
 		return fmt.Errorf("获取未完成订单失败: %w", err)
 	}
 
-	var orders []map[string]interface{}
+	var orders []map[string]any
 	if err := json.Unmarshal(body, &orders); err != nil {
 		return fmt.Errorf("解析订单数据失败: %w", err)
 	}
@@ -1145,7 +1145,7 @@ func (t *AsterTrader) CancelTakeProfitOrders(symbol string) error {
 		if orderType == "TAKE_PROFIT_MARKET" || orderType == "TAKE_PROFIT" {
 			orderID, _ := order["orderId"].(float64)
 			positionSide, _ := order["positionSide"].(string)
-			cancelParams := map[string]interface{}{
+			cancelParams := map[string]any{
 				"symbol":  symbol,
 				"orderId": int64(orderID),
 			}
@@ -1179,7 +1179,7 @@ func (t *AsterTrader) CancelTakeProfitOrders(symbol string) error {
 
 // CancelAllOrders 取消所有订单
 func (t *AsterTrader) CancelAllOrders(symbol string) error {
-	params := map[string]interface{}{
+	params := map[string]any{
 		"symbol": symbol,
 	}
 
@@ -1190,7 +1190,7 @@ func (t *AsterTrader) CancelAllOrders(symbol string) error {
 // CancelStopOrders 取消该币种的止盈/止损单（用于调整止盈止损位置）
 func (t *AsterTrader) CancelStopOrders(symbol string) error {
 	// 获取该币种的所有未完成订单
-	params := map[string]interface{}{
+	params := map[string]any{
 		"symbol": symbol,
 	}
 
@@ -1199,7 +1199,7 @@ func (t *AsterTrader) CancelStopOrders(symbol string) error {
 		return fmt.Errorf("获取未完成订单失败: %w", err)
 	}
 
-	var orders []map[string]interface{}
+	var orders []map[string]any
 	if err := json.Unmarshal(body, &orders); err != nil {
 		return fmt.Errorf("解析订单数据失败: %w", err)
 	}
@@ -1216,7 +1216,7 @@ func (t *AsterTrader) CancelStopOrders(symbol string) error {
 			orderType == "TAKE_PROFIT" {
 
 			orderID, _ := order["orderId"].(float64)
-			cancelParams := map[string]interface{}{
+			cancelParams := map[string]any{
 				"symbol":  symbol,
 				"orderId": int64(orderID),
 			}
@@ -1253,14 +1253,14 @@ func (t *AsterTrader) FormatQuantity(symbol string, quantity float64) (string, e
 
 // GetRecentFills 获取最近的成交记录
 // Aster 使用 Binance 兼容 API: /fapi/v1/userTrades
-func (t *AsterTrader) GetRecentFills(symbol string, startTime int64, endTime int64) ([]map[string]interface{}, error) {
+func (t *AsterTrader) GetRecentFills(symbol string, startTime int64, endTime int64) ([]map[string]any, error) {
 	// endTime = 0 表示当前时间
 	if endTime == 0 {
 		endTime = time.Now().UnixMilli()
 	}
 
 	// 构建请求参数
-	params := map[string]interface{}{
+	params := map[string]any{
 		"symbol":    symbol,
 		"startTime": startTime,
 		"endTime":   endTime,
@@ -1274,13 +1274,13 @@ func (t *AsterTrader) GetRecentFills(symbol string, startTime int64, endTime int
 	}
 
 	// 解析响应
-	var trades []map[string]interface{}
+	var trades []map[string]any
 	if err := json.Unmarshal(body, &trades); err != nil {
 		return nil, fmt.Errorf("解析成交记录失败: %w", err)
 	}
 
 	// 转换为统一格式
-	var result []map[string]interface{}
+	var result []map[string]any
 
 	for _, trade := range trades {
 		// 解析价格和数量
@@ -1324,7 +1324,7 @@ func (t *AsterTrader) GetRecentFills(symbol string, startTime int64, endTime int
 			}
 		}
 
-		result = append(result, map[string]interface{}{
+		result = append(result, map[string]any{
 			"symbol":    symbol,
 			"side":      side,
 			"price":     price,

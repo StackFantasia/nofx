@@ -111,12 +111,12 @@ type AutoTrader struct {
 	peakPnLCache          map[string]float64               // 最高收益缓存 (symbol -> 峰值盈亏百分比)
 	peakPnLCacheMutex     sync.RWMutex                     // 缓存读写锁
 	lastBalanceSyncTime   time.Time                        // 上次余额同步时间
-	database              interface{}                      // 数据库引用（用于自动更新余额）
+	database              any                              // 数据库引用（用于自动更新余额）
 	userID                string                           // 用户ID
 }
 
 // NewAutoTrader 创建自动交易器
-func NewAutoTrader(config AutoTraderConfig, database interface{}, userID string) (*AutoTrader, error) {
+func NewAutoTrader(config AutoTraderConfig, database any, userID string) (*AutoTrader, error) {
 	// 设置默认值
 	if config.ID == "" {
 		config.ID = "default_trader"
@@ -1062,7 +1062,7 @@ func (at *AutoTrader) executeUpdateStopLossWithRecord(decision *decision.Decisio
 	}
 
 	// 查找目标持仓
-	var targetPosition map[string]interface{}
+	var targetPosition map[string]any
 	for _, pos := range positions {
 		symbol, _ := pos["symbol"].(string)
 		posAmt, _ := pos["positionAmt"].(float64)
@@ -1194,7 +1194,7 @@ func (at *AutoTrader) executeUpdateTakeProfitWithRecord(decision *decision.Decis
 	}
 
 	// 查找目标持仓
-	var targetPosition map[string]interface{}
+	var targetPosition map[string]any
 	for _, pos := range positions {
 		symbol, _ := pos["symbol"].(string)
 		posAmt, _ := pos["positionAmt"].(float64)
@@ -1313,7 +1313,7 @@ func (at *AutoTrader) executePartialCloseWithRecord(decision *decision.Decision,
 	}
 
 	// 查找目标持仓
-	var targetPosition map[string]interface{}
+	var targetPosition map[string]any
 	for _, pos := range positions {
 		symbol, _ := pos["symbol"].(string)
 		posAmt, _ := pos["positionAmt"].(float64)
@@ -1372,7 +1372,7 @@ func (at *AutoTrader) executePartialCloseWithRecord(decision *decision.Decision,
 	closeTime := time.Now().UnixMilli()
 
 	// 执行平仓
-	var order map[string]interface{}
+	var order map[string]any
 	if positionSide == "LONG" {
 		order, err = at.trader.CloseLong(decision.Symbol, closeQuantity)
 	} else {
@@ -1500,7 +1500,7 @@ func (at *AutoTrader) GetDecisionLogger() logger.IDecisionLogger {
 }
 
 // GetStatus 获取系统状态（用于API）
-func (at *AutoTrader) GetStatus() map[string]interface{} {
+func (at *AutoTrader) GetStatus() map[string]any {
 	aiProvider := "DeepSeek"
 	if at.config.UseQwen {
 		aiProvider = "Qwen"
@@ -1513,7 +1513,7 @@ func (at *AutoTrader) GetStatus() map[string]interface{} {
 	callCount := at.callCount
 	at.statusMutex.RUnlock()
 
-	return map[string]interface{}{
+	return map[string]any{
 		"trader_id":       at.id,
 		"trader_name":     at.name,
 		"ai_model":        at.aiModel,
@@ -1531,7 +1531,7 @@ func (at *AutoTrader) GetStatus() map[string]interface{} {
 }
 
 // GetAccountInfo 获取账户信息（用于API）
-func (at *AutoTrader) GetAccountInfo() (map[string]interface{}, error) {
+func (at *AutoTrader) GetAccountInfo() (map[string]any, error) {
 	balance, err := at.trader.GetBalance()
 	if err != nil {
 		return nil, fmt.Errorf("获取余额失败: %w", err)
@@ -1600,7 +1600,7 @@ func (at *AutoTrader) GetAccountInfo() (map[string]interface{}, error) {
 		marginUsedPct = (totalMarginUsed / totalEquity) * 100
 	}
 
-	return map[string]interface{}{
+	return map[string]any{
 		// 核心字段
 		"total_equity":      totalEquity,           // 账户净值 = wallet + unrealized
 		"wallet_balance":    totalWalletBalance,    // 钱包余额（不含未实现盈亏）
@@ -1621,13 +1621,13 @@ func (at *AutoTrader) GetAccountInfo() (map[string]interface{}, error) {
 }
 
 // GetPositions 获取持仓列表（用于API）
-func (at *AutoTrader) GetPositions() ([]map[string]interface{}, error) {
+func (at *AutoTrader) GetPositions() ([]map[string]any, error) {
 	positions, err := at.trader.GetPositions()
 	if err != nil {
 		return nil, fmt.Errorf("获取持仓失败: %w", err)
 	}
 
-	var result []map[string]interface{}
+	var result []map[string]any
 	for _, pos := range positions {
 		symbol := pos["symbol"].(string)
 		side := pos["side"].(string)
@@ -1651,7 +1651,7 @@ func (at *AutoTrader) GetPositions() ([]map[string]interface{}, error) {
 		// 计算盈亏百分比（基于保证金）
 		pnlPct := calculatePnLPercentage(unrealizedPnl, marginUsed)
 
-		result = append(result, map[string]interface{}{
+		result = append(result, map[string]any{
 			"symbol":             symbol,
 			"side":               side,
 			"entry_price":        entryPrice,

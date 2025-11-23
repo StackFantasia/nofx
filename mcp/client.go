@@ -172,7 +172,7 @@ func (client *Client) callOnce(systemPrompt, userPrompt string) (string, error) 
 	})
 
 	// 构建请求体
-	requestBody := map[string]interface{}{
+	requestBody := map[string]any{
 		"model":       client.Model,
 		"messages":    messages,
 		"temperature": client.Temperature,

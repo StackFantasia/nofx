@@ -114,7 +114,7 @@ func (w *WSClient) SubscribeMiniTicker(symbol string) error {
 }
 
 func (w *WSClient) subscribe(stream string) error {
-	subscribeMsg := map[string]interface{}{
+	subscribeMsg := map[string]any{
 		"method": "SUBSCRIBE",
 		"params": []string{stream},
 		"id":     time.Now().Unix(),

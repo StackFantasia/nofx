@@ -21,10 +21,10 @@ func SanitizeModelConfigForLog(models map[string]struct {
 	APIKey          string `json:"api_key"`
 	CustomAPIURL    string `json:"custom_api_url"`
 	CustomModelName string `json:"custom_model_name"`
-}) map[string]interface{} {
-	safe := make(map[string]interface{})
+}) map[string]any {
+	safe := make(map[string]any)
 	for modelID, cfg := range models {
-		safe[modelID] = map[string]interface{}{
+		safe[modelID] = map[string]any{
 			"enabled":           cfg.Enabled,
 			"api_key":           MaskSensitiveString(cfg.APIKey),
 			"custom_api_url":    cfg.CustomAPIURL,
@@ -44,10 +44,10 @@ func SanitizeExchangeConfigForLog(exchanges map[string]struct {
 	AsterUser             string `json:"aster_user"`
 	AsterSigner           string `json:"aster_signer"`
 	AsterPrivateKey       string `json:"aster_private_key"`
-}) map[string]interface{} {
-	safe := make(map[string]interface{})
+}) map[string]any {
+	safe := make(map[string]any)
 	for exchangeID, cfg := range exchanges {
-		safeExchange := map[string]interface{}{
+		safeExchange := map[string]any{
 			"enabled": cfg.Enabled,
 			"testnet": cfg.Testnet,
 		}

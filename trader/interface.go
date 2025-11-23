@@ -4,22 +4,22 @@ package trader
 // 支持多个交易平台（币安、Hyperliquid等）
 type Trader interface {
 	// GetBalance 获取账户余额
-	GetBalance() (map[string]interface{}, error)
+	GetBalance() (map[string]any, error)
 
 	// GetPositions 获取所有持仓
-	GetPositions() ([]map[string]interface{}, error)
+	GetPositions() ([]map[string]any, error)
 
 	// OpenLong 开多仓
-	OpenLong(symbol string, quantity float64, leverage int) (map[string]interface{}, error)
+	OpenLong(symbol string, quantity float64, leverage int) (map[string]any, error)
 
 	// OpenShort 开空仓
-	OpenShort(symbol string, quantity float64, leverage int) (map[string]interface{}, error)
+	OpenShort(symbol string, quantity float64, leverage int) (map[string]any, error)
 
 	// CloseLong 平多仓（quantity=0表示全部平仓）
-	CloseLong(symbol string, quantity float64) (map[string]interface{}, error)
+	CloseLong(symbol string, quantity float64) (map[string]any, error)
 
 	// CloseShort 平空仓（quantity=0表示全部平仓）
-	CloseShort(symbol string, quantity float64) (map[string]interface{}, error)
+	CloseShort(symbol string, quantity float64) (map[string]any, error)
 
 	// SetLeverage 设置杠杆
 	SetLeverage(symbol string, leverage int) error
@@ -62,5 +62,5 @@ type Trader interface {
 	//   - quantity: 成交数量
 	//   - timestamp: 成交时间（毫秒时间戳）
 	//   - fee: 手续费（可选）
-	GetRecentFills(symbol string, startTime int64, endTime int64) ([]map[string]interface{}, error)
+	GetRecentFills(symbol string, startTime int64, endTime int64) ([]map[string]any, error)
 }

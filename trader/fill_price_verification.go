@@ -28,7 +28,7 @@ func (at *AutoTrader) verifyAndUpdateActualFillPrice(
 	startTime := openTime - 10000
 	endTime := openTime + 10000
 
-	var fills []map[string]interface{}
+	var fills []map[string]any
 	var err error
 
 	// 重试机制：交易所可能需要时间同步成交记录
@@ -63,7 +63,7 @@ func (at *AutoTrader) verifyAndUpdateActualFillPrice(
 		expectedSide = "Sell"
 	}
 
-	var matchedFills []map[string]interface{}
+	var matchedFills []map[string]any
 	for _, fill := range fills {
 		fillSide, _ := fill["side"].(string)
 		if fillSide == expectedSide {
@@ -274,7 +274,7 @@ func (at *AutoTrader) verifyAndUpdateCloseFillPrice(
 	startTime := closeTime - 10000
 	endTime := closeTime + 10000
 
-	var fills []map[string]interface{}
+	var fills []map[string]any
 	var err error
 
 	// 重试机制：交易所可能需要时间同步成交记录
@@ -314,7 +314,7 @@ func (at *AutoTrader) verifyAndUpdateCloseFillPrice(
 		expectedSide = "Buy"
 	}
 
-	var matchedFills []map[string]interface{}
+	var matchedFills []map[string]any
 	for _, fill := range fills {
 		side, _ := fill["side"].(string)
 		if side == expectedSide {

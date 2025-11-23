@@ -1323,7 +1323,7 @@ func (s *Server) handleTraderList(c *gin.Context) {
 		return
 	}
 
-	result := make([]map[string]interface{}, 0, len(traders))
+	result := make([]map[string]any, 0, len(traders))
 	for _, trader := range traders {
 		// 获取实时运行状态
 		isRunning := trader.IsRunning
@@ -1347,7 +1347,7 @@ func (s *Server) handleTraderList(c *gin.Context) {
 			trader.SystemPromptTemplate,
 		)
 
-		result = append(result, map[string]interface{}{
+		result = append(result, map[string]any{
 			"trader_id":              trader.ID,
 			"trader_name":            trader.Name,
 			"ai_model":               trader.AIModelID, // 使用完整 ID
@@ -1390,7 +1390,7 @@ func (s *Server) handleGetTraderConfig(c *gin.Context) {
 	// 返回完整的模型ID，不做转换，保持与前端模型列表一致
 	aiModelID := traderConfig.AIModelID
 
-	result := map[string]interface{}{
+	result := map[string]any{
 		"trader_id":              traderConfig.ID,
 		"trader_name":            traderConfig.Name,
 		"ai_model":               aiModelID,
@@ -2224,9 +2224,9 @@ func (s *Server) handleGetPromptTemplates(c *gin.Context) {
 	templates := decision.GetAllPromptTemplates()
 
 	// 转换为响应格式
-	response := make([]map[string]interface{}, 0, len(templates))
+	response := make([]map[string]any, 0, len(templates))
 	for _, tmpl := range templates {
-		response = append(response, map[string]interface{}{
+		response = append(response, map[string]any{
 			"name": tmpl.Name,
 		})
 	}
@@ -2266,11 +2266,11 @@ func (s *Server) handlePublicTraderList(c *gin.Context) {
 	// 获取traders数组
 	tradersData, exists := competition["traders"]
 	if !exists {
-		c.JSON(http.StatusOK, []map[string]interface{}{})
+		c.JSON(http.StatusOK, []map[string]any{})
 		return
 	}
 
-	traders, ok := tradersData.([]map[string]interface{})
+	traders, ok := tradersData.([]map[string]any)
 	if !ok {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "交易员数据格式错误",
@@ -2279,19 +2279,19 @@ func (s *Server) handlePublicTraderList(c *gin.Context) {
 	}
 
 	// 返回交易员基本信息，过滤敏感信息
-	result := make([]map[string]interface{}, 0, len(traders))
+	result := make([]map[string]any, 0, len(traders))
 	for _, trader := range traders {
-		result = append(result, map[string]interface{}{
-			"trader_id":       trader["trader_id"],
-			"trader_name":     trader["trader_name"],
-			"ai_model":        trader["ai_model"],
-			"exchange":        trader["exchange"],
-			"is_running":      trader["is_running"],
-			"total_equity":    trader["total_equity"],
-			"total_pnl":       trader["total_pnl"],
-			"total_pnl_pct":   trader["total_pnl_pct"],
-			"position_count":  trader["position_count"],
-			"margin_used_pct": trader["margin_used_pct"],
+		result = append(result, map[string]any{
+			"trader_id":              trader["trader_id"],
+			"trader_name":            trader["trader_name"],
+			"ai_model":               trader["ai_model"],
+			"exchange":               trader["exchange"],
+			"is_running":             trader["is_running"],
+			"total_equity":           trader["total_equity"],
+			"total_pnl":              trader["total_pnl"],
+			"total_pnl_pct":          trader["total_pnl_pct"],
+			"position_count":         trader["position_count"],
+			"margin_used_pct":        trader["margin_used_pct"],
 			"system_prompt_template": trader["system_prompt_template"],
 		})
 	}
@@ -2345,7 +2345,7 @@ func (s *Server) handleEquityHistoryBatch(c *gin.Context) {
 				return
 			}
 
-			traders, ok := topTraders["traders"].([]map[string]interface{})
+			traders, ok := topTraders["traders"].([]map[string]any)
 			if !ok {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "交易员数据格式错误"})
 				return
@@ -2381,9 +2381,9 @@ func (s *Server) handleEquityHistoryBatch(c *gin.Context) {
 }
 
 // getEquityHistoryForTraders 获取多个交易员的历史数据
-func (s *Server) getEquityHistoryForTraders(traderIDs []string) map[string]interface{} {
-	result := make(map[string]interface{})
-	histories := make(map[string]interface{})
+func (s *Server) getEquityHistoryForTraders(traderIDs []string) map[string]any {
+	result := make(map[string]any)
+	histories := make(map[string]any)
 	errors := make(map[string]string)
 
 	for _, traderID := range traderIDs {
@@ -2405,11 +2405,11 @@ func (s *Server) getEquityHistoryForTraders(traderIDs []string) map[string]inter
 		}
 
 		// 构建收益率历史数据
-		history := make([]map[string]interface{}, 0, len(records))
+		history := make([]map[string]any, 0, len(records))
 		for _, record := range records {
 			// 计算总权益（余额+未实现盈亏）
 			totalEquity := record.AccountState.TotalBalance + record.AccountState.TotalUnrealizedProfit
-			
+
 			// 计算总盈亏和收益率
 			initialBalance := record.AccountState.InitialBalance
 			totalPnL := totalEquity - initialBalance
@@ -2418,7 +2418,7 @@ func (s *Server) getEquityHistoryForTraders(traderIDs []string) map[string]inter
 				totalPnLPct = (totalPnL / initialBalance) * 100
 			}
 
-			history = append(history, map[string]interface{}{
+			history = append(history, map[string]any{
 				"timestamp":     record.Timestamp,
 				"total_equity":  totalEquity,
 				"total_pnl":     totalPnL,
@@ -2457,7 +2457,7 @@ func (s *Server) handleGetPublicTraderConfig(c *gin.Context) {
 	status := trader.GetStatus()
 
 	// 只返回公开的配置信息，不包含API密钥等敏感数据
-	result := map[string]interface{}{
+	result := map[string]any{
 		"trader_id":   trader.GetID(),
 		"trader_name": trader.GetName(),
 		"ai_model":    trader.GetAIModel(),

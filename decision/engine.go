@@ -22,7 +22,7 @@ var fatalFunc = realFatal
 
 // realFatal 真正的致命错误处理（调用 os.Exit）
 // ⚠️ 资金安全关键：当配置错误时，必须阻止系统启动
-func realFatal(format string, v ...interface{}) {
+func realFatal(format string, v ...any) {
 	log.Printf(format, v...)
 	os.Exit(1) // 进程立即退出
 }
@@ -101,7 +101,7 @@ type Context struct {
 	MarketDataMap   map[string]*market.Data            `json:"-"` // 不序列化，但内部使用
 	MultiTFMarket   map[string]map[string]*market.Data `json:"-"`
 	OITopDataMap    map[string]*OITopData              `json:"-"` // OI Top数据映射
-	Performance     interface{}                        `json:"-"` // 历史表现分析（logger.PerformanceAnalysis）
+	Performance     any                                `json:"-"` // 历史表现分析（logger.PerformanceAnalysis）
 	BTCETHLeverage  int                                `json:"-"` // BTC/ETH杠杆倍数（从配置读取）
 	AltcoinLeverage int                                `json:"-"` // 山寨币杠杆倍数（从配置读取）
 }
@@ -535,7 +535,7 @@ func buildUserPrompt(ctx *Context) string {
 
 	// 夏普比率（直接传值，不要复杂格式化）
 	if ctx.Performance != nil {
-		// 直接从interface{}中提取SharpeRatio
+		// 直接从any中提取SharpeRatio
 		type PerformanceData struct {
 			SharpeRatio float64 `json:"sharpe_ratio"`
 		}

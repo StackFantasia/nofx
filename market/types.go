@@ -99,7 +99,7 @@ type Kline struct {
 	TakerBuyQuoteVolume float64 `json:"takerBuyQuoteVolume"`
 }
 
-type KlineResponse []interface{}
+type KlineResponse []any
 
 type PriceTicker struct {
 	Symbol string `json:"symbol"`

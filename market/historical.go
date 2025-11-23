@@ -60,7 +60,7 @@ func GetKlinesRange(symbol string, timeframe string, start, end time.Time) ([]Kl
 			return nil, fmt.Errorf("binance klines api returned status %d: %s", resp.StatusCode, string(body))
 		}
 
-		var raw [][]interface{}
+		var raw [][]any
 		if err := json.Unmarshal(body, &raw); err != nil {
 			return nil, err
 		}

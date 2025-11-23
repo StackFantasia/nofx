@@ -131,7 +131,7 @@ func NewHyperliquidTrader(privateKeyHex string, walletAddr string, testnet bool)
 }
 
 // GetBalance 获取账户余额
-func (t *HyperliquidTrader) GetBalance() (map[string]interface{}, error) {
+func (t *HyperliquidTrader) GetBalance() (map[string]any, error) {
 	log.Printf("🔄 正在调用Hyperliquid API获取账户余额...")
 
 	// ✅ Step 1: 查询 Spot 现货账户余额
@@ -157,12 +157,12 @@ func (t *HyperliquidTrader) GetBalance() (map[string]interface{}, error) {
 	}
 
 	// 解析余额信息（MarginSummary字段都是string）
-	result := make(map[string]interface{})
+	result := make(map[string]any)
 
 	// ✅ Step 3: 根据保证金模式动态选择正确的摘要（CrossMarginSummary 或 MarginSummary）
 	var accountValue, totalMarginUsed float64
 	var summaryType string
-	var summary interface{}
+	var summary any
 
 	if t.isCrossMargin {
 		// 全仓模式：使用 CrossMarginSummary
@@ -244,14 +244,14 @@ func (t *HyperliquidTrader) GetBalance() (map[string]interface{}, error) {
 }
 
 // GetPositions 获取所有持仓
-func (t *HyperliquidTrader) GetPositions() ([]map[string]interface{}, error) {
+func (t *HyperliquidTrader) GetPositions() ([]map[string]any, error) {
 	// 获取账户状态
 	accountState, err := t.exchange.Info().UserState(t.ctx, t.walletAddr)
 	if err != nil {
 		return nil, fmt.Errorf("获取持仓失败: %w", err)
 	}
 
-	var result []map[string]interface{}
+	var result []map[string]any
 
 	// 遍历所有持仓
 	for _, assetPos := range accountState.AssetPositions {
@@ -264,7 +264,7 @@ func (t *HyperliquidTrader) GetPositions() ([]map[string]interface{}, error) {
 			continue // 跳过无持仓的
 		}
 
-		posMap := make(map[string]interface{})
+		posMap := make(map[string]any)
 
 		// 标准化symbol格式（Hyperliquid使用如"BTC"，我们转换为"BTCUSDT"）
 		symbol := position.Coin + "USDT"
@@ -373,7 +373,7 @@ func (t *HyperliquidTrader) refreshMetaIfNeeded(coin string) error {
 }
 
 // OpenLong 开多仓
-func (t *HyperliquidTrader) OpenLong(symbol string, quantity float64, leverage int) (map[string]interface{}, error) {
+func (t *HyperliquidTrader) OpenLong(symbol string, quantity float64, leverage int) (map[string]any, error) {
 	// 先取消该币种的所有委托单
 	if err := t.CancelAllOrders(symbol); err != nil {
 		log.Printf("  ⚠ 取消旧委托单失败: %v", err)
@@ -422,7 +422,7 @@ func (t *HyperliquidTrader) OpenLong(symbol string, quantity float64, leverage i
 
 	log.Printf("✓ 开多仓成功: %s 数量: %.4f", symbol, roundedQuantity)
 
-	result := make(map[string]interface{})
+	result := make(map[string]any)
 	result["orderId"] = 0 // Hyperliquid没有返回order ID
 	result["symbol"] = symbol
 	result["status"] = "FILLED"
@@ -431,7 +431,7 @@ func (t *HyperliquidTrader) OpenLong(symbol string, quantity float64, leverage i
 }
 
 // OpenShort 开空仓
-func (t *HyperliquidTrader) OpenShort(symbol string, quantity float64, leverage int) (map[string]interface{}, error) {
+func (t *HyperliquidTrader) OpenShort(symbol string, quantity float64, leverage int) (map[string]any, error) {
 	// 先取消该币种的所有委托单
 	if err := t.CancelAllOrders(symbol); err != nil {
 		log.Printf("  ⚠ 取消旧委托单失败: %v", err)
@@ -480,7 +480,7 @@ func (t *HyperliquidTrader) OpenShort(symbol string, quantity float64, leverage 
 
 	log.Printf("✓ 开空仓成功: %s 数量: %.4f", symbol, roundedQuantity)
 
-	result := make(map[string]interface{})
+	result := make(map[string]any)
 	result["orderId"] = 0
 	result["symbol"] = symbol
 	result["status"] = "FILLED"
@@ -489,7 +489,7 @@ func (t *HyperliquidTrader) OpenShort(symbol string, quantity float64, leverage 
 }
 
 // CloseLong 平多仓
-func (t *HyperliquidTrader) CloseLong(symbol string, quantity float64) (map[string]interface{}, error) {
+func (t *HyperliquidTrader) CloseLong(symbol string, quantity float64) (map[string]any, error) {
 	// 如果数量为0，获取全部持仓数量
 	if quantity == 0 {
 		positions, err := t.GetPositions()
@@ -551,7 +551,7 @@ func (t *HyperliquidTrader) CloseLong(symbol string, quantity float64) (map[stri
 		log.Printf("  ⚠ 取消挂单失败: %v", err)
 	}
 
-	return map[string]interface{}{
+	return map[string]any{
 		"orderId": 0,
 		"symbol":  symbol,
 		"status":  "FILLED",
@@ -559,7 +559,7 @@ func (t *HyperliquidTrader) CloseLong(symbol string, quantity float64) (map[stri
 }
 
 // CloseShort 平空仓
-func (t *HyperliquidTrader) CloseShort(symbol string, quantity float64) (map[string]interface{}, error) {
+func (t *HyperliquidTrader) CloseShort(symbol string, quantity float64) (map[string]any, error) {
 	// 如果数量为0，获取全部持仓数量
 	if quantity == 0 {
 		positions, err := t.GetPositions()
@@ -621,7 +621,7 @@ func (t *HyperliquidTrader) CloseShort(symbol string, quantity float64) (map[str
 		log.Printf("  ⚠ 取消挂单失败: %v", err)
 	}
 
-	return map[string]interface{}{
+	return map[string]any{
 		"orderId": 0,
 		"symbol":  symbol,
 		"status":  "FILLED",
@@ -911,7 +911,7 @@ func absFloat(x float64) float64 {
 }
 
 // GetRecentFills 获取最近的成交记录
-func (t *HyperliquidTrader) GetRecentFills(symbol string, startTime int64, endTime int64) ([]map[string]interface{}, error) {
+func (t *HyperliquidTrader) GetRecentFills(symbol string, startTime int64, endTime int64) ([]map[string]any, error) {
 	// endTime = 0 表示当前时间
 	if endTime == 0 {
 		endTime = time.Now().UnixMilli()
@@ -924,7 +924,7 @@ func (t *HyperliquidTrader) GetRecentFills(symbol string, startTime int64, endTi
 	}
 
 	// 转换为统一格式
-	var result []map[string]interface{}
+	var result []map[string]any
 	coin := convertSymbolToHyperliquid(symbol)
 
 	for _, fill := range fills {
@@ -957,7 +957,7 @@ func (t *HyperliquidTrader) GetRecentFills(symbol string, startTime int64, endTi
 		// 需要转换为统一的 "Buy" / "Sell"
 		side := convertHyperliquidDirToSide(fill.Dir)
 
-		result = append(result, map[string]interface{}{
+		result = append(result, map[string]any{
 			"symbol":    symbol,
 			"side":      side,
 			"price":     price,

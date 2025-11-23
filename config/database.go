@@ -1196,7 +1196,7 @@ func (d *Database) UpdateExchange(userID, id string, enabled bool, apiKey, secre
 		"aster_signer = ?",
 		"updated_at = datetime('now')",
 	}
-	args := []interface{}{enabled, testnet, hyperliquidWalletAddr, asterUser, asterSigner}
+	args := []any{enabled, testnet, hyperliquidWalletAddr, asterUser, asterSigner}
 
 	// 🔒 敏感字段：只在非空时更新（保护现有数据）
 	if apiKey != "" {

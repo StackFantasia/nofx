@@ -53,12 +53,12 @@ type FuturesTrader struct {
 	client *futures.Client
 
 	// 余额缓存
-	cachedBalance     map[string]interface{}
+	cachedBalance     map[string]any
 	balanceCacheTime  time.Time
 	balanceCacheMutex sync.RWMutex
 
 	// 持仓缓存
-	cachedPositions     []map[string]interface{}
+	cachedPositions     []map[string]any
 	positionsCacheTime  time.Time
 	positionsCacheMutex sync.RWMutex
 
@@ -128,7 +128,7 @@ func syncBinanceServerTime(client *futures.Client) {
 }
 
 // GetBalance 获取账户余额（带缓存）
-func (t *FuturesTrader) GetBalance() (map[string]interface{}, error) {
+func (t *FuturesTrader) GetBalance() (map[string]any, error) {
 	// 先检查缓存是否有效
 	t.balanceCacheMutex.RLock()
 	if t.cachedBalance != nil && time.Since(t.balanceCacheTime) < t.cacheDuration {
@@ -147,7 +147,7 @@ func (t *FuturesTrader) GetBalance() (map[string]interface{}, error) {
 		return nil, fmt.Errorf("获取账户信息失败: %w", err)
 	}
 
-	result := make(map[string]interface{})
+	result := make(map[string]any)
 	result["totalWalletBalance"], _ = strconv.ParseFloat(account.TotalWalletBalance, 64)
 	result["availableBalance"], _ = strconv.ParseFloat(account.AvailableBalance, 64)
 	result["totalUnrealizedProfit"], _ = strconv.ParseFloat(account.TotalUnrealizedProfit, 64)
@@ -167,7 +167,7 @@ func (t *FuturesTrader) GetBalance() (map[string]interface{}, error) {
 }
 
 // GetPositions 获取所有持仓（带缓存）
-func (t *FuturesTrader) GetPositions() ([]map[string]interface{}, error) {
+func (t *FuturesTrader) GetPositions() ([]map[string]any, error) {
 	// 先检查缓存是否有效
 	t.positionsCacheMutex.RLock()
 	if t.cachedPositions != nil && time.Since(t.positionsCacheTime) < t.cacheDuration {
@@ -185,14 +185,14 @@ func (t *FuturesTrader) GetPositions() ([]map[string]interface{}, error) {
 		return nil, fmt.Errorf("获取持仓失败: %w", err)
 	}
 
-	var result []map[string]interface{}
+	var result []map[string]any
 	for _, pos := range positions {
 		posAmt, _ := strconv.ParseFloat(pos.PositionAmt, 64)
 		if posAmt == 0 {
 			continue // 跳过无持仓的
 		}
 
-		posMap := make(map[string]interface{})
+		posMap := make(map[string]any)
 		posMap["symbol"] = pos.Symbol
 		posMap["positionAmt"], _ = strconv.ParseFloat(pos.PositionAmt, 64)
 		posMap["entryPrice"], _ = strconv.ParseFloat(pos.EntryPrice, 64)
@@ -318,7 +318,7 @@ func (t *FuturesTrader) SetLeverage(symbol string, leverage int) error {
 }
 
 // OpenLong 开多仓
-func (t *FuturesTrader) OpenLong(symbol string, quantity float64, leverage int) (map[string]interface{}, error) {
+func (t *FuturesTrader) OpenLong(symbol string, quantity float64, leverage int) (map[string]any, error) {
 	// 先取消该币种的所有委托单（清理旧的止损止盈单）
 	if err := t.CancelAllOrders(symbol); err != nil {
 		log.Printf("  ⚠ 取消旧委托单失败（可能没有委托单）: %v", err)
@@ -365,7 +365,7 @@ func (t *FuturesTrader) OpenLong(symbol string, quantity float64, leverage int) 
 	log.Printf("✓ 开多仓成功: %s 数量: %s", symbol, quantityStr)
 	log.Printf("  订单ID: %d", order.OrderID)
 
-	result := make(map[string]interface{})
+	result := make(map[string]any)
 	result["orderId"] = order.OrderID
 	result["symbol"] = order.Symbol
 	result["status"] = order.Status
@@ -373,7 +373,7 @@ func (t *FuturesTrader) OpenLong(symbol string, quantity float64, leverage int) 
 }
 
 // OpenShort 开空仓
-func (t *FuturesTrader) OpenShort(symbol string, quantity float64, leverage int) (map[string]interface{}, error) {
+func (t *FuturesTrader) OpenShort(symbol string, quantity float64, leverage int) (map[string]any, error) {
 	// 先取消该币种的所有委托单（清理旧的止损止盈单）
 	if err := t.CancelAllOrders(symbol); err != nil {
 		log.Printf("  ⚠ 取消旧委托单失败（可能没有委托单）: %v", err)
@@ -420,7 +420,7 @@ func (t *FuturesTrader) OpenShort(symbol string, quantity float64, leverage int)
 	log.Printf("✓ 开空仓成功: %s 数量: %s", symbol, quantityStr)
 	log.Printf("  订单ID: %d", order.OrderID)
 
-	result := make(map[string]interface{})
+	result := make(map[string]any)
 	result["orderId"] = order.OrderID
 	result["symbol"] = order.Symbol
 	result["status"] = order.Status
@@ -428,7 +428,7 @@ func (t *FuturesTrader) OpenShort(symbol string, quantity float64, leverage int)
 }
 
 // CloseLong 平多仓
-func (t *FuturesTrader) CloseLong(symbol string, quantity float64) (map[string]interface{}, error) {
+func (t *FuturesTrader) CloseLong(symbol string, quantity float64) (map[string]any, error) {
 	// 如果数量为0，获取全部持仓数量
 	if quantity == 0 {
 		positions, err := t.GetPositions()
@@ -476,7 +476,7 @@ func (t *FuturesTrader) CloseLong(symbol string, quantity float64) (map[string]i
 		log.Printf(logMsgCancelledAllOrders, symbol)
 	}
 
-	result := make(map[string]interface{})
+	result := make(map[string]any)
 	result["orderId"] = order.OrderID
 	result["symbol"] = order.Symbol
 	result["status"] = order.Status
@@ -484,7 +484,7 @@ func (t *FuturesTrader) CloseLong(symbol string, quantity float64) (map[string]i
 }
 
 // CloseShort 平空仓
-func (t *FuturesTrader) CloseShort(symbol string, quantity float64) (map[string]interface{}, error) {
+func (t *FuturesTrader) CloseShort(symbol string, quantity float64) (map[string]any, error) {
 	// 如果数量为0，获取全部持仓数量
 	if quantity == 0 {
 		positions, err := t.GetPositions()
@@ -532,7 +532,7 @@ func (t *FuturesTrader) CloseShort(symbol string, quantity float64) (map[string]
 		log.Printf(logMsgCancelledAllOrders, symbol)
 	}
 
-	result := make(map[string]interface{})
+	result := make(map[string]any)
 	result["orderId"] = order.OrderID
 	result["symbol"] = order.Symbol
 	result["status"] = order.Status
@@ -932,7 +932,7 @@ func stringContains(s, substr string) bool {
 }
 
 // GetRecentFills 获取最近的成交记录
-func (t *FuturesTrader) GetRecentFills(symbol string, startTime int64, endTime int64) ([]map[string]interface{}, error) {
+func (t *FuturesTrader) GetRecentFills(symbol string, startTime int64, endTime int64) ([]map[string]any, error) {
 	// endTime = 0 表示当前时间
 	if endTime == 0 {
 		endTime = time.Now().UnixMilli()
@@ -950,7 +950,7 @@ func (t *FuturesTrader) GetRecentFills(symbol string, startTime int64, endTime i
 	}
 
 	// 转换为统一格式
-	var result []map[string]interface{}
+	var result []map[string]any
 
 	for _, trade := range trades {
 		// 解析价格和数量
@@ -979,7 +979,7 @@ func (t *FuturesTrader) GetRecentFills(symbol string, startTime int64, endTime i
 			side = "Sell"
 		}
 
-		result = append(result, map[string]interface{}{
+		result = append(result, map[string]any{
 			"symbol":    symbol,
 			"side":      side,
 			"price":     price,
