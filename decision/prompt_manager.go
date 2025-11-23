@@ -30,7 +30,7 @@ var (
 
 // init 包初始化时加载所有提示词模板
 func init() {
-	promptsDir = "/app/prompts"
+	promptsDir = "/opt/nofx/prompts"
 
 	globalPromptManager = NewPromptManager()
 	if err := globalPromptManager.LoadTemplates(promptsDir); err != nil {

@@ -99,9 +99,9 @@ type AutoTrader struct {
 	lastResetTime         time.Time
 	stopUntil             time.Time
 	isRunning             bool
-	startTime             time.Time          // 系统启动时间
-	callCount             int                // AI调用次数
-	statusMutex           sync.RWMutex       // 保护 isRunning, startTime, callCount 的并发访问
+	startTime             time.Time                        // 系统启动时间
+	callCount             int                              // AI调用次数
+	statusMutex           sync.RWMutex                     // 保护 isRunning, startTime, callCount 的并发访问
 	positionFirstSeenTime map[string]int64                 // 持仓首次出现时间 (symbol_side -> timestamp毫秒)
 	lastPositions         map[string]decision.PositionInfo // 上一次周期的持仓快照 (用于检测被动平仓)
 	positionStopLoss      map[string]float64               // 持仓止损价格 (symbol_side -> stop_loss_price)
@@ -352,7 +352,7 @@ func (at *AutoTrader) runCycle() error {
 
 	// 1. 检查是否需要停止交易
 	if time.Now().Before(at.stopUntil) {
-		remaining := at.stopUntil.Sub(time.Now())
+		remaining := time.Until(at.stopUntil)
 		log.Printf("⏸ 风险控制：暂停交易中，剩余 %.0f 分钟", remaining.Minutes())
 		record.Success = false
 		record.ErrorMessage = fmt.Sprintf("风险控制暂停中，剩余 %.0f 分钟", remaining.Minutes())
@@ -446,7 +446,7 @@ func (at *AutoTrader) runCycle() error {
 				closed.Symbol,
 				closed.Side,
 				closed.EntryPrice,
-				action.Price,    // 使用真实成交价格（已矫正）
+				action.Price, // 使用真实成交价格（已矫正）
 				pnlPct,
 				reasonCN)
 		}
@@ -739,7 +739,7 @@ func (at *AutoTrader) buildTradingContext() (*decision.Context, error) {
 		CurrentTime:     time.Now().Format("2006-01-02 15:04:05"),
 		RuntimeMinutes:  int(time.Since(at.startTime).Minutes()),
 		CallCount:       at.callCount,
-		Exchange:        at.exchange,                // 交易所名称
+		Exchange:        at.exchange,               // 交易所名称
 		BTCETHLeverage:  at.config.BTCETHLeverage,  // 使用配置的杠杆倍数
 		AltcoinLeverage: at.config.AltcoinLeverage, // 使用配置的杠杆倍数
 		Account: decision.AccountInfo{
@@ -1824,10 +1824,6 @@ func (at *AutoTrader) checkPositionDrawdown() {
 		side := pos["side"].(string)
 		entryPrice := pos["entryPrice"].(float64)
 		markPrice := pos["markPrice"].(float64)
-		quantity := pos["positionAmt"].(float64)
-		if quantity < 0 {
-			quantity = -quantity // 空仓数量为负，转为正数
-		}
 
 		// 计算当前盈亏百分比
 		leverage := 10 // 默认值
@@ -1951,7 +1947,7 @@ func (at *AutoTrader) ClearPeakPnLCache(symbol, side string) {
 // 对比上一次和当前的持仓快照，找出消失的持仓
 func (at *AutoTrader) detectClosedPositions(currentPositions []decision.PositionInfo) []decision.PositionInfo {
 	// 首次运行或没有缓存，返回空列表
-	if at.lastPositions == nil || len(at.lastPositions) == 0 {
+	if len(at.lastPositions) == 0 {
 		return []decision.PositionInfo{}
 	}
 
@@ -1995,11 +1991,11 @@ func (at *AutoTrader) generateAutoCloseActions(closedPositions []decision.Positi
 			Symbol:    pos.Symbol,
 			Quantity:  pos.Quantity,
 			Leverage:  pos.Leverage,
-			Price:     closePrice,    // 推断的平仓价格（止损/止盈/强平/市价）
-			OrderID:   0,             // 自动平仓没有订单ID
-			Timestamp: time.Now(),    // 检测时间（非真实触发时间）
+			Price:     closePrice, // 推断的平仓价格（止损/止盈/强平/市价）
+			OrderID:   0,          // 自动平仓没有订单ID
+			Timestamp: time.Now(), // 检测时间（非真实触发时间）
 			Success:   true,
-			Error:     closeReason,   // 使用 Error 字段存储平仓原因（stop_loss/take_profit/liquidation/manual/unknown）
+			Error:     closeReason, // 使用 Error 字段存储平仓原因（stop_loss/take_profit/liquidation/manual/unknown）
 		})
 	}
 
