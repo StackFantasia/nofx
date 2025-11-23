@@ -65,10 +65,12 @@ export default function TraderDashboard() {
   })
 
   // 过滤器状态：只显示有操作的决策（从 localStorage 读取，默认 false）
-  const [showOnlyWithActions, setShowOnlyWithActions] = useState<boolean>(() => {
-    const saved = localStorage.getItem('showOnlyWithActions')
-    return saved ? JSON.parse(saved) : false
-  })
+  const [showOnlyWithActions, setShowOnlyWithActions] = useState<boolean>(
+    () => {
+      const saved = localStorage.getItem('showOnlyWithActions')
+      return saved ? JSON.parse(saved) : false
+    }
+  )
 
   // Prompt Modal 状态
   const [showPromptModal, setShowPromptModal] = useState(false)
@@ -146,7 +148,12 @@ export default function TraderDashboard() {
     user && token && selectedTraderId
       ? `decisions/latest-${selectedTraderId}-${decisionLimit}-${showOnlyWithActions}`
       : null,
-    () => api.getLatestDecisions(selectedTraderId, decisionLimit, showOnlyWithActions),
+    () =>
+      api.getLatestDecisions(
+        selectedTraderId,
+        decisionLimit,
+        showOnlyWithActions
+      ),
     {
       refreshInterval: 30000,
       revalidateOnFocus: false,
@@ -336,7 +343,7 @@ export default function TraderDashboard() {
           {traders && traders.length > 0 && (
             <div className="flex flex-col sm:flex-row sm:items-center gap-2">
               <span className="text-sm" style={{ color: '#848E9C' }}>
-                {t('switchTrader', language)}:
+                {t('switchTrader', language)}
               </span>
               <select
                 value={selectedTraderId}
@@ -379,21 +386,28 @@ export default function TraderDashboard() {
           </span>
           <span className="hidden sm:inline">•</span>
           <span className="whitespace-nowrap flex items-center gap-1">
-            Prompt: <span className="font-semibold" style={{ color: highlightColor }}>{selectedTrader.system_prompt_template || '-'}</span>
-              <button
-                onClick={() => setShowPromptModal(true)}
-                className="p-1 rounded hover:bg-gray-700 transition-colors"
-                title={t('viewPrompt', language)}
-              >
-                <Eye className="w-4 h-4" style={{ color: highlightColor }} />
-              </button>
+            Prompt:{' '}
+            <span className="font-semibold" style={{ color: highlightColor }}>
+              {selectedTrader.system_prompt_template || '-'}
+            </span>
+            <button
+              onClick={() => setShowPromptModal(true)}
+              className="p-1 rounded hover:bg-gray-700 transition-colors"
+              title={t('viewPrompt', language)}
+            >
+              <Eye className="w-4 h-4" style={{ color: highlightColor }} />
+            </button>
           </span>
           {status && (
             <>
               <span className="hidden sm:inline">•</span>
-              <span className="whitespace-nowrap">Cycles: {status.call_count}</span>
+              <span className="whitespace-nowrap">
+                Cycles: {status.call_count}
+              </span>
               <span className="hidden sm:inline">•</span>
-              <span className="whitespace-nowrap">Runtime: {status.runtime_minutes} min</span>
+              <span className="whitespace-nowrap">
+                Runtime: {status.runtime_minutes} min
+              </span>
             </>
           )}
         </div>
@@ -630,7 +644,8 @@ export default function TraderDashboard() {
               <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center"
                 style={{
-                  background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
+                  background:
+                    'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
                   boxShadow: '0 4px 14px rgba(99, 102, 241, 0.4)',
                 }}
               >
