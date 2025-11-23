@@ -147,9 +147,10 @@ export function EquityChart({ traderId }: EquityChartProps) {
   const isProfit = currentValue.raw_pnl >= 0
 
   // Get the latest timestamp for display
-  const latestTimestamp = validHistory.length > 0
-    ? validHistory[validHistory.length - 1].timestamp
-    : null
+  const latestTimestamp =
+    validHistory.length > 0
+      ? validHistory[validHistory.length - 1].timestamp
+      : null
 
   // 计算Y轴范围
   const calculateYDomain = () => {
@@ -438,10 +439,7 @@ export function EquityChart({ traderId }: EquityChartProps) {
             {currentValue.raw_equity.toFixed(2)} USDT
           </div>
           {latestTimestamp && (
-            <div
-              className="text-xs mt-1"
-              style={{ color: '#848E9C' }}
-            >
+            <div className="text-xs mt-1" style={{ color: '#848E9C' }}>
               {formatTimestamp(latestTimestamp, language)}
             </div>
           )}

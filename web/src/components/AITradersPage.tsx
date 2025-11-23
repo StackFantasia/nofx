@@ -2333,7 +2333,7 @@ function ExchangeConfigModal({
                   <>
                     <div>
                       <label
-                        className="block text-sm font-semibold mb-2 flex items-center gap-2"
+                        className="flex text-sm font-semibold mb-2 items-center gap-2"
                         style={{ color: '#EAECEF' }}
                       >
                         {t('user', language)}
@@ -2361,7 +2361,7 @@ function ExchangeConfigModal({
 
                     <div>
                       <label
-                        className="block text-sm font-semibold mb-2 flex items-center gap-2"
+                        className="flex text-sm font-semibold mb-2 items-center gap-2"
                         style={{ color: '#EAECEF' }}
                       >
                         {t('signer', language)}
@@ -2389,7 +2389,7 @@ function ExchangeConfigModal({
 
                     <div>
                       <label
-                        className="block text-sm font-semibold mb-2 flex items-center gap-2"
+                        className="flex text-sm font-semibold mb-2 items-center gap-2"
                         style={{ color: '#EAECEF' }}
                       >
                         {t('privateKey', language)}

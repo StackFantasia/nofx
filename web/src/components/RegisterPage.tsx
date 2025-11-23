@@ -559,7 +559,7 @@ export function RegisterPage() {
             <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
               已有账户？{' '}
               <button
-                onClick={() => window.location.href = '/login'}
+                onClick={() => (window.location.href = '/login')}
                 className="font-semibold hover:underline transition-colors"
                 style={{ color: 'var(--brand-yellow)' }}
               >

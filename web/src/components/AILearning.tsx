@@ -206,7 +206,9 @@ export default function AILearning({ traderId }: AILearningProps) {
             {/* PromptHash 过滤开关 */}
             <div className="flex items-center gap-2">
               <label className="text-xs" style={{ color: '#848E9C' }}>
-                {language === 'zh' ? '仅当前提示词版本(最多100条)' : 'Current prompt only (max 100)'}
+                {language === 'zh'
+                  ? '仅当前提示词版本(最多100条)'
+                  : 'Current prompt only (max 100)'}
               </label>
               <button
                 onClick={() => handleFilterByPromptChange(!filterByPrompt)}
@@ -218,7 +220,9 @@ export default function AILearning({ traderId }: AILearningProps) {
                 <div
                   className="absolute top-1 w-4 h-4 rounded-full bg-white transition-transform"
                   style={{
-                    transform: filterByPrompt ? 'translateX(22px)' : 'translateX(4px)',
+                    transform: filterByPrompt
+                      ? 'translateX(22px)'
+                      : 'translateX(4px)',
                   }}
                 />
               </button>
@@ -460,10 +464,7 @@ export default function AILearning({ traderId }: AILearningProps) {
                     : 'N/A'}
               </div>
               {performance.total_trades < 2 && (
-                <div
-                  className="text-xs mt-1"
-                  style={{ color: '#94A3B8' }}
-                >
+                <div className="text-xs mt-1" style={{ color: '#94A3B8' }}>
                   {t('insufficientTradesForSharpe', language)}
                 </div>
               )}
@@ -898,7 +899,10 @@ export default function AILearning({ traderId }: AILearningProps) {
               <div className="flex items-center gap-2">
                 <ScrollText className="w-6 h-6" style={{ color: '#FCD34D' }} />
                 <div>
-                  <h3 className="font-bold text-lg" style={{ color: '#FCD34D' }}>
+                  <h3
+                    className="font-bold text-lg"
+                    style={{ color: '#FCD34D' }}
+                  >
                     {t('tradeHistory', language)}
                   </h3>
                   <p className="text-xs" style={{ color: '#94A3B8' }}>
