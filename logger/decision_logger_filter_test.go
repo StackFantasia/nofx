@@ -2,7 +2,6 @@ package logger
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -14,7 +13,7 @@ import (
 
 func TestGetLatestRecordsWithFilter(t *testing.T) {
 	// 创建临时目录
-	tmpDir, err := ioutil.TempDir("", "decision_logger_filter_test")
+	tmpDir, err := os.MkdirTemp("", "decision_logger_filter_test")
 	require.NoError(t, err)
 	defer os.RemoveAll(tmpDir)
 
@@ -59,7 +58,7 @@ func TestGetLatestRecordsWithFilter(t *testing.T) {
 		data, _ := json.Marshal(record)
 		// 使用正确的文件名格式
 		filename := filepath.Join(tmpDir, tr.timestamp.Format("decision_20060102_150405_cycle")+string(rune(tr.cycle+48))+".json")
-		ioutil.WriteFile(filename, data, 0644)
+		os.WriteFile(filename, data, 0644)
 	}
 
 	t.Run("GetLatestRecords without filter returns all records", func(t *testing.T) {
@@ -92,7 +91,7 @@ func TestGetLatestRecordsWithFilter(t *testing.T) {
 
 	t.Run("GetLatestRecords with filter when no actions exist", func(t *testing.T) {
 		// 创建一个只有无操作记录的目录
-		tmpDir2, err := ioutil.TempDir("", "decision_logger_filter_test_no_actions")
+		tmpDir2, err := os.MkdirTemp("", "decision_logger_filter_test_no_actions")
 		require.NoError(t, err)
 		defer os.RemoveAll(tmpDir2)
 
@@ -108,7 +107,7 @@ func TestGetLatestRecordsWithFilter(t *testing.T) {
 			}
 			data, _ := json.Marshal(record)
 			filename := filepath.Join(tmpDir2, ts.Format("decision_20060102_150405_cycle")+string(rune(i+48))+".json")
-			ioutil.WriteFile(filename, data, 0644)
+			os.WriteFile(filename, data, 0644)
 		}
 
 		records, err := logger2.GetLatestRecordsWithFilter(10, true)
@@ -117,7 +116,7 @@ func TestGetLatestRecordsWithFilter(t *testing.T) {
 	})
 
 	t.Run("GetLatestRecords with filter excludes hold and wait actions", func(t *testing.T) {
-		tmpDir3, err := ioutil.TempDir("", "decision_logger_filter_test_hold_wait")
+		tmpDir3, err := os.MkdirTemp("", "decision_logger_filter_test_hold_wait")
 		require.NoError(t, err)
 		defer os.RemoveAll(tmpDir3)
 
@@ -147,7 +146,7 @@ func TestGetLatestRecordsWithFilter(t *testing.T) {
 			}
 			data, _ := json.Marshal(record)
 			filename := filepath.Join(tmpDir3, ts.Format("decision_20060102_150405_cycle")+string(rune(tc.cycle+48))+".json")
-			ioutil.WriteFile(filename, data, 0644)
+			os.WriteFile(filename, data, 0644)
 		}
 
 		records, err := logger3.GetLatestRecordsWithFilter(10, true)

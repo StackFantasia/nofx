@@ -776,28 +776,6 @@ func validateDecisions(decisions []Decision, accountEquity float64, btcEthLevera
 	return nil
 }
 
-// findMatchingBracket 查找匹配的右括号
-func findMatchingBracket(s string, start int) int {
-	if start >= len(s) || s[start] != '[' {
-		return -1
-	}
-
-	depth := 0
-	for i := start; i < len(s); i++ {
-		switch s[i] {
-		case '[':
-			depth++
-		case ']':
-			depth--
-			if depth == 0 {
-				return i
-			}
-		}
-	}
-
-	return -1
-}
-
 // validateDecision 验证单个决策的有效性
 func validateDecision(d *Decision, accountEquity float64, btcEthLeverage, altcoinLeverage int, exchange string) error {
 	// 验证action

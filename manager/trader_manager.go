@@ -182,7 +182,7 @@ func (tm *TraderManager) LoadTradersFromDatabase(database *config.Database) erro
 }
 
 // addTraderFromConfig 内部方法：从配置添加交易员（不加锁，因为调用方已加锁）
-func (tm *TraderManager) addTraderFromDB(traderCfg *config.TraderRecord, aiModelCfg *config.AIModelConfig, exchangeCfg *config.ExchangeConfig, coinPoolURL, oiTopURL string, maxDailyLoss, maxDrawdown float64, stopTradingMinutes int, defaultCoins []string, database *config.Database, userID string) error {
+func (tm *TraderManager) addTraderFromDB(traderCfg *config.TraderRecord, aiModelCfg *config.AIModelConfig, exchangeCfg *config.ExchangeConfig, coinPoolURL, _ string, maxDailyLoss, maxDrawdown float64, stopTradingMinutes int, defaultCoins []string, database *config.Database, userID string) error {
 	if _, exists := tm.traders[traderCfg.ID]; exists {
 		return fmt.Errorf("trader ID '%s' 已存在", traderCfg.ID)
 	}
@@ -242,24 +242,26 @@ func (tm *TraderManager) addTraderFromDB(traderCfg *config.TraderRecord, aiModel
 	}
 
 	// 根据交易所类型设置API密钥
-	if exchangeCfg.ID == "binance" {
+	switch exchangeCfg.ID {
+	case "binance":
 		traderConfig.BinanceAPIKey = exchangeCfg.APIKey
 		traderConfig.BinanceSecretKey = exchangeCfg.SecretKey
-	} else if exchangeCfg.ID == "hyperliquid" {
+	case "hyperliquid":
 		traderConfig.HyperliquidPrivateKey = exchangeCfg.APIKey // hyperliquid用APIKey存储private key
 		traderConfig.HyperliquidWalletAddr = exchangeCfg.HyperliquidWalletAddr
-	} else if exchangeCfg.ID == "aster" {
+	case "aster":
 		traderConfig.AsterUser = exchangeCfg.AsterUser
 		traderConfig.AsterSigner = exchangeCfg.AsterSigner
 		traderConfig.AsterPrivateKey = exchangeCfg.AsterPrivateKey
 	}
 
 	// 根据AI模型设置API密钥
-	if aiModelCfg.Provider == "qwen" {
+	switch aiModelCfg.Provider {
+	case "qwen":
 		traderConfig.QwenKey = aiModelCfg.APIKey
-	} else if aiModelCfg.Provider == "deepseek" {
+	case "deepseek":
 		traderConfig.DeepSeekKey = aiModelCfg.APIKey
-	} else {
+	default:
 		// 其他provider (openai, anthropic, custom等) 使用 CustomAPIKey
 		traderConfig.CustomAPIKey = aiModelCfg.APIKey
 		log.Printf("🔑 [%s] 使用自定义AI Provider: %s", traderCfg.Name, aiModelCfg.Provider)
@@ -352,24 +354,26 @@ func (tm *TraderManager) AddTraderFromDB(traderCfg *config.TraderRecord, aiModel
 	}
 
 	// 根据交易所类型设置API密钥
-	if exchangeCfg.ID == "binance" {
+	switch exchangeCfg.ID {
+	case "binance":
 		traderConfig.BinanceAPIKey = exchangeCfg.APIKey
 		traderConfig.BinanceSecretKey = exchangeCfg.SecretKey
-	} else if exchangeCfg.ID == "hyperliquid" {
+	case "hyperliquid":
 		traderConfig.HyperliquidPrivateKey = exchangeCfg.APIKey // hyperliquid用APIKey存储private key
 		traderConfig.HyperliquidWalletAddr = exchangeCfg.HyperliquidWalletAddr
-	} else if exchangeCfg.ID == "aster" {
+	case "aster":
 		traderConfig.AsterUser = exchangeCfg.AsterUser
 		traderConfig.AsterSigner = exchangeCfg.AsterSigner
 		traderConfig.AsterPrivateKey = exchangeCfg.AsterPrivateKey
 	}
 
 	// 根据AI模型设置API密钥
-	if aiModelCfg.Provider == "qwen" {
+	switch aiModelCfg.Provider {
+	case "qwen":
 		traderConfig.QwenKey = aiModelCfg.APIKey
-	} else if aiModelCfg.Provider == "deepseek" {
+	case "deepseek":
 		traderConfig.DeepSeekKey = aiModelCfg.APIKey
-	} else {
+	default:
 		// 其他provider (openai, anthropic, custom等) 使用 CustomAPIKey
 		traderConfig.CustomAPIKey = aiModelCfg.APIKey
 		log.Printf("🔑 [%s] 使用自定义AI Provider: %s", traderCfg.Name, aiModelCfg.Provider)
@@ -1053,7 +1057,7 @@ func (tm *TraderManager) LoadTraderByID(database *config.Database, userID, trade
 }
 
 // loadSingleTrader 加载单个交易员（从现有代码提取的公共逻辑）
-func (tm *TraderManager) loadSingleTrader(traderCfg *config.TraderRecord, aiModelCfg *config.AIModelConfig, exchangeCfg *config.ExchangeConfig, coinPoolURL, oiTopURL string, maxDailyLoss, maxDrawdown float64, stopTradingMinutes int, defaultCoins []string, database *config.Database, userID string) error {
+func (tm *TraderManager) loadSingleTrader(traderCfg *config.TraderRecord, aiModelCfg *config.AIModelConfig, exchangeCfg *config.ExchangeConfig, coinPoolURL, _ string, maxDailyLoss, maxDrawdown float64, stopTradingMinutes int, defaultCoins []string, database *config.Database, userID string) error {
 	// 处理交易币种列表
 	var tradingCoins []string
 	if traderCfg.TradingSymbols != "" {
@@ -1104,24 +1108,26 @@ func (tm *TraderManager) loadSingleTrader(traderCfg *config.TraderRecord, aiMode
 	}
 
 	// 根据交易所类型设置API密钥
-	if exchangeCfg.ID == "binance" {
+	switch exchangeCfg.ID {
+	case "binance":
 		traderConfig.BinanceAPIKey = exchangeCfg.APIKey
 		traderConfig.BinanceSecretKey = exchangeCfg.SecretKey
-	} else if exchangeCfg.ID == "hyperliquid" {
+	case "hyperliquid":
 		traderConfig.HyperliquidPrivateKey = exchangeCfg.APIKey // hyperliquid用APIKey存储private key
 		traderConfig.HyperliquidWalletAddr = exchangeCfg.HyperliquidWalletAddr
-	} else if exchangeCfg.ID == "aster" {
+	case "aster":
 		traderConfig.AsterUser = exchangeCfg.AsterUser
 		traderConfig.AsterSigner = exchangeCfg.AsterSigner
 		traderConfig.AsterPrivateKey = exchangeCfg.AsterPrivateKey
 	}
 
 	// 根据AI模型设置API密钥
-	if aiModelCfg.Provider == "qwen" {
+	switch aiModelCfg.Provider {
+	case "qwen":
 		traderConfig.QwenKey = aiModelCfg.APIKey
-	} else if aiModelCfg.Provider == "deepseek" {
+	case "deepseek":
 		traderConfig.DeepSeekKey = aiModelCfg.APIKey
-	} else {
+	default:
 		// 其他provider (openai, anthropic, custom等) 使用 CustomAPIKey
 		traderConfig.CustomAPIKey = aiModelCfg.APIKey
 		log.Printf("🔑 [%s] 使用自定义AI Provider: %s", traderCfg.Name, aiModelCfg.Provider)
