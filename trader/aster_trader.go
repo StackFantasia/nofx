@@ -223,15 +223,15 @@ func (t *AsterTrader) normalizeAndStringify(params map[string]interface{}) (stri
 }
 
 // normalize 递归规范化参数（按key排序，所有值转为字符串）
-func (t *AsterTrader) normalize(v interface{}) (interface{}, error) {
+func (t *AsterTrader) normalize(v any) (any, error) {
 	switch val := v.(type) {
-	case map[string]interface{}:
+	case map[string]any:
 		keys := make([]string, 0, len(val))
 		for k := range val {
 			keys = append(keys, k)
 		}
 		sort.Strings(keys)
-		newMap := make(map[string]interface{}, len(keys))
+		newMap := make(map[string]any, len(keys))
 		for _, k := range keys {
 			nv, err := t.normalize(val[k])
 			if err != nil {
@@ -240,8 +240,8 @@ func (t *AsterTrader) normalize(v interface{}) (interface{}, error) {
 			newMap[k] = nv
 		}
 		return newMap, nil
-	case []interface{}:
-		out := make([]interface{}, 0, len(val))
+	case []any:
+		out := make([]any, 0, len(val))
 		for _, it := range val {
 			nv, err := t.normalize(it)
 			if err != nil {

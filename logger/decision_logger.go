@@ -3,7 +3,6 @@ package logger
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"math"
 	"os"
 	"path/filepath"
@@ -141,7 +140,7 @@ func (l *DecisionLogger) LogDecision(record *DecisionRecord) error {
 	}
 
 	// 写入文件（使用安全权限：只有所有者可读写）
-	if err := ioutil.WriteFile(filepath, data, 0600); err != nil {
+	if err := os.WriteFile(filepath, data, 0600); err != nil {
 		return fmt.Errorf("写入决策记录失败: %w", err)
 	}
 
@@ -151,7 +150,7 @@ func (l *DecisionLogger) LogDecision(record *DecisionRecord) error {
 
 // GetLatestRecords 获取最近N条记录（按时间正序：从旧到新）
 func (l *DecisionLogger) GetLatestRecords(n int) ([]*DecisionRecord, error) {
-	files, err := ioutil.ReadDir(l.logDir)
+	files, err := os.ReadDir(l.logDir)
 	if err != nil {
 		return nil, fmt.Errorf("读取日志目录失败: %w", err)
 	}
@@ -166,7 +165,7 @@ func (l *DecisionLogger) GetLatestRecords(n int) ([]*DecisionRecord, error) {
 		}
 
 		filepath := filepath.Join(l.logDir, file.Name())
-		data, err := ioutil.ReadFile(filepath)
+		data, err := os.ReadFile(filepath)
 		if err != nil {
 			continue
 		}
@@ -200,7 +199,7 @@ func (l *DecisionLogger) GetRecordByDate(date time.Time) ([]*DecisionRecord, err
 
 	var records []*DecisionRecord
 	for _, filepath := range files {
-		data, err := ioutil.ReadFile(filepath)
+		data, err := os.ReadFile(filepath)
 		if err != nil {
 			continue
 		}
@@ -220,7 +219,7 @@ func (l *DecisionLogger) GetRecordByDate(date time.Time) ([]*DecisionRecord, err
 func (l *DecisionLogger) CleanOldRecords(days int) error {
 	cutoffTime := time.Now().AddDate(0, 0, -days)
 
-	files, err := ioutil.ReadDir(l.logDir)
+	files, err := os.ReadDir(l.logDir)
 	if err != nil {
 		return fmt.Errorf("读取日志目录失败: %w", err)
 	}
@@ -231,7 +230,14 @@ func (l *DecisionLogger) CleanOldRecords(days int) error {
 			continue
 		}
 
-		if file.ModTime().Before(cutoffTime) {
+		// 修复：使用 file.Info() 获取 fs.FileInfo 接口，然后调用 ModTime()
+		fileInfo, err := file.Info()
+		if err != nil {
+			fmt.Printf("⚠ 获取文件信息失败 %s: %v\n", file.Name(), err)
+			continue
+		}
+
+		if fileInfo.ModTime().Before(cutoffTime) {
 			filepath := filepath.Join(l.logDir, file.Name())
 			if err := os.Remove(filepath); err != nil {
 				fmt.Printf("⚠ 删除旧记录失败 %s: %v\n", file.Name(), err)
@@ -250,7 +256,7 @@ func (l *DecisionLogger) CleanOldRecords(days int) error {
 
 // GetStatistics 获取统计信息
 func (l *DecisionLogger) GetStatistics() (*Statistics, error) {
-	files, err := ioutil.ReadDir(l.logDir)
+	files, err := os.ReadDir(l.logDir)
 	if err != nil {
 		return nil, fmt.Errorf("读取日志目录失败: %w", err)
 	}
@@ -263,7 +269,7 @@ func (l *DecisionLogger) GetStatistics() (*Statistics, error) {
 		}
 
 		filepath := filepath.Join(l.logDir, file.Name())
-		data, err := ioutil.ReadFile(filepath)
+		data, err := os.ReadFile(filepath)
 		if err != nil {
 			continue
 		}
@@ -373,7 +379,7 @@ func (l *DecisionLogger) AnalyzePerformance(lookbackCycles int) (*PerformanceAna
 	}
 
 	// 追踪持仓状态：symbol_side -> {side, openPrice, openTime, quantity, leverage}
-	openPositions := make(map[string]map[string]interface{})
+	openPositions := make(map[string]map[string]any)
 
 	// 为了避免开仓记录在窗口外导致匹配失败，需要先从所有历史记录中找出未平仓的持仓
 	// 获取更多历史记录来构建完整的持仓状态（使用更大的窗口）
@@ -409,7 +415,7 @@ func (l *DecisionLogger) AnalyzePerformance(lookbackCycles int) (*PerformanceAna
 				switch action.Action {
 				case "open_long", "open_short":
 					// 记录开仓
-					openPositions[posKey] = map[string]interface{}{
+					openPositions[posKey] = map[string]any{
 						"side":      side,
 						"openPrice": action.Price,
 						"openTime":  action.Timestamp,
@@ -456,7 +462,7 @@ func (l *DecisionLogger) AnalyzePerformance(lookbackCycles int) (*PerformanceAna
 			switch action.Action {
 			case "open_long", "open_short":
 				// 更新开仓记录（可能已经在预填充时记录过了）
-				openPositions[posKey] = map[string]interface{}{
+				openPositions[posKey] = map[string]any{
 					"side":               side,
 					"openPrice":          action.Price,
 					"openTime":           action.Timestamp,

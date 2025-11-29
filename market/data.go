@@ -534,7 +534,7 @@ func Normalize(symbol string) string {
 }
 
 // parseFloat 解析float值
-func parseFloat(v interface{}) (float64, error) {
+func parseFloat(v any) (float64, error) {
 	switch val := v.(type) {
 	case string:
 		return strconv.ParseFloat(val, 64)

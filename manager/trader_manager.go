@@ -16,7 +16,7 @@ import (
 
 // CompetitionCache 竞赛数据缓存
 type CompetitionCache struct {
-	data      map[string]interface{}
+	data      map[string]any
 	timestamp time.Time
 	mu        sync.RWMutex
 }

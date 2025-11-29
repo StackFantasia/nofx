@@ -1,4 +1,4 @@
-# 🤖 NOFX - Agentic Trading OS
+# 🤖 NOFX - AI交易操作系统
 
 [![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?style=flat&logo=go)](https://golang.org/)
 [![React](https://img.shields.io/badge/React-18+-61DAFB?style=flat&logo=react)](https://reactjs.org/)
@@ -6,291 +6,186 @@
 [![License](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
 [![Backed by Amber.ac](https://img.shields.io/badge/Backed%20by-Amber.ac-orange.svg)](https://amber.ac)
 
-| 🎁 **CONTRIBUTOR AIRDROP PROGRAM** |
-|:----------------------------------:|
-| Code · Bug Fixes · Issues → Airdrop |
-| [Learn More](#-contributor-airdrop-program) |
+## 🚀 通用AI交易操作系统
 
-**Languages:** [English](README.md) | [中文](docs/i18n/zh-CN/README.md) | [Українська](docs/i18n/uk/README.md) | [Русский](docs/i18n/ru/README.md) | [日本語](docs/i18n/ja/README.md) | [한국어](docs/i18n/ko/README.md) | [Tiếng Việt](docs/i18n/vi/README.md)
+**NOFX** 是通用架构的 **AI交易操作系统（Agentic Trading OS）**。已在加密市场打通"**多智能体决策 → 统一风控 → 低延迟执行 → 真实/纸面账户复盘**"的闭环，正按同一技术栈扩展到**股票、期货、期权、外汇等所有市场**。
 
-**📚 Documentation:** [Docs Home](docs/README.md) | [Getting Started](docs/getting-started/README.md) | [Prompt Writing Guide](docs/prompt-guide.md) ([中文](docs/prompt-guide.zh-CN.md)) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [Security](SECURITY.md) | [⚠️ Disclaimer](DISCLAIMER.md)
+### 🎯 核心特性
 
----
-
-## 📑 Table of Contents
-
-- [🚀 Universal AI Trading Operating System](#-universal-ai-trading-operating-system)
-- [👥 Developer Community](#-developer-community)
-- [📸 Screenshots](#-screenshots)
-- [🏦 Supported Exchanges (DEX/CEX Tutorials)](#-supported-exchanges-dexcex-tutorials)
-- [🤖 Supported AI Models](#-supported-ai-models)
-- [✨ Current Implementation](#-current-implementation---crypto-markets)
-- [🔮 Roadmap](#-roadmap---universal-market-expansion)
-- [🏗️ Technical Architecture](#️-technical-architecture)
-- [🚀 Quick Start](#-quick-start)
-- [📖 AI Decision Flow](#-ai-decision-flow)
-- [🧠 AI Self-Learning](#-ai-self-learning-example)
-- [📊 Web Interface Features](#-web-interface-features)
-- [🎛️ API Endpoints](#️-api-endpoints)
-- [⚠️ Important Risk Warnings](#️-important-risk-warnings)
-- [🛠️ Common Issues](#️-common-issues)
-- [📈 Performance Tips](#-performance-optimization-tips)
-- [🔄 Changelog](#-changelog)
-- [📄 License](#-license)
-- [🤝 Contributing](#-contributing)
-- [🎁 Contributor Airdrop Program](#-contributor-airdrop-program)
+- **通用数据与回测层**：跨市场、跨周期、跨交易所统一表示与因子库，沉淀可迁移的"策略记忆"
+- **多智能体自博弈与自进化**：策略自动对战择优，按账户级 PnL 与风险约束持续迭代
+- **执行与风控一体化**：低延迟路由、滑点/风控沙箱、账户级限额，一键切换市场
 
 ---
 
-## 🚀 Universal AI Trading Operating System
-
-**NOFX** is a **universal Agentic Trading OS** built on a unified architecture. We've successfully closed the loop in crypto markets: **"Multi-Agent Decision → Unified Risk Control → Low-Latency Execution → Live/Paper Account Backtesting"**, and are now expanding this same technology stack to **stocks, futures, options, forex, and all financial markets**.
-
-### 🎯 Core Features
-
-- **Universal Data & Backtesting Layer**: Cross-market, cross-timeframe, cross-exchange unified representation and factor library, accumulating transferable "strategy memory"
-- **Multi-Agent Self-Play & Self-Evolution**: Strategies automatically compete and select the best, continuously iterating based on account-level PnL and risk constraints
-- **Integrated Execution & Risk Control**: Low-latency routing, slippage/risk control sandbox, account-level limits, one-click market switching
-
-### 🏢 Backed by [Amber.ac](https://amber.ac)
-
-### 👥 Core Team
-
-- **Tinkle** - [@Web3Tinkle](https://x.com/Web3Tinkle)
-- **Official Twitter (Only)** - [@nofx_official](https://x.com/nofx_official)
-
-### 💼 Seed Funding Round Open
-
-We are currently raising our **seed round**.
-
-**For investment inquiries**, please DM **Tinkle** via Twitter.
+> ⚠️ **风险提示**：本系统为实验性项目，AI自动交易存在重大风险，强烈建议仅用于学习研究或小额资金测试！
 
 ---
 
-> ⚠️ **Risk Warning**: This system is experimental. AI auto-trading carries significant risks. Strongly recommended for learning/research purposes or testing with small amounts only!
+## 🏦 支持的交易所（DEX/CEX教程）
 
-## 👥 Developer Community
+### CEX（中心化交易所）
 
-Join our Telegram developer community to discuss, share ideas, and get support:
+| 交易所 | 状态 | 注册（手续费优惠） | API设置 |
+|--------|------|-------------------|---------|
+| **Binance** | ✅ 已支持 | [注册](https://www.binance.com/join?ref=NOFXCHI) | [API指南](../../getting-started/binance-api.md) |
+| **Bybit** | ✅ 已支持 | [注册](https://partner.bybit.com/b/83856) | [API指南](../../getting-started/bybit-api.md) |
+| **OKX** | ✅ 已支持 | [注册](https://www.okx.com/join/1865360) | [API指南](../../getting-started/okx-api.md) |
 
-**💬 [NOFX Developer Community](https://t.me/nofx_dev_community)**
+### Perp-DEX（去中心化永续交易所）
 
----
-
-## 📸 Screenshots
-
-### 🏆 Competition Mode - Real-time AI Battle
-![Competition Page](screenshots/competition-page.png)
-*Multi-AI leaderboard with real-time performance comparison charts showing Qwen vs DeepSeek live trading battle*
-
-### 📊 Trader Details - Complete Trading Dashboard
-![Details Page](screenshots/details-page.png)
-*Professional trading interface with equity curves, live positions, and AI decision logs with expandable input prompts & chain-of-thought reasoning*
+| 交易所 | 状态 | 注册（手续费优惠） | 代理钱包设置 |
+|--------|------|-------------------|--------------|
+| **Hyperliquid** | ✅ 已支持 | [注册](https://app.hyperliquid.xyz/join/AITRADING) | [代理钱包指南](../../getting-started/hyperliquid-agent-wallet.md) |
+| **Aster DEX** | ✅ 已支持 | [注册](https://www.asterdex.com/en/referral/fdfc0e) | [API钱包指南](../../getting-started/aster-api-wallet.md) |
+| **Lighter** | ✅ 已支持 | [注册](https://lighter.xyz) | [代理钱包指南](../../getting-started/lighter-agent-wallet.md) |
 
 ---
 
-## 🏦 Supported Exchanges (DEX/CEX Tutorials)
+## 🤖 支持的AI模型
 
-### CEX (Centralized Exchanges)
-
-| Exchange | Status | Register (Fee Discount) | API Setup |
-|----------|--------|-------------------------|-----------|
-| **Binance** | ✅ Supported | [Register](https://www.binance.com/join?ref=NOFXENG) | [API Guide](docs/getting-started/binance-api.md) |
-| **Bybit** | ✅ Supported | [Register](https://partner.bybit.com/b/83856) | [API Guide](docs/getting-started/bybit-api.md) |
-| **OKX** | ✅ Supported | [Register](https://www.okx.com/join/1865360) | [API Guide](docs/getting-started/okx-api.md) |
-
-### Perp-DEX (Decentralized Perpetual Exchanges)
-
-| Exchange | Status | Register (Fee Discount) | Agent Wallet Setup |
-|----------|--------|-------------------------|--------------------|
-| **Hyperliquid** | ✅ Supported | [Register](https://app.hyperliquid.xyz/join/AITRADING) | [Agent Wallet Guide](docs/getting-started/hyperliquid-agent-wallet.md) |
-| **Aster DEX** | ✅ Supported | [Register](https://www.asterdex.com/en/referral/fdfc0e) | [API Wallet Guide](docs/getting-started/aster-api-wallet.md) |
-| **Lighter** | ✅ Supported | [Register](https://lighter.xyz) | [Agent Wallet Guide](docs/getting-started/lighter-agent-wallet.md) |
+| AI模型 | 状态 | 获取API密钥 |
+|--------|------|-------------|
+| **DeepSeek** | ✅ 已支持 | [获取API密钥](https://platform.deepseek.com) |
+| **Qwen (通义千问)** | ✅ 已支持 | [获取API密钥](https://dashscope.console.aliyun.com) |
+| **OpenAI (GPT)** | ✅ 已支持 | [获取API密钥](https://platform.openai.com) |
+| **Claude** | ✅ 已支持 | [获取API密钥](https://console.anthropic.com) |
+| **Gemini** | ✅ 已支持 | [获取API密钥](https://aistudio.google.com) |
+| **Grok** | ✅ 已支持 | [获取API密钥](https://console.x.ai) |
+| **Kimi (月之暗面)** | ✅ 已支持 | [获取API密钥](https://platform.moonshot.cn) |
 
 ---
 
-## 🤖 Supported AI Models
+## ✨ 当前实现 - 加密货币市场
 
-| AI Model | Status | Get API Key |
-|----------|--------|-------------|
-| **DeepSeek** | ✅ Supported | [Get API Key](https://platform.deepseek.com) |
-| **Qwen** | ✅ Supported | [Get API Key](https://dashscope.console.aliyun.com) |
-| **OpenAI (GPT)** | ✅ Supported | [Get API Key](https://platform.openai.com) |
-| **Claude** | ✅ Supported | [Get API Key](https://console.anthropic.com) |
-| **Gemini** | ✅ Supported | [Get API Key](https://aistudio.google.com) |
-| **Grok** | ✅ Supported | [Get API Key](https://console.x.ai) |
-| **Kimi** | ✅ Supported | [Get API Key](https://platform.moonshot.cn) |
+NOFX 目前已在**加密货币市场全面运行**，具备以下经过验证的能力：
 
----
+### 🏆 多智能体竞赛框架
+- **实时智能体对战**：Qwen vs DeepSeek 模型实时交易竞赛
+- **独立账户管理**：每个智能体维护独立的决策日志和性能指标
+- **实时性能对比**：实时 ROI 追踪、胜率统计、正面对抗分析
+- **自进化循环**：智能体从历史表现中学习，持续改进
 
-## ✨ Current Implementation - Crypto Markets
+### 🧠 AI 自学习与优化
+- **历史反馈系统**：每次决策前分析最近 20 个交易周期
+- **智能性能分析**：
+  - 识别表现最佳/最差资产
+  - 计算胜率、盈亏比、以真实 USDT 计的平均盈利
+  - 避免重复错误（连续亏损模式）
+  - 强化成功策略（高胜率模式）
+- **动态策略调整**：AI 根据回测结果自主调整交易风格
 
-NOFX is currently **fully operational in cryptocurrency markets** with the following proven capabilities:
+### 📊 通用市场数据层（加密货币实现）
+- **多时间框架分析**：3分钟实时 + 4小时趋势数据
+- **技术指标**：EMA20/50、MACD、RSI(7/14)、ATR
+- **持仓量追踪**：市场情绪、资金流向分析
+- **流动性过滤**：自动过滤低流动性资产（<15M USD）
+- **跨交易所支持**：Binance、Hyperliquid、Aster DEX，统一数据接口
 
-### 🏆 Multi-Agent Competition Framework
-- **Live Agent Battle**: Qwen vs DeepSeek models compete in real-time trading
-- **Independent Account Management**: Each agent maintains its own decision logs and performance metrics
-- **Real-time Performance Comparison**: Live ROI tracking, win rate statistics, and head-to-head analysis
-- **Self-Evolution Loop**: Agents learn from their historical performance and continuously improve
+### 🎯 统一风控系统
+- **仓位限制**：单资产限制（山寨币≤1.5x净值，BTC/ETH≤10x净值）
+- **可配置杠杆**：根据资产类别和账户类型动态调整 1x 到 50x
+- **保证金管理**：总使用率≤90%，AI 控制分配
+- **风险回报强制执行**：强制≥1:2 的止损止盈比
+- **防叠加保护**：防止同一资产/方向的重复仓位
 
-### 🧠 AI Self-Learning & Optimization
-- **Historical Feedback System**: Analyzes last 20 trading cycles before each decision
-- **Smart Performance Analysis**:
-  - Identifies best/worst performing assets
-  - Calculates win rate, profit/loss ratio, average profit in real USDT terms
-  - Avoids repeating mistakes (consecutive losing patterns)
-  - Reinforces successful strategies (high win rate patterns)
-- **Dynamic Strategy Adjustment**: AI autonomously adapts trading style based on backtest results
+### ⚡ 低延迟执行引擎
+- **多交易所 API 集成**：Binance Futures、Hyperliquid DEX、Aster DEX
+- **自动精度处理**：每个交易所智能订单大小和价格格式化
+- **优先级执行**：先平仓现有持仓，再开新仓
+- **滑点控制**：执行前验证，实时精度检查
 
-### 📊 Universal Market Data Layer (Crypto Implementation)
-- **Multi-Timeframe Analysis**: 3-minute real-time + 4-hour trend data
-- **Technical Indicators**: EMA20/50, MACD, RSI(7/14), ATR
-- **Open Interest Tracking**: Market sentiment, capital flow analysis
-- **Liquidity Filtering**: Auto-filters low liquidity assets (<15M USD)
-- **Cross-Exchange Support**: Binance, Hyperliquid, Aster DEX with unified data interface
-
-### 🎯 Unified Risk Control System
-- **Position Limits**: Per-asset limits (Altcoins ≤1.5x equity, BTC/ETH ≤10x equity)
-- **Configurable Leverage**: Dynamic leverage from 1x to 50x based on asset class and account type
-- **Margin Management**: Total usage ≤90%, AI-controlled allocation
-- **Risk-Reward Enforcement**: Mandatory ≥1:2 stop-loss to take-profit ratio
-- **Anti-Stacking Protection**: Prevents duplicate positions in same asset/direction
-
-### ⚡ Low-Latency Execution Engine
-- **Multi-Exchange API Integration**: Binance Futures, Hyperliquid DEX, Aster DEX
-- **Automatic Precision Handling**: Smart order size & price formatting per exchange
-- **Priority Execution**: Close existing positions first, then open new ones
-- **Slippage Control**: Pre-execution validation, real-time precision checks
-
-### 🎨 Professional Monitoring Interface
-- **Binance-Style Dashboard**: Professional dark theme with real-time updates
-- **Equity Curves**: Historical account value tracking (USD/percentage toggle)
-- **Performance Charts**: Multi-agent ROI comparison with live updates
-- **Complete Decision Logs**: Full Chain of Thought (CoT) reasoning for every trade
-- **5-Second Data Refresh**: Real-time account, position, and P/L updates
+### 🎨 专业监控界面
+- **币安风格仪表板**：专业暗色主题，实时更新
+- **净值曲线**：历史账户价值追踪（USD/百分比切换）
+- **性能图表**：多智能体 ROI 对比，实时更新
+- **完整决策日志**：每笔交易的完整思维链（CoT）推理
+- **5秒数据刷新**：实时账户、持仓和盈亏更新
 
 ---
 
-## 🔮 Roadmap - Universal Market Expansion
+## 🏗️ 技术架构
 
-NOFX is on a mission to become the **Universal AI Trading Operating System** for all financial markets.
+NOFX 采用现代化的模块化架构：
 
-**Vision:** Same architecture. Same agent framework. All markets.
+- **后端：** Go + Gin 框架，SQLite 数据库
+- **前端：** React 18 + TypeScript + Vite + TailwindCSS
+- **多交易所支持：** Binance、Hyperliquid、Aster DEX
+- **AI 集成：** DeepSeek、Qwen 及自定义 OpenAI 兼容 API
+- **状态管理：** 前端 Zustand，后端数据库驱动
+- **实时更新：** SWR，5-10 秒轮询间隔
 
-**Expansion Markets:**
-- 📈 **Stock Markets**: US equities, A-shares, Hong Kong stocks
-- 📊 **Futures Markets**: Commodity futures, index futures
-- 🎯 **Options Trading**: Equity options, crypto options
-- 💱 **Forex Markets**: Major currency pairs, cross rates
-
-**Upcoming Features:**
-- Enhanced AI capabilities (GPT-4, Claude 3, Gemini Pro, flexible prompt templates)
-- New exchange integrations (OKX, Bybit, Lighter, EdgeX + CEX/Perp-DEX)
-- Project structure refactoring (high cohesion, low coupling, SOLID principles)
-- Security enhancements (AES-256 encryption for API keys, RBAC, 2FA improvements)
-- User experience improvements (mobile-responsive, TradingView charts, alert system)
-
-📖 **For detailed roadmap and timeline, see:**
-- **English:** [Roadmap Documentation](docs/roadmap/README.md)
-- **中文:** [路线图文档](docs/roadmap/README.zh-CN.md)
+**核心特性：**
+- 🗄️ 数据库驱动的配置（无需编辑 JSON）
+- 🔐 JWT 认证，支持可选的 2FA
+- 📊 实时性能跟踪和分析
+- 🤖 多 AI 竞赛模式，实时对比
+- 🔌 RESTful API，完整的配置和监控
 
 ---
 
-## 🏗️ Technical Architecture
+## 🚀 快速开始
 
-NOFX is built with a modern, modular architecture:
+### 🐳 方式A：Docker 一键部署（最简单 - 新手推荐！）
 
-- **Backend:** Go with Gin framework, SQLite database
-- **Frontend:** React 18 + TypeScript + Vite + TailwindCSS
-- **Multi-Exchange Support:** Binance, Hyperliquid, Aster DEX
-- **AI Integration:** DeepSeek, Qwen, and custom OpenAI-compatible APIs
-- **State Management:** Zustand for frontend, database-driven for backend
-- **Real-time Updates:** SWR with 5-10s polling intervals
+**⚡ 使用Docker只需3步即可开始交易 - 无需安装任何环境！**
 
-**Key Features:**
-- 🗄️ Database-driven configuration (no more JSON editing)
-- 🔐 JWT authentication with optional 2FA support
-- 📊 Real-time performance tracking and analytics
-- 🤖 Multi-AI competition mode with live comparison
-- 🔌 RESTful API for all configuration and monitoring
+Docker会自动处理所有依赖（Go、Node.js、TA-Lib）和环境配置，完美适合新手！
 
-📖 **For detailed architecture documentation, see:**
-- **English:** [Architecture Documentation](docs/architecture/README.md)
-- **中文:** [架构文档](docs/architecture/README.zh-CN.md)
-
----
-
-## 🚀 Quick Start
-
-### 🐳 Option A: Docker One-Click Deployment (EASIEST - Recommended!)
-
-**⚡ Start the platform in 2 simple steps with Docker - No installation needed!**
-
-Docker automatically handles all dependencies (Go, Node.js, TA-Lib, SQLite) and environment setup.
-
-#### Step 1: Prepare Configuration
+#### 步骤1：准备配置文件
 ```bash
-# Copy configuration template
+# 复制配置文件模板
 cp config.json.example config.json
 
-# Edit and fill in your API keys
-nano config.json  # or use any editor
+# 编辑并填入你的API密钥
+nano config.json  # 或使用其他编辑器
 ```
 
-⚠️ **Note**: Basic config.json is still needed for some settings, but ~~trader configurations~~ are now done through the web interface.
+⚠️ **注意**: 基础config.json仍需要一些设置，但~~交易员配置~~现在通过Web界面进行。
 
-#### Step 2: One-Click Start
+#### 步骤2：一键启动
 ```bash
-# Option 1: Use convenience script (Recommended)
-chmod +x ./start.sh
-./start.sh start --build
+# 方式1：使用便捷脚本（推荐）
+chmod +x scripts/start.sh
+./scripts/start.sh start --build
 
-> #### Docker Compose Version Notes
->
-> **This project uses Docker Compose V2 syntax (with spaces)**
->
-> If you have the older standalone `docker-compose` installed, please upgrade to Docker Desktop or Docker 20.10+
 
-# Option 2: Use docker compose directly
+# 方式2：直接使用docker compose
+# 如果您还在使用旧的独立 `docker-compose`，请升级到 Docker Desktop 或 Docker 20.10+
 docker compose up -d --build
 ```
 
-#### Step 2: Access Web Interface
-Open your browser and visit: **http://localhost:3000**
+#### 步骤3：访问控制台
+在浏览器中打开：**http://localhost:3000**
 
-**That's it! 🎉** Your AI trading platform is now running!
+**就是这么简单！🎉** 你的AI交易系统已经运行起来了！
 
-#### Initial Setup (Through Web Interface)
-1. **Configure AI Models**: Add your DeepSeek/Qwen API keys
-2. **Configure Exchanges**: Set up Binance/Hyperliquid credentials  
-3. **Create Traders**: Combine AI models with exchanges
-4. **Start Trading**: Launch your configured traders
-
-#### Manage Your System
+#### 管理你的系统
 ```bash
-./start.sh logs      # View logs
-./start.sh status    # Check status
-./start.sh stop      # Stop services
-./start.sh restart   # Restart services
+./scripts/start.sh logs      # 查看日志
+./scripts/start.sh status    # 检查状态
+./scripts/start.sh stop      # 停止服务
+./scripts/start.sh restart   # 重启服务
 ```
 
-**📖 For detailed Docker deployment guide, troubleshooting, and advanced configuration:**
-- **English**: See [docs/getting-started/docker-deploy.en.md](docs/getting-started/docker-deploy.en.md)
-- **中文**: 查看 [docs/getting-started/docker-deploy.zh-CN.md](docs/getting-started/docker-deploy.zh-CN.md)
+**📖 详细的Docker部署教程、故障排查和高级配置：**
+- **中文**: 查看 [DOCKER_DEPLOY.md](DOCKER_DEPLOY.md)
+- **English**: See [DOCKER_DEPLOY.en.md](DOCKER_DEPLOY.en.md)
+- **日本語**: [DOCKER_DEPLOY.ja.md](DOCKER_DEPLOY.ja.md)を参照
 
 ---
 
-### 📦 Option B: Manual Installation (For Developers)
+### 📦 方式B：手动安装（开发者）
 
-**Note**: If you used Docker deployment above, skip this section. Manual installation is only needed if you want to modify the code or run without Docker.
+**注意**：如果你使用了上面的Docker部署，请跳过本节。手动安装仅在你需要修改代码或不想使用Docker时需要。
 
-### 1. Environment Requirements
+### 1. 环境要求
 
 - **Go 1.21+**
 - **Node.js 18+**
-- **TA-Lib** library (technical indicator calculation)
+- **TA-Lib** 库（技术指标计算）
 
-#### Installing TA-Lib
+#### 安装 TA-Lib
 
 **macOS:**
 ```bash
@@ -302,258 +197,106 @@ brew install ta-lib
 sudo apt-get install libta-lib0-dev
 ```
 
-**Other systems**: Refer to [TA-Lib Official Documentation](https://github.com/markcheno/go-talib)
+**其他系统**: 参考 [TA-Lib官方文档](https://github.com/markcheno/go-talib)
 
-### 2. Clone the Project
+### 2. 克隆项目
 
 ```bash
-git clone https://github.com/tinkle-community/nofx.git
+git clone <repository-url>
 cd nofx
 ```
 
-### 3. Install Dependencies
+### 3. 安装依赖
 
-**Backend:**
+**后端:**
 ```bash
 go mod download
 ```
 
-**Frontend:**
+**前端:**
 ```bash
 cd web
 npm install
 cd ..
 ```
 
-### 4. Get AI API Keys
+### 4. 获取AI API密钥
 
-Before configuring the system, you need to obtain AI API keys. Choose one of the following AI providers:
+在配置系统之前，您需要获取AI API密钥。请选择以下AI提供商之一：
 
-#### Option 1: DeepSeek (Recommended for Beginners)
+#### 选项1：DeepSeek（推荐新手）
 
-**Why DeepSeek?**
-- 💰 Cheaper than GPT-4 (about 1/10 the cost)
-- 🚀 Fast response time
-- 🎯 Excellent trading decision quality
-- 🌍 Works globally without VPN
+**为什么选择DeepSeek？**
+- 💰 比GPT-4便宜（约1/10成本）
+- 🚀 响应速度快
+- 🎯 交易决策质量优秀
+- 🌍 全球可用无需VPN
 
-**How to get DeepSeek API Key:**
+**如何获取DeepSeek API密钥：**
 
-1. **Visit**: [https://platform.deepseek.com](https://platform.deepseek.com)
-2. **Register**: Sign up with email/phone number
-3. **Verify**: Complete email/phone verification
-4. **Top-up**: Add credits to your account
-   - Minimum: ~$5 USD
-   - Recommended: $20-50 USD for testing
-5. **Create API Key**:
-   - Go to API Keys section
-   - Click "Create New Key"
-   - Copy and save the key (starts with `sk-`)
-   - ⚠️ **Important**: Save it immediately - you can't see it again!
+1. **访问**：[https://platform.deepseek.com](https://platform.deepseek.com)
+2. **注册**：使用邮箱/手机号注册
+3. **验证**：完成邮箱/手机验证
+4. **充值**：向账户添加余额
+   - 最低：约$5美元
+   - 推荐：$20-50美元用于测试
+5. **创建API密钥**：
+   - 进入API Keys部分
+   - 点击"创建新密钥"
+   - 复制并保存密钥（以`sk-`开头）
+   - ⚠️ **重要**：立即保存 - 之后无法再查看！
 
-**Pricing**: ~$0.14 per 1M tokens (very cheap!)
+**价格**：每百万tokens约$0.14（非常便宜！）
 
-#### Option 2: Qwen (Alibaba Cloud)
+#### 选项2：Qwen（阿里云通义千问）
 
-**How to get Qwen API Key:**
+**如何获取Qwen API密钥：**
 
-1. **Visit**: [https://dashscope.console.aliyun.com](https://dashscope.console.aliyun.com)
-2. **Register**: Sign up with Alibaba Cloud account
-3. **Enable Service**: Activate DashScope service
-4. **Create API Key**:
-   - Go to API Key Management
-   - Create new key
-   - Copy and save (starts with `sk-`)
+1. **访问**：[https://dashscope.console.aliyun.com](https://dashscope.console.aliyun.com)
+2. **注册**：使用阿里云账户注册
+3. **开通服务**：激活DashScope服务
+4. **创建API密钥**：
+   - 进入API密钥管理
+   - 创建新密钥
+   - 复制并保存（以`sk-`开头）
 
-**Note**: May require Chinese phone number for registration
-
----
-
-### 5. Start the System
-
-#### **Step 1: Start the Backend**
-
-```bash
-# Build the program (first time only, or after code changes)
-go build -o nofx
-
-# Start the backend
-./nofx
-```
-
-**What you should see:**
-
-```
-╔════════════════════════════════════════════════════════════╗
-║    🤖 AI多模型交易系统 - 支持 DeepSeek & Qwen                  ║
-╚════════════════════════════════════════════════════════════╝
-
-🤖 数据库中的AI交易员配置:
-  • 暂无配置的交易员，请通过Web界面创建
-
-🌐 API服务器启动在 http://localhost:8081
-```
-
-#### **Step 2: Start the Frontend**
-
-Open a **NEW terminal window**, then:
-
-```bash
-cd web
-npm run dev
-```
-
-#### **Step 3: Access the Web Interface**
-
-Open your browser and visit: **🌐 http://localhost:3000**
-
-### 6. Configure Through Web Interface
-
-**Now configure everything through the web interface - no more JSON editing!**
-
-#### **Step 1: Configure AI Models**
-1. Click "AI模型配置" button
-2. Enable DeepSeek or Qwen (or both)
-3. Enter your API keys
-4. Save configuration
-
-#### **Step 2: Configure Exchanges**  
-1. Click "交易所配置" button
-2. Enable Binance or Hyperliquid (or both)
-3. Enter your API credentials
-4. Save configuration
-
-#### **Step 3: Create Traders**
-1. Click "创建交易员" button
-2. Select an AI model (must be configured first)
-3. Select an exchange (must be configured first)  
-4. Set initial balance and trader name
-5. Create trader
-
-#### **Step 4: Start Trading**
-- Your traders will appear in the main interface
-- Use Start/Stop buttons to control them
-- Monitor performance in real-time
-
-**✅ No more JSON file editing - everything is done through the web interface!**
+**注意**：可能需要中国手机号注册
 
 ---
 
-#### ⚔️ Expert Mode: Multi-Trader Competition
+#### ⚙️ 杠杆配置 (v2.0.3+)
 
-For running multiple AI traders competing against each other:
+**什么是杠杆配置？**
 
-```json
-{
-  "traders": [
-    {
-      "id": "qwen_trader",
-      "name": "Qwen AI Trader",
-      "ai_model": "qwen",
-      "binance_api_key": "YOUR_BINANCE_API_KEY_1",
-      "binance_secret_key": "YOUR_BINANCE_SECRET_KEY_1",
-      "use_qwen": true,
-      "qwen_key": "sk-xxxxx",
-      "deepseek_key": "",
-      "initial_balance": 1000.0,
-      "scan_interval_minutes": 3
-    },
-    {
-      "id": "deepseek_trader",
-      "name": "DeepSeek AI Trader",
-      "ai_model": "deepseek",
-      "binance_api_key": "YOUR_BINANCE_API_KEY_2",
-      "binance_secret_key": "YOUR_BINANCE_SECRET_KEY_2",
-      "use_qwen": false,
-      "qwen_key": "",
-      "deepseek_key": "sk-xxxxx",
-      "initial_balance": 1000.0,
-      "scan_interval_minutes": 3
-    }
-  ],
-  "use_default_coins": true,
-  "coin_pool_api_url": "",
-  "oi_top_api_url": "",
-  "api_server_port": 8080
-}
-```
+杠杆设置控制AI每次交易可以使用的最大杠杆。这对于风险管理至关重要，特别是对于有杠杆限制的币安子账户。
 
-**Requirements for Competition Mode:**
-- 2 separate Binance futures accounts (different API keys)
-- Both AI API keys (Qwen + DeepSeek)
-- More capital for testing (recommended: 500+ USDT per account)
-
----
-
-#### 📚 Configuration Field Explanations
-
-| Field | Description | Example Value | Required? |
-|-------|-------------|---------------|-----------|
-| `id` | Unique identifier for this trader | `"my_trader"` | ✅ Yes |
-| `name` | Display name | `"My AI Trader"` | ✅ Yes |
-| `enabled` | Whether this trader is enabled<br>Set to `false` to skip startup | `true` or `false` | ✅ Yes |
-| `ai_model` | AI provider to use | `"deepseek"` or `"qwen"` or `"custom"` | ✅ Yes |
-| `exchange` | Exchange to use | `"binance"` or `"hyperliquid"` or `"aster"` | ✅ Yes |
-| `binance_api_key` | Binance API key | `"abc123..."` | Required when using Binance |
-| `binance_secret_key` | Binance Secret key | `"xyz789..."` | Required when using Binance |
-| `hyperliquid_private_key` | Hyperliquid private key<br>⚠️ Remove `0x` prefix | `"your_key..."` | Required when using Hyperliquid |
-| `hyperliquid_wallet_addr` | Hyperliquid wallet address | `"0xabc..."` | Required when using Hyperliquid |
-| `hyperliquid_testnet` | Use testnet | `true` or `false` | ❌ No (defaults to false) |
-| `use_qwen` | Whether to use Qwen | `true` or `false` | ✅ Yes |
-| `deepseek_key` | DeepSeek API key | `"sk-xxx"` | If using DeepSeek |
-| `qwen_key` | Qwen API key | `"sk-xxx"` | If using Qwen |
-| `initial_balance` | Starting balance for P/L calculation | `1000.0` | ✅ Yes |
-| `scan_interval_minutes` | How often to make decisions | `3` (3-5 recommended) | ✅ Yes |
-| **`leverage`** | **Leverage configuration (v2.0.3+)** | See below | ✅ Yes |
-| `btc_eth_leverage` | Maximum leverage for BTC/ETH<br>⚠️ Subaccounts: ≤5x | `5` (default, safe)<br>`50` (main account max) | ✅ Yes |
-| `altcoin_leverage` | Maximum leverage for altcoins<br>⚠️ Subaccounts: ≤5x | `5` (default, safe)<br>`20` (main account max) | ✅ Yes |
-| `use_default_coins` | Use built-in coin list<br>**✨ Smart Default: `true`** (v2.0.2+)<br>Auto-enabled if no API URL provided | `true` or omit | ❌ No<br>(Optional, auto-defaults) |
-| `coin_pool_api_url` | Custom coin pool API<br>*Only needed when `use_default_coins: false`* | `""` (empty) | ❌ No |
-| `oi_top_api_url` | Open interest API<br>*Optional supplement data* | `""` (empty) | ❌ No |
-| `api_server_port` | Web dashboard port | `8080` | ✅ Yes |
-
-~~**Default Trading Coins** (when `use_default_coins: true`):
-- BTC, ETH, SOL, BNB, XRP, DOGE, ADA, HYPE~~
-
-*Note: Trading coins are now configured through the web interface*
-
----
-
-#### ⚙️ Leverage Configuration (v2.0.3+)
-
-**What is leverage configuration?**
-
-The leverage settings control the maximum leverage the AI can use for each trade. This is crucial for risk management, especially for Binance subaccounts which have leverage restrictions.
-
-~~**Configuration format:**~~
+**配置格式：**
 
 ```json
 "leverage": {
-  "btc_eth_leverage": 5,    // Maximum leverage for BTC and ETH
-  "altcoin_leverage": 5      // Maximum leverage for all other coins
+  "btc_eth_leverage": 5,    // BTC和ETH的最大杠杆
+  "altcoin_leverage": 5      // 所有其他币种的最大杠杆
 }
 ```
 
-*Note: Leverage is now configured through the web interface*
+**⚠️ 重要：币安子账户限制**
 
-**⚠️ Important: Binance Subaccount Restrictions**
+- **子账户**：币安限制为**≤5倍杠杆**
+- **主账户**：可使用最高20倍（山寨币）或50倍（BTC/ETH）
+- 如果您使用子账户并设置杠杆>5倍，交易将**失败**，错误信息：`Subaccounts are restricted from using leverage greater than 5x`
 
-- **Subaccounts**: Limited to **≤5x leverage** by Binance
-- **Main accounts**: Can use up to 20x (altcoins) or 50x (BTC/ETH)
-- If you're using a subaccount and set leverage >5x, trades will **fail** with error: `Subaccounts are restricted from using leverage greater than 5x`
+**推荐设置：**
 
-**Recommended settings:**
+| 账户类型 | BTC/ETH杠杆 | 山寨币杠杆 | 风险级别 |
+|---------|------------|-----------|---------|
+| **子账户** | `5` | `5` | ✅ 安全（默认） |
+| **主账户（保守）** | `10` | `10` | 🟡 中等 |
+| **主账户（激进）** | `20` | `15` | 🔴 高 |
+| **主账户（最大）** | `50` | `20` | 🔴🔴 非常高 |
 
-| Account Type | BTC/ETH Leverage | Altcoin Leverage | Risk Level |
-|-------------|------------------|------------------|------------|
-| **Subaccount** | `5` | `5` | ✅ Safe (default) |
-| **Main (Conservative)** | `10` | `10` | 🟡 Medium |
-| **Main (Aggressive)** | `20` | `15` | 🔴 High |
-| **Main (Maximum)** | `50` | `20` | 🔴🔴 Very High |
+**示例：**
 
-**Examples:**
-
-~~**Safe configuration (subaccount or conservative):**~~
+**安全配置（子账户或保守）：**
 ```json
 "leverage": {
   "btc_eth_leverage": 5,
@@ -561,7 +304,7 @@ The leverage settings control the maximum leverage the AI can use for each trade
 }
 ```
 
-~~**Aggressive configuration (main account only):**~~
+**激进配置（仅主账户）：**
 ```json
 "leverage": {
   "btc_eth_leverage": 20,
@@ -569,44 +312,42 @@ The leverage settings control the maximum leverage the AI can use for each trade
 }
 ```
 
-*Note: Leverage configuration is now done through the web interface*
+**AI如何使用杠杆：**
 
-**How AI uses leverage:**
-
-- AI can choose **any leverage from 1x up to your configured maximum**
-- For example, with `altcoin_leverage: 20`, AI might decide to use 5x, 10x, or 20x based on market conditions
-- The configuration sets the **upper limit**, not a fixed value
-- AI considers volatility, risk-reward ratio, and account balance when choosing leverage
+- AI可以选择**从1倍到您配置的最大值之间的任何杠杆**
+- 例如，当`altcoin_leverage: 20`时，AI可能根据市场情况决定使用5倍、10倍或20倍
+- 配置设置的是**上限**，而不是固定值
+- AI在选择杠杆时会考虑波动性、风险回报比和账户余额
 
 ---
 
-#### ⚠️ Important: `use_default_coins` Field
+#### ⚠️ 重要：`use_default_coins` 字段
 
-**Smart Default Behavior (v2.0.2+):**
+**智能默认行为（v2.0.2+）：**
 
-The system now automatically defaults to `use_default_coins: true` if:
-- You don't include this field in config.json, OR
-- You set it to `false` but don't provide `coin_pool_api_url`
+系统现在会自动默认为`use_default_coins: true`，如果：
+- 您在config.json中未包含此字段，或
+- 您将其设为`false`但未提供`coin_pool_api_url`
 
-This makes it beginner-friendly! You can even omit this field entirely.
+这让新手更友好！您甚至可以完全省略此字段。
 
-**Configuration Examples:**
+**配置示例：**
 
-✅ **Option 1: Explicitly set (Recommended for clarity)**
+✅ **选项1：显式设置（推荐以保持清晰）**
 ```json
 "use_default_coins": true,
 "coin_pool_api_url": "",
 "oi_top_api_url": ""
 ```
 
-✅ **Option 2: Omit the field (uses default coins automatically)**
+✅ **选项2：省略字段（自动使用默认币种）**
 ```json
-// Just don't include "use_default_coins" at all
+// 完全不包含"use_default_coins"
 "coin_pool_api_url": "",
 "oi_top_api_url": ""
 ```
 
-⚙️ **Advanced: Use external API**
+⚙️ **高级：使用外部API**
 ```json
 "use_default_coins": false,
 "coin_pool_api_url": "http://your-api.com/coins",
@@ -615,29 +356,29 @@ This makes it beginner-friendly! You can even omit this field entirely.
 
 ---
 
-### 6. Run the System
+### 6. 运行系统
 
-#### 🚀 Starting the System (2 steps)
+#### 🚀 启动系统（2个步骤）
 
-The system has **2 parts** that run separately:
-1. **Backend** (AI trading brain + API)
-2. **Frontend** (Web dashboard for monitoring)
+系统有**2个部分**需要分别运行：
+1. **后端**（AI交易大脑 + API）
+2. **前端**（Web监控仪表板）
 
 ---
 
-#### **Step 1: Start the Backend**
+#### **步骤1：启动后端**
 
-Open a terminal and run:
+打开终端并运行：
 
 ```bash
-# Build the program (first time only, or after code changes)
+# 构建程序（首次运行或代码更改后）
 go build -o nofx
 
-# Start the backend
+# 启动后端
 ./nofx
 ```
 
-**What you should see:**
+**您应该看到：**
 
 ```
 🚀 启动自动交易系统...
@@ -646,33 +387,33 @@ go build -o nofx
 📊 开始交易监控...
 ```
 
-**⚠️ If you see errors:**
+**⚠️ 如果看到错误：**
 
-| Error Message | Solution |
-|--------------|----------|
-| `invalid API key` | Check your Binance API key in config.json |
-| `TA-Lib not found` | Run `brew install ta-lib` (macOS) |
-| `port 8080 already in use` | ~~Change `api_server_port` in config.json~~ *Change `API_PORT` in .env file* |
-| `DeepSeek API error` | Verify your DeepSeek API key and balance |
+| 错误信息 | 解决方案 |
+|---------|---------|
+| `invalid API key` | 检查Web界面中的API密钥 |
+| `TA-Lib not found` | 运行`brew install ta-lib`（macOS） |
+| `port 8080 already in use` | 修改.env文件中的`API_PORT` |
+| `DeepSeek API error` | 验证DeepSeek API密钥和余额 |
 
-**✅ Backend is running correctly when you see:**
-- No error messages
-- "开始交易监控..." appears
-- System shows account balance
-- Keep this terminal window open!
+**✅ 后端运行正常的标志：**
+- 无错误信息
+- 出现"开始交易监控..."
+- 系统显示账户余额
+- 保持此终端窗口打开！
 
 ---
 
-#### **Step 2: Start the Frontend**
+#### **步骤2：启动前端**
 
-Open a **NEW terminal window** (keep the first one running!), then:
+打开**新的终端窗口**（保持第一个运行！），然后：
 
 ```bash
 cd web
 npm run dev
 ```
 
-**What you should see:**
+**您应该看到：**
 
 ```
 VITE v5.x.x  ready in xxx ms
@@ -681,492 +422,390 @@ VITE v5.x.x  ready in xxx ms
 ➜  Network: use --host to expose
 ```
 
-**✅ Frontend is running when you see:**
-- "Local: http://localhost:3000/" message
-- No error messages
-- Keep this terminal window open too!
+**✅ 前端运行正常的标志：**
+- "Local: http://localhost:3000/"消息
+- 无错误信息
+- 也保持此终端窗口打开！
 
 ---
 
-#### **Step 3: Access the Dashboard**
+#### **步骤3：访问仪表板**
 
-Open your web browser and visit:
+在Web浏览器中访问：
 
 **🌐 http://localhost:3000**
 
-**What you'll see:**
-- 📊 Real-time account balance
-- 📈 Open positions (if any)
-- 🤖 AI decision logs
-- 📉 Equity curve chart
+**您将看到：**
+- 📊 实时账户余额
+- 📈 持仓（如果有）
+- 🤖 AI决策日志
+- 📉 净值曲线图
 
-**First-time tips:**
-- It may take 3-5 minutes for the first AI decision
-- Initial decisions might say "观望" (wait) - this is normal
-- AI needs to analyze market conditions first
+**首次使用提示：**
+- 首次AI决策可能需要3-5分钟
+- 初始决策可能显示"观望"- 这是正常的
+- AI需要先分析市场状况
 
 ---
 
-### 7. Monitor the System
+### 7. 监控系统
 
-**What to watch:**
+**需要关注的内容：**
 
-✅ **Healthy System Signs:**
-- Backend terminal shows decision cycles every 3-5 minutes
-- No continuous error messages
-- Account balance updates
-- Web dashboard refreshes automatically
+✅ **健康系统标志：**
+- 后端终端每3-5分钟显示决策周期
+- 无持续错误信息
+- 账户余额更新
+- Web仪表板自动刷新
 
-⚠️ **Warning Signs:**
-- Repeated API errors
-- No decisions for 10+ minutes
-- Balance decreasing rapidly
+⚠️ **警告标志：**
+- 重复的API错误
+- 10分钟以上无决策
+- 余额快速下降
 
-**Checking System Status:**
+**检查系统状态：**
 
 ```bash
-# In a new terminal window
+# 在新终端窗口中
 curl http://localhost:8080/api/health
 ```
 
-Should return: `{"status":"ok"}`
+应返回：`{"status":"ok"}`
 
 ---
 
-### 8. Stop the System
+### 8. 停止系统
 
-**Graceful Shutdown (Recommended):**
+**优雅关闭（推荐）：**
 
-1. Go to the **backend terminal** (the first one)
-2. Press `Ctrl+C`
-3. Wait for "系统已停止" message
-4. Go to the **frontend terminal** (the second one)
-5. Press `Ctrl+C`
+1. 转到**后端终端**（第一个）
+2. 按`Ctrl+C`
+3. 等待"系统已停止"消息
+4. 转到**前端终端**（第二个）
+5. 按`Ctrl+C`
 
-**⚠️ Important:**
-- Always stop the backend first
-- Wait for confirmation before closing terminals
-- Don't force quit (don't close terminal directly)
-
----
-
-## 📖 AI Decision Flow
-
-Each decision cycle (default 3 minutes), the system executes the following intelligent process:
-
-### Step 1: 📊 Analyze Historical Performance (last 20 cycles)
-- ✓ Calculate overall win rate, avg profit, P/L ratio
-- ✓ Per-coin statistics (win rate, avg P/L in USDT)
-- ✓ Identify best/worst performing coins
-- ✓ List last 5 trade details with accurate PnL
-- ✓ Calculate Sharpe ratio for risk-adjusted performance
-- 📌 **NEW (v2.0.2)**: Accurate USDT PnL with leverage
-
-**↓**
-
-### Step 2: 💰 Get Account Status
-- Total equity & available balance
-- Number of open positions & unrealized P/L
-- Margin usage rate (AI manages up to 90%)
-- Daily P/L tracking & drawdown monitoring
-
-**↓**
-
-### Step 3: 🔍 Analyze Existing Positions (if any)
-- For each position, fetch latest market data
-- Calculate real-time technical indicators:
-  - 3min K-line: RSI(7), MACD, EMA20
-  - 4hour K-line: RSI(14), EMA20/50, ATR
-- Track position holding duration (e.g., "2h 15min")
-- 📌 **NEW (v2.0.2)**: Shows how long each position held
-- Display: Entry price, current price, P/L%, duration
-- AI evaluates: Should hold or close?
-
-**↓**
-
-### Step 4: 🎯 Evaluate New Opportunities (candidate coins)
-- Fetch coin pool (2 modes):
-  - 🌟 **Default Mode**: BTC, ETH, SOL, BNB, XRP, etc.
-  - ⚙️ **Advanced Mode**: AI500 (top 20) + OI Top (top 20)
-- Merge & deduplicate candidate coins
-- Filter: Remove low liquidity (<15M USD OI value)
-- Batch fetch market data + technical indicators
-- Calculate volatility, trend strength, volume surge
-
-**↓**
-
-### Step 5: 🧠 AI Comprehensive Decision (DeepSeek/Qwen)
-- Review historical feedback:
-  - Recent win rate & profit factor
-  - Best/worst coins performance
-  - Avoid repeating mistakes
-- Analyze all raw sequence data:
-  - 3min price sequences, 4hour K-line sequences
-  - Complete indicator sequences (not just latest)
-  - 📌 **NEW (v2.0.2)**: AI has full freedom to analyze
-- Chain of Thought (CoT) reasoning process
-- Output structured decisions:
-  - Action: `close_long` / `close_short` / `open_long` / `open_short`
-  - Coin symbol, quantity, leverage
-  - Stop-loss & take-profit levels (≥1:2 ratio)
-- Decision: Wait / Hold / Close / Open
-
-**↓**
-
-### Step 6: ⚡ Execute Trades
-- Priority order: Close existing → Then open new
-- Risk checks before execution:
-  - Position size limits (1.5x for altcoins, 10x BTC)
-  - No duplicate positions (same coin + direction)
-  - Margin usage within 90% limit
-- Auto-fetch & apply Binance LOT_SIZE precision
-- Execute orders via Binance Futures API
-- After closing: Auto-cancel all pending orders
-- Record actual execution price & order ID
-- 📌 Track position open time for duration calculation
-
-**↓**
-
-### Step 7: 📝 Record Complete Logs & Update Performance
-- Save decision log to `decision_logs/{trader_id}/`
-- Log includes:
-  - Complete Chain of Thought (CoT)
-  - Input prompt with all market data
-  - Structured decision JSON
-  - Account snapshot (balance, positions, margin)
-  - Execution results (success/failure, prices)
-- Update performance database:
-  - Match open/close pairs by `symbol_side` key
-  - 📌 **NEW**: Prevents long/short conflicts
-  - Calculate accurate USDT PnL:
-    - `PnL = Position Value × Price Δ% × Leverage`
-  - 📌 **NEW**: Considers quantity + leverage
-  - Store: quantity, leverage, open time, close time
-  - Update win rate, profit factor, Sharpe ratio
-- Performance data feeds back into next cycle
-
-**↓**
-
-**🔄 (Repeat every 3-5 min)**
-
-### Key Improvements in v2.0.2
-
-**📌 Position Duration Tracking:**
-- System now tracks how long each position has been held
-- Displayed in user prompt: "持仓时长2小时15分钟"
-- Helps AI make better decisions on when to exit
-
-**📌 Accurate PnL Calculation:**
-- Previously: Only percentage (100U@5% = 1000U@5% = both showed "5.0")
-- Now: Real USDT profit = Position Value × Price Change × Leverage
-- Example: 1000 USDT × 5% × 20x = 1000 USDT actual profit
-
-**📌 Enhanced AI Freedom:**
-- AI can freely analyze all raw sequence data
-- No longer restricted to predefined indicator combinations
-- Can perform own trend analysis, support/resistance calculation
-
-**📌 Improved Position Tracking:**
-- Uses `symbol_side` key (e.g., "BTCUSDT_long")
-- Prevents conflicts when holding both long & short
-- Stores complete data: quantity, leverage, open/close times
+**⚠️ 重要：**
+- 始终先停止后端
+- 关闭终端前等待确认
+- 不要强制退出（不要直接关闭终端）
 
 ---
 
-## 🧠 AI Self-Learning Example
+## 📖 AI决策流程
 
-### Historical Feedback (Auto-added to Prompt)
+每个决策周期（默认3分钟），系统按以下流程运行：
+
+### 步骤1: 📊 分析历史表现（最近20个周期）
+- ✓ 计算整体胜率、平均盈利、盈亏比
+- ✓ 统计各币种表现（胜率、平均USDT盈亏）
+- ✓ 识别最佳/最差币种
+- ✓ 列出最近5笔交易详情（含准确盈亏金额）
+- ✓ 计算夏普比率衡量风险调整后收益
+- 📌 **新增 (v2.0.2)**: 考虑杠杆的准确USDT盈亏计算
+
+**↓**
+
+### 步骤2: 💰 获取账户状态
+- 账户净值、可用余额、未实现盈亏
+- 持仓数量、总盈亏（已实现+未实现）
+- 保证金使用率（current/maximum）
+- 风险评估指标
+
+**↓**
+
+### 步骤3: 🔍 分析现有持仓（如果有）
+- 获取每个持仓的市场数据（3分钟+4小时K线）
+- 计算技术指标（RSI、MACD、EMA）
+- 显示持仓时长（例如"持仓时长2小时15分钟"）
+- AI判断是否需要平仓（止盈、止损或调整）
+- 📌 **新增 (v2.0.2)**: 追踪持仓时长帮助AI决策
+
+**↓**
+
+### 步骤4: 🎯 评估新机会（候选币种池）
+- 获取币种池（2种模式）：
+  - 🌟 **默认模式**: BTC、ETH、SOL、BNB、XRP等
+  - ⚙️ **高级模式**: AI500（前20） + OI Top（前20）
+- 合并去重，过滤低流动性币种（持仓量<15M USD）
+- 批量获取市场数据和技术指标
+- 为每个候选币种准备完整的原始数据序列
+
+**↓**
+
+### 步骤5: 🧠 AI综合决策
+- 查看历史反馈（胜率、盈亏比、最佳/最差币种）
+- 接收所有原始序列数据（K线、指标、持仓量）
+- Chain of Thought 思维链分析
+- 输出决策：平仓/开仓/持有/观望
+- 包含杠杆、仓位、止损、止盈参数
+- 📌 **新增 (v2.0.2)**: AI可自由分析原始序列，不受预定义指标限制
+
+**↓**
+
+### 步骤6: ⚡ 执行交易
+- 优先级排序：先平仓，再开仓
+- 精度自动适配（LOT_SIZE规则）
+- 防止仓位叠加（同币种同方向拒绝开仓）
+- 平仓后自动取消所有挂单
+- 记录开仓时间用于持仓时长追踪
+- 📌 追踪持仓开仓时间
+
+**↓**
+
+### 步骤7: 📝 记录日志
+- 保存完整决策记录到 `decision_logs/`
+- 包含思维链、决策JSON、账户快照、执行结果
+- 存储完整持仓数据（数量、杠杆、开/平仓时间）
+- 使用 `symbol_side` 键值防止多空冲突
+- 📌 **新增 (v2.0.2)**: 防止多空持仓冲突，考虑数量+杠杆
+
+**↓**
+
+**🔄 （每3-5分钟重复一次）**
+
+### v2.0.2的核心改进
+
+**📌 持仓时长追踪：**
+- 系统现在追踪每个持仓已持有多长时间
+- 在用户提示中显示："持仓时长2小时15分钟"
+- 帮助AI更好地判断何时退出仓位
+
+**📌 准确的盈亏计算：**
+- 之前：只显示百分比（100U@5% = 1000U@5% = 都显示"5.0"）
+- 现在：真实USDT盈亏 = 仓位价值 × 价格变化% × 杠杆倍数
+- 示例：1000 USDT × 5% × 20倍 = 1000 USDT实际盈利
+
+**📌 增强的AI自由度：**
+- AI可以自由分析所有原始序列数据
+- 不再局限于预定义的指标组合
+- 可以执行自己的趋势分析、支撑位/阻力位计算
+
+**📌 改进的持仓追踪：**
+- 使用`symbol_side`键值（例如"BTCUSDT_long"）
+- 防止同时持有多空仓时的冲突
+- 存储完整数据：数量、杠杆、开/平仓时间
+
+---
+
+## 🧠 AI自我学习示例
+
+### 历史反馈（Prompt中自动添加）
 
 ```markdown
-## 📊 Historical Performance Feedback
+## 📊 历史表现反馈
 
-### Overall Performance
-- **Total Trades**: 15 (Profit: 8 | Loss: 7)
-- **Win Rate**: 53.3%
-- **Average Profit**: +3.2% | Average Loss: -2.1%
-- **Profit/Loss Ratio**: 1.52:1
+### 整体表现
+- **总交易数**: 15 笔 (盈利: 8 | 亏损: 7)
+- **胜率**: 53.3%
+- **平均盈利**: +3.2% | 平均亏损: -2.1%
+- **盈亏比**: 1.52:1
 
-### Recent Trades
+### 最近交易
 1. BTCUSDT LONG: 95000.0000 → 97500.0000 = +2.63% ✓
 2. ETHUSDT SHORT: 3500.0000 → 3450.0000 = +1.43% ✓
 3. SOLUSDT LONG: 185.0000 → 180.0000 = -2.70% ✗
 4. BNBUSDT LONG: 610.0000 → 625.0000 = +2.46% ✓
 5. ADAUSDT LONG: 0.8500 → 0.8300 = -2.35% ✗
 
-### Coin Performance
-- **Best**: BTCUSDT (Win rate 75%, avg +2.5%)
-- **Worst**: SOLUSDT (Win rate 25%, avg -1.8%)
+### 币种表现
+- **最佳**: BTCUSDT (胜率75%, 平均+2.5%)
+- **最差**: SOLUSDT (胜率25%, 平均-1.8%)
 ```
 
-### How AI Uses Feedback
+### AI如何使用反馈
 
-1. **Avoid consecutive losers**: Seeing SOLUSDT with 3 consecutive stop-losses, AI avoids or is more cautious
-2. **Reinforce successful strategies**: BTC breakout long with 75% win rate, AI continues this pattern
-3. **Dynamic style adjustment**: Win rate <40% → conservative; P/L ratio >2 → maintain aggressive
-4. **Identify market conditions**: Consecutive losses may indicate choppy market, reduce trading frequency
-
----
-
-## 📊 Web Interface Features
-
-### 1. Competition Page
-
-- **🏆 Leaderboard**: Real-time ROI ranking, golden border highlights leader
-- **📈 Performance Comparison**: Dual AI ROI curve comparison (purple vs blue)
-- **⚔️ Head-to-Head**: Direct comparison showing lead margin
-- **Real-time Data**: Total equity, P/L%, position count, margin usage
-
-### 2. Details Page
-
-- **Equity Curve**: Historical trend chart (USD/percentage toggle)
-- **Statistics**: Total cycles, success/fail, open/close stats
-- **Position Table**: All position details (entry price, current price, P/L%, liquidation price)
-- **AI Decision Logs**: Recent decision records (expandable CoT)
-
-### 3. Real-time Updates
-
-- System status, account info, position list: **5-second refresh**
-- Decision logs, statistics: **10-second refresh**
-- Equity charts: **10-second refresh**
+1. **避免连续亏损币种**: 看到SOLUSDT连续3次止损，AI会避开或更谨慎
+2. **强化成功策略**: BTC突破做多胜率75%，AI会继续这个模式
+3. **动态调整风格**: 胜率<40%时变保守，盈亏比>2时保持激进
+4. **识别市场环境**: 连续亏损可能说明市场震荡，减少交易频率
 
 ---
 
-## 🎛️ API Endpoints
+## 📊 Web界面功能
 
-### Configuration Management
+### 1. 竞赛页面（Competition）
+
+- **🏆 排行榜**: 实时收益率排名，金色边框突出显示领先者
+- **📈 性能对比图**: 双AI收益率曲线对比（紫色vs蓝色）
+- **⚔️ Head-to-Head**: 直接对比，显示领先差距
+- **实时数据**: 总净值、盈亏%、持仓数、保证金使用率
+
+### 2. 详情页面（Details）
+
+- **账户净值曲线**: 历史走势图（美元/百分比切换）
+- **统计信息**: 总周期、成功/失败、开仓/平仓统计
+- **持仓表格**: 所有持仓详情（入场价、当前价、盈亏%、强平价）
+- **AI决策日志**: 最近决策记录（可展开思维链）
+
+### 3. 实时更新
+
+- 系统状态、账户信息、持仓列表：**每5秒刷新**
+- 决策日志、统计信息：**每10秒刷新**
+- 收益率图表：**每10秒刷新**
+
+---
+
+## 🎛️ API接口
+
+### 竞赛相关
 
 ```bash
-GET  /api/models              # Get AI model configurations
-PUT  /api/models              # Update AI model configurations
-GET  /api/exchanges           # Get exchange configurations  
-PUT  /api/exchanges           # Update exchange configurations
+GET /api/competition          # 竞赛排行榜（所有trader）
+GET /api/traders              # Trader列表
 ```
 
-### Trader Management
+### 单Trader相关
 
 ```bash
-GET    /api/traders           # List all traders
-POST   /api/traders           # Create new trader
-DELETE /api/traders/:id       # Delete trader
-POST   /api/traders/:id/start # Start trader
-POST   /api/traders/:id/stop  # Stop trader
+GET /api/status?trader_id=xxx            # 系统状态
+GET /api/account?trader_id=xxx           # 账户信息
+GET /api/positions?trader_id=xxx         # 持仓列表
+GET /api/equity-history?trader_id=xxx    # 净值历史（图表数据）
+GET /api/decisions/latest?trader_id=xxx  # 最新5条决策
+GET /api/statistics?trader_id=xxx        # 统计信息
 ```
 
-### Trading Data & Monitoring
+### 系统接口
 
 ```bash
-GET /api/status?trader_id=xxx            # System status
-GET /api/account?trader_id=xxx           # Account info
-GET /api/positions?trader_id=xxx         # Position list
-GET /api/equity-history?trader_id=xxx    # Equity history (chart data)
-GET /api/decisions/latest?trader_id=xxx  # Latest 5 decisions
-GET /api/statistics?trader_id=xxx        # Statistics
-GET /api/performance?trader_id=xxx       # AI performance analysis
-```
-
-### System Endpoints
-
-```bash
-GET /api/health                   # Health check
+GET /api/health                   # 健康检查
+GET /api/config               # 系统配置
 ```
 
 ---
 
-## ⚠️ Important Risk Warnings
+## 📝 决策日志格式
 
-### Trading Risks
+每次AI决策都会生成详细的JSON日志：
 
-1. **Cryptocurrency markets are extremely volatile**, AI decisions don't guarantee profit
-2. **Futures trading uses leverage**, losses may exceed principal
-3. **Extreme market conditions** may lead to liquidation risk
-4. **Funding rates** may affect holding costs
-5. **Liquidity risk**: Some coins may experience slippage
-
-### Technical Risks
-
-1. **Network latency** may cause price slippage
-2. **API rate limits** may affect trade execution
-3. **AI API timeouts** may cause decision failures
-4. **System bugs** may trigger unexpected behavior
-
-### Usage Recommendations
-
-✅ **Recommended**
-- Use only funds you can afford to lose for testing
-- Start with small amounts (recommended 100-500 USDT)
-- Regularly check system operation status
-- Monitor account balance changes
-- Analyze AI decision logs to understand strategy
-
-❌ **Not Recommended**
-- Invest all funds or borrowed money
-- Run unsupervised for long periods
-- Blindly trust AI decisions
-- Use without understanding the system
-- Run during extreme market volatility
-
----
-
-## 🛠️ Common Issues
-
-> 📖 **For detailed troubleshooting:** See the comprehensive [Troubleshooting Guide](docs/guides/TROUBLESHOOTING.md) ([中文版](docs/guides/TROUBLESHOOTING.zh-CN.md))
-
-### 1. Compilation error: TA-Lib not found
-
-**Solution**: Install TA-Lib library
-```bash
-# macOS
-brew install ta-lib
-
-# Ubuntu
-sudo apt-get install libta-lib0-dev
+### 日志文件路径
+```
+decision_logs/
+├── qwen_trader/
+│   └── decision_20251028_153042_cycle15.json
+└── deepseek_trader/
+    └── decision_20251028_153045_cycle15.json
 ```
 
-### 2. Precision error: Precision is over the maximum
+### 日志内容示例
 
-**Solution**: System auto-handles precision from Binance LOT_SIZE. If error persists, check network connection.
-
-### 3. AI API timeout
-
-**Solution**:
-- Check if API key is correct
-- Check network connection (may need proxy)
-- System timeout is set to 120 seconds
-
-### 4. Frontend can't connect to backend
-
-**Solution**:
-- Ensure backend is running (http://localhost:8080)
-- Check if port 8080 is occupied
-- Check browser console for errors
-
-### 5. Coin pool API failure
-
-**Solution**:
-- Coin pool API is optional
-- If API fails, system uses default mainstream coins (BTC, ETH, etc.)
-- ~~Check API URL and auth parameter in config.json~~ *Check configuration in web interface*
-
----
-
-## 📈 Performance Optimization Tips
-
-1. **Set reasonable decision cycle**: Recommended 3-5 minutes, avoid over-trading
-2. **Control candidate coin count**: System defaults to AI500 top 20 + OI Top top 20
-3. **Regularly clean logs**: Avoid excessive disk usage
-4. **Monitor API call count**: Avoid triggering Binance rate limits
-5. **Test with small capital**: First test with 100-500 USDT for strategy validation
+```json
+{
+  "timestamp": "2025-10-28T15:30:42+08:00",
+  "cycle_number": 15,
+  "cot_trace": "当前持仓：ETHUSDT多头盈利+2.3%，趋势良好继续持有...",
+  "decision_json": "[{\"symbol\":\"BTCUSDT\",\"action\":\"open_long\"...}]",
+  "account_state": {
+    "total_balance": 1045.80,
+    "available_balance": 823.40,
+    "position_count": 3,
+    "margin_used_pct": 21.3
+  },
+  "positions": [...],
+  "candidate_coins": ["BTCUSDT", "ETHUSDT", ...],
+  "decisions": [
+    {
+      "action": "open_long",
+      "symbol": "BTCUSDT",
+      "quantity": 0.015,
+      "leverage": 50,
+      "price": 95800.0,
+      "order_id": 123456789,
+      "success": true
+    }
+  ],
+  "execution_log": ["✓ BTCUSDT open_long 成功"],
+  "success": true
+}
+```
 
 ---
 
-## 🔄 Changelog
+## 🔧 风险控制详解
 
-📖 **For detailed version history and updates, see:**
+### 单币种仓位限制
 
-- **English:** [CHANGELOG.md](CHANGELOG.md)
-- **中文:** [CHANGELOG.zh-CN.md](CHANGELOG.zh-CN.md)
+| 币种类型 | 仓位价值上限 | 杠杆 | 保证金占用 | 示例（1000U账户） |
+|---------|-------------|------|-----------|------------------|
+| 山寨币  | 1.5倍净值    | 20x  | 7.5%      | 最多开1500U仓位 = 75U保证金 |
+| BTC/ETH | 10倍净值     | 50x  | 20%       | 最多开10000U仓位 = 200U保证金 |
 
-**Latest Release:** v3.0.0 (2025-10-30) - Major Architecture Transformation
+### 为什么这样设计？
 
-**Recent Highlights:**
-- 🚀 Complete system redesign with web-based configuration
-- 🗄️ Database-driven architecture (SQLite)
-- 🎨 No more JSON editing - all configuration through web interface
-- 🔧 Mix & match AI models with any exchange
-- 📊 Enhanced API layer with comprehensive endpoints
+1. **高杠杆 + 小仓位 = 分散风险**
+   - 20倍杠杆，1500U仓位，只需75U保证金
+   - 可以同时开10+个小仓位，分散单币种风险
 
----
+2. **单币种风险可控**
+   - 山寨币仓位≤1.5倍净值，5%反向波动 = 7.5%损失
+   - BTC仓位≤10倍净值，2%反向波动 = 20%损失
 
-## 📄 License
+3. **不限制总保证金使用率**
+   - AI根据市场机会自主决策保证金使用率
+   - 上限90%，但不强制满仓
+   - 有好机会就开仓，没机会就观望
 
-This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)** - See [LICENSE](LICENSE) file for details.
+### 防止过度交易
 
-**What this means:**
-- ✅ You can use, modify, and distribute this software
-- ✅ You must disclose source code of your modifications
-- ✅ If you run a modified version on a server, you must make the source code available to users
-- ✅ All derivatives must also be licensed under AGPL-3.0
-
-For commercial licensing or questions, please contact the maintainers.
-
----
-
-## 🤝 Contributing
-
-We welcome contributions from the community! See our comprehensive guides:
-
-- **📖 [Contributing Guide](CONTRIBUTING.md)** - Complete development workflow, code standards, and PR process
-- **🤝 [Code of Conduct](CODE_OF_CONDUCT.md)** - Community guidelines and standards
-- **💰 [Bounty Program](docs/community/bounty-guide.md)** - Earn rewards for contributions
-- **🔒 [Security Policy](SECURITY.md)** - Report vulnerabilities responsibly
-
-**Quick Start:**
-1. Fork the project
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open Pull Request
+- **同币种同方向不允许重复开仓**: 防止AI连续开同一个仓位导致超限
+- **先平仓后开仓**: 换仓时确保先释放保证金
+- **止损止盈强制检查**: 风险回报比≥1:2
 
 ---
 
-## 🎁 Contributor Airdrop Program
+## ⚠️ 重要风险提示
 
-All contributions are tracked on GitHub. When NOFX generates revenue, contributors will receive airdrops based on their contributions.
+### 交易风险
 
-### 🔥 Priority Rewards: Pinned Issues
+1. **加密货币市场波动极大**，AI决策不保证盈利
+2. **合约交易使用杠杆**，亏损可能超过本金
+3. **市场极端行情**下可能出现爆仓风险
+4. **资金费率**可能影响持仓成本
+5. **流动性风险**：某些币种可能出现滑点
 
-**PRs that resolve [Pinned Issues](https://github.com/NoFxAiOS/nofx/issues) receive the HIGHEST rewards!**
+### 技术风险
 
-Check our pinned issues for high-priority features and bugs - these carry bonus multipliers.
+1. **网络延迟**可能导致价格滑点
+2. **API限流**可能影响交易执行
+3. **AI API超时**可能导致决策失败
+4. **系统Bug**可能引发意外行为
 
-### Contribution Weights
+### 使用建议
 
-| Contribution Type | Weight | Description |
-|------------------|:------:|-------------|
-| **🔥 Pinned Issue PRs** | ⭐⭐⭐⭐⭐⭐ | PRs solving pinned/priority issues (HIGHEST REWARD) |
-| **Code Commits** (Merged PRs) | ⭐⭐⭐⭐⭐ | Core features, optimizations, new integrations |
-| **Bug Fixes** | ⭐⭐⭐⭐ | Fix confirmed bugs and issues |
-| **Feature Suggestions** (Adopted Issues) | ⭐⭐⭐ | Ideas that get implemented |
-| **Bug Reports** (Confirmed) | ⭐⭐ | Report valid bugs with reproducible steps |
-| **Documentation** | ⭐⭐ | Translations, guides, tutorials |
+✅ **建议做法**
+- 仅使用可承受损失的资金测试
+- 从小额资金开始（建议100-500 USDT）
+- 定期检查系统运行状态
+- 监控账户余额变化
+- 分析AI决策日志，理解策略
 
-### How It Works
-
-1. **Check Pinned Issues** - High-priority tasks with bonus rewards
-2. **Contribute** - Submit PRs, report bugs, suggest features
-3. **Track** - All contributions recorded via GitHub activity
-4. **Earn** - Receive airdrops proportional to your contribution weight
-
-> 💡 Start with [Pinned Issues](https://github.com/NoFxAiOS/nofx/issues) for maximum rewards!
-
----
-
-## 📬 Contact
-
-
-### 🐛 Technical Support
-- **GitHub Issues**: [Submit an Issue](https://github.com/tinkle-community/nofx/issues)
-- **Developer Community**: [Telegram Group](https://t.me/nofx_dev_community)
+❌ **不建议做法**
+- 投入全部资金或借贷资金
+- 长时间无人监控运行
+- 盲目信任AI决策
+- 在不理解系统的情况下使用
+- 在市场极端波动时运行
 
 ---
 
-## 🙏 Acknowledgments
+## 📈 性能优化建议
 
-- [Binance API](https://binance-docs.github.io/apidocs/futures/en/) - Binance Futures API
-- [DeepSeek](https://platform.deepseek.com/) - DeepSeek AI API
-- [Qwen](https://dashscope.console.aliyun.com/) - Alibaba Cloud Qwen
-- [TA-Lib](https://ta-lib.org/) - Technical indicator library
-- [Recharts](https://recharts.org/) - React chart library
-
----
-
-**Last Updated**: 2025-10-30 (v3.0.0)
-
-**⚡ Explore the possibilities of quantitative trading with the power of AI!**
+1. **合理设置决策周期**: 建议3-5分钟，避免过度交易
+2. **控制候选币种数量**: 系统默认分析AI500前20 + OI Top前20
+3. **定期清理日志**: 避免占用过多磁盘空间
+4. **监控API调用次数**: 避免触发Binance限流（权重限制）
+5. **小额资金测试**: 先用100-500 USDT测试策略有效性
 
 ---
 
-## ⭐ Star History
+## 📄 开源协议
 
-[![Star History Chart](https://api.star-history.com/svg?repos=tinkle-community/nofx&type=Date)](https://star-history.com/#tinkle-community/nofx&Date)
+本项目采用 **GNU Affero 通用公共许可证 v3.0 (AGPL-3.0)** - 详见 [LICENSE](LICENSE) 文件
 
+**这意味着什么：**
+- ✅ 你可以使用、修改和分发此软件
+- ✅ 你必须公开你修改版本的源代码
+- ✅ 如果你在服务器上运行修改版本，必须向用户提供源代码
+- ✅ 所有衍生作品也必须使用 AGPL-3.0 许可证
+
+如需商业许可或有疑问,请联系维护者。

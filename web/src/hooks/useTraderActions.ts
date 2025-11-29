@@ -571,7 +571,8 @@ export function useTraderActions({
               aster_private_key: exchange.asterPrivateKey || '',
               lighter_wallet_addr: exchange.lighterWalletAddr || '',
               lighter_private_key: exchange.lighterPrivateKey || '',
-              lighter_api_key_private_key: exchange.lighterApiKeyPrivateKey || '',
+              lighter_api_key_private_key:
+                exchange.lighterApiKeyPrivateKey || '',
             },
           ])
         ),

@@ -156,55 +156,55 @@ func WithFields(fields logrus.Fields) *logrus.Entry {
 }
 
 // WithField 创建带单个字段的logger entry
-func WithField(key string, value interface{}) *logrus.Entry {
+func WithField(key string, value any) *logrus.Entry {
 	return Log.WithField(key, value)
 }
 
 // add debug, info, warn
-func Debug(args ...interface{}) {
+func Debug(args ...any) {
 	Log.Debug(args...)
 }
 
-func Info(args ...interface{}) {
+func Info(args ...any) {
 	Log.Info(args...)
 }
 
-func Warn(args ...interface{}) {
+func Warn(args ...any) {
 	Log.Warn(args...)
 }
 
-func Debugf(format string, args ...interface{}) {
+func Debugf(format string, args ...any) {
 	Log.Debugf(format, args...)
 }
 
-func Infof(format string, args ...interface{}) {
+func Infof(format string, args ...any) {
 	Log.Infof(format, args...)
 }
 
-func Warnf(format string, args ...interface{}) {
+func Warnf(format string, args ...any) {
 	Log.Warnf(format, args...)
 }
 
-func Error(args ...interface{}) {
+func Error(args ...any) {
 	Log.Error(args...)
 }
 
-func Errorf(format string, args ...interface{}) {
+func Errorf(format string, args ...any) {
 	Log.Errorf(format, args...)
 }
 
-func Fatal(args ...interface{}) {
+func Fatal(args ...any) {
 	Log.Fatal(args...)
 }
 
-func Fatalf(format string, args ...interface{}) {
+func Fatalf(format string, args ...any) {
 	Log.Fatalf(format, args...)
 }
 
-func Panic(args ...interface{}) {
+func Panic(args ...any) {
 	Log.Panic(args...)
 }
 
-func Panicf(format string, args ...interface{}) {
+func Panicf(format string, args ...any) {
 	Log.Panicf(format, args...)
 }

@@ -86,7 +86,8 @@ export const translations = {
     // Backtest Page
     backtestPage: {
       title: 'Backtest Lab',
-      subtitle: 'Pick a model + time range to replay the full AI decision loop.',
+      subtitle:
+        'Pick a model + time range to replay the full AI decision loop.',
       start: 'Start Backtest',
       starting: 'Starting...',
       quickRanges: {
@@ -124,13 +125,13 @@ export const translations = {
         customTfPlaceholder: 'Custom TFs (comma separated, e.g. 2h,6h)',
         initialBalanceLabel: 'Initial balance (USDT)',
         feeLabel: 'Fee (bps)',
-      slippageLabel: 'Slippage (bps)',
-      btcEthLeverageLabel: 'BTC/ETH leverage (x)',
-      altcoinLeverageLabel: 'Altcoin leverage (x)',
-      fillPolicies: {
-        nextOpen: 'Next open',
-        barVwap: 'Bar VWAP',
-        midPrice: 'Mid price',
+        slippageLabel: 'Slippage (bps)',
+        btcEthLeverageLabel: 'BTC/ETH leverage (x)',
+        altcoinLeverageLabel: 'Altcoin leverage (x)',
+        fillPolicies: {
+          nextOpen: 'Next open',
+          barVwap: 'Bar VWAP',
+          midPrice: 'Mid price',
         },
         promptPresets: {
           baseline: 'Baseline',
@@ -205,7 +206,8 @@ export const translations = {
         title: 'AI Decision Trail',
         subtitle: 'Showing last {count} cycles',
         empty: 'No records yet',
-        emptyHint: 'The AI thought & execution log will appear once the run starts.',
+        emptyHint:
+          'The AI thought & execution log will appear once the run starts.',
       },
       charts: {
         equityTitle: 'Equity Curve',
@@ -392,13 +394,20 @@ export const translations = {
     lighterApiKeyPrivateKey: 'API Key Private Key',
     enterLighterWalletAddress: 'Enter Ethereum wallet address (0x...)',
     enterLighterPrivateKey: 'Enter L1 private key (32 bytes)',
-    enterLighterApiKeyPrivateKey: 'Enter API Key private key (40 bytes, optional)',
-    lighterWalletAddressDesc: 'Your Ethereum wallet address for account identification',
-    lighterPrivateKeyDesc: 'L1 private key for account identification (32-byte ECDSA key)',
-    lighterApiKeyPrivateKeyDesc: 'API Key private key for transaction signing (40-byte Poseidon2 key)',
-    lighterApiKeyOptionalNote: 'Without API Key, system will use limited V1 mode',
-    lighterV1Description: 'Basic Mode - Limited functionality, testing framework only',
-    lighterV2Description: 'Full Mode - Supports Poseidon2 signing and real trading',
+    enterLighterApiKeyPrivateKey:
+      'Enter API Key private key (40 bytes, optional)',
+    lighterWalletAddressDesc:
+      'Your Ethereum wallet address for account identification',
+    lighterPrivateKeyDesc:
+      'L1 private key for account identification (32-byte ECDSA key)',
+    lighterApiKeyPrivateKeyDesc:
+      'API Key private key for transaction signing (40-byte Poseidon2 key)',
+    lighterApiKeyOptionalNote:
+      'Without API Key, system will use limited V1 mode',
+    lighterV1Description:
+      'Basic Mode - Limited functionality, testing framework only',
+    lighterV2Description:
+      'Full Mode - Supports Poseidon2 signing and real trading',
     lighterPrivateKeyImported: 'LIGHTER private key imported',
 
     // Exchange names
@@ -1149,13 +1158,13 @@ export const translations = {
         customTfPlaceholder: '自定义周期（逗号分隔，例如 2h,6h）',
         initialBalanceLabel: '初始资金 (USDT)',
         feeLabel: '手续费 (bps)',
-      slippageLabel: '滑点 (bps)',
-      btcEthLeverageLabel: 'BTC/ETH 杠杆 (倍)',
-      altcoinLeverageLabel: '山寨币杠杆 (倍)',
-      fillPolicies: {
-        nextOpen: '下一根开盘价',
-        barVwap: 'K线 VWAP',
-        midPrice: '中间价',
+        slippageLabel: '滑点 (bps)',
+        btcEthLeverageLabel: 'BTC/ETH 杠杆 (倍)',
+        altcoinLeverageLabel: '山寨币杠杆 (倍)',
+        fillPolicies: {
+          nextOpen: '下一根开盘价',
+          barVwap: 'K线 VWAP',
+          midPrice: '中间价',
         },
         promptPresets: {
           baseline: '基础版',
@@ -1416,8 +1425,10 @@ export const translations = {
     enterLighterApiKeyPrivateKey: '請輸入 API Key 私鑰（40 字節，可選）',
     lighterWalletAddressDesc: '您的以太坊錢包地址，用於識別賬戶',
     lighterPrivateKeyDesc: 'L1 私鑰用於賬戶識別（32 字節 ECDSA 私鑰）',
-    lighterApiKeyPrivateKeyDesc: 'API Key 私鑰用於簽名交易（40 字節 Poseidon2 私鑰）',
-    lighterApiKeyOptionalNote: '如果不提供 API Key，系統將使用功能受限的 V1 模式',
+    lighterApiKeyPrivateKeyDesc:
+      'API Key 私鑰用於簽名交易（40 字節 Poseidon2 私鑰）',
+    lighterApiKeyOptionalNote:
+      '如果不提供 API Key，系統將使用功能受限的 V1 模式',
     lighterV1Description: '基本模式 - 功能受限，僅用於測試框架',
     lighterV2Description: '完整模式 - 支持 Poseidon2 簽名和真實交易',
     lighterPrivateKeyImported: 'LIGHTER 私鑰已導入',
@@ -1665,7 +1676,8 @@ export const translations = {
     signIn: '登录',
     signUp: '注册',
     registrationClosed: '注册已关闭',
-    registrationClosedMessage: '平台当前不开放新用户注册，如需访问请联系管理员获取账号。',
+    registrationClosedMessage:
+      '平台当前不开放新用户注册，如需访问请联系管理员获取账号。',
 
     // Hero Section
     githubStarsInDays: '3 天内 2.5K+ GitHub Stars',

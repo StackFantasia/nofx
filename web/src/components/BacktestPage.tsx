@@ -254,7 +254,10 @@ export function BacktestPage() {
           altcoin_leverage: Number(formState.altcoinLeverage),
         },
       })
-      setToast({ text: tr('toasts.startSuccess', { id: payload.run_id }), tone: 'success' })
+      setToast({
+        text: tr('toasts.startSuccess', { id: payload.run_id }),
+        tone: 'success',
+      })
       setSelectedRunId(payload.run_id)
       await refreshRuns()
     } catch (error: any) {
@@ -410,20 +413,20 @@ export function BacktestPage() {
               toast.tone === 'error'
                 ? 'rgba(246,70,93,0.1)'
                 : toast.tone === 'success'
-                ? 'rgba(14,203,129,0.1)'
-                : 'rgba(240,185,11,0.1)',
+                  ? 'rgba(14,203,129,0.1)'
+                  : 'rgba(240,185,11,0.1)',
             color:
               toast.tone === 'error'
                 ? '#F6465D'
                 : toast.tone === 'success'
-                ? '#0ECB81'
-                : '#F0B90B',
+                  ? '#0ECB81'
+                  : '#F0B90B',
             borderColor:
               toast.tone === 'error'
                 ? 'rgba(246,70,93,0.3)'
                 : toast.tone === 'success'
-                ? 'rgba(14,203,129,0.4)'
-                : 'rgba(240,185,11,0.4)',
+                  ? 'rgba(14,203,129,0.4)'
+                  : 'rgba(240,185,11,0.4)',
           }}
         >
           {toast.text}
@@ -630,7 +633,9 @@ export function BacktestPage() {
                 className="input"
                 min={0}
                 value={formState.fee}
-                onChange={(e) => handleFormChange('fee', Number(e.target.value))}
+                onChange={(e) =>
+                  handleFormChange('fee', Number(e.target.value))
+                }
               />
             </label>
             <label className="flex flex-col gap-1">
@@ -653,8 +658,12 @@ export function BacktestPage() {
               value={formState.fill}
               onChange={(e) => handleFormChange('fill', e.target.value)}
             >
-              <option value="next_open">{tr('form.fillPolicies.nextOpen')}</option>
-              <option value="bar_vwap">{tr('form.fillPolicies.barVwap')}</option>
+              <option value="next_open">
+                {tr('form.fillPolicies.nextOpen')}
+              </option>
+              <option value="bar_vwap">
+                {tr('form.fillPolicies.barVwap')}
+              </option>
               <option value="mid">{tr('form.fillPolicies.midPrice')}</option>
             </select>
             <select
@@ -662,10 +671,18 @@ export function BacktestPage() {
               value={formState.prompt}
               onChange={(e) => handleFormChange('prompt', e.target.value)}
             >
-              <option value="baseline">{tr('form.promptPresets.baseline')}</option>
-              <option value="aggressive">{tr('form.promptPresets.aggressive')}</option>
-              <option value="conservative">{tr('form.promptPresets.conservative')}</option>
-              <option value="scalping">{tr('form.promptPresets.scalping')}</option>
+              <option value="baseline">
+                {tr('form.promptPresets.baseline')}
+              </option>
+              <option value="aggressive">
+                {tr('form.promptPresets.aggressive')}
+              </option>
+              <option value="conservative">
+                {tr('form.promptPresets.conservative')}
+              </option>
+              <option value="scalping">
+                {tr('form.promptPresets.scalping')}
+              </option>
             </select>
             <select
               className="input"
@@ -791,15 +808,15 @@ export function BacktestPage() {
             <table className="w-full text-xs">
               <thead style={{ color: '#848E9C' }}>
                 <tr>
-                  <th className="py-2 text-left">
-                    {tr('tableHeaders.runId')}
-                  </th>
+                  <th className="py-2 text-left">{tr('tableHeaders.runId')}</th>
                   <th className="py-2 text-left">{tr('tableHeaders.label')}</th>
                   <th className="py-2 text-left">{tr('tableHeaders.state')}</th>
                   <th className="py-2 text-left">
                     {tr('tableHeaders.progress')}
                   </th>
-                  <th className="py-2 text-left">{tr('tableHeaders.equity')}</th>
+                  <th className="py-2 text-left">
+                    {tr('tableHeaders.equity')}
+                  </th>
                   <th className="py-2 text-left">
                     {tr('tableHeaders.lastError')}
                   </th>
@@ -1035,7 +1052,10 @@ export function BacktestPage() {
           <section className="p-5 space-y-3 binance-card">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold" style={{ color: '#EAECEF' }}>
+                <h3
+                  className="text-lg font-semibold"
+                  style={{ color: '#EAECEF' }}
+                >
                   {tr('decisionTrail.title')}
                 </h3>
                 <p className="text-xs" style={{ color: '#848E9C' }}>
@@ -1124,7 +1144,10 @@ export function BacktestPage() {
                     label={tr('metrics.maxDrawdown')}
                     value={metrics.max_drawdown_pct}
                   />
-                  <Metric label={tr('metrics.sharpe')} value={metrics.sharpe_ratio} />
+                  <Metric
+                    label={tr('metrics.sharpe')}
+                    value={metrics.sharpe_ratio}
+                  />
                   <Metric
                     label={tr('metrics.profitFactor')}
                     value={metrics.profit_factor}
@@ -1270,4 +1293,3 @@ function Metric({
     </div>
   )
 }
-

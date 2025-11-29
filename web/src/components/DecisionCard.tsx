@@ -52,7 +52,9 @@ export function DecisionCard({ decision, language }: DecisionCardProps) {
               📥 {t('inputPrompt', language)}
             </span>
             <span className="text-xs">
-              {showInputPrompt ? t('collapse', language) : t('expand', language)}
+              {showInputPrompt
+                ? t('collapse', language)
+                : t('expand', language)}
             </span>
           </button>
           {showInputPrompt && (
@@ -122,23 +124,20 @@ export function DecisionCard({ decision, language }: DecisionCardProps) {
                         color: '#60a5fa',
                       }
                     : action.action.includes('close')
-                    ? {
-                        background: 'rgba(14, 203, 129, 0.1)',
-                        color: '#0ECB81',
-                      }
-                    : {
-                        background: 'rgba(248, 113, 113, 0.1)',
-                        color: '#F87171',
-                      }
+                      ? {
+                          background: 'rgba(14, 203, 129, 0.1)',
+                          color: '#0ECB81',
+                        }
+                      : {
+                          background: 'rgba(248, 113, 113, 0.1)',
+                          color: '#F87171',
+                        }
                 }
               >
                 {action.action}
               </span>
               {action.reasoning && (
-                <span
-                  className="text-xs"
-                  style={{ color: '#848E9C', flex: 1 }}
-                >
+                <span className="text-xs" style={{ color: '#848E9C', flex: 1 }}>
                   {action.reasoning}
                 </span>
               )}
