@@ -3,7 +3,6 @@ package trader
 import (
 	"context"
 	"crypto/ecdsa"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -168,26 +167,6 @@ func (t *LighterTrader) ensureAuthToken() error {
 	}
 
 	return nil
-}
-
-// signMessage 签名消息（Ethereum签名）
-func (t *LighterTrader) signMessage(message []byte) (string, error) {
-	// 使用Ethereum个人签名格式
-	prefix := fmt.Sprintf("\x19Ethereum Signed Message:\n%d", len(message))
-	prefixedMessage := append([]byte(prefix), message...)
-
-	hash := crypto.Keccak256Hash(prefixedMessage)
-	signature, err := crypto.Sign(hash.Bytes(), t.privateKey)
-	if err != nil {
-		return "", err
-	}
-
-	// 调整v值（Ethereum格式）
-	if signature[64] < 27 {
-		signature[64] += 27
-	}
-
-	return "0x" + hex.EncodeToString(signature), nil
 }
 
 // GetName 获取交易器名称

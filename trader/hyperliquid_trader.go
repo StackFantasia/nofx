@@ -336,41 +336,6 @@ func (t *HyperliquidTrader) SetLeverage(symbol string, leverage int) error {
 	return nil
 }
 
-// refreshMetaIfNeeded 当 Meta 信息失效时刷新（Asset ID 为 0 时触发）
-func (t *HyperliquidTrader) refreshMetaIfNeeded(coin string) error {
-	assetID := t.exchange.Info().NameToAsset(coin)
-	if assetID != 0 {
-		return nil // Meta 正常，无需刷新
-	}
-
-	log.Printf("⚠️  %s 的 Asset ID 为 0，尝试刷新 Meta 信息...", coin)
-
-	// 刷新 Meta 信息
-	meta, err := t.exchange.Info().Meta(t.ctx)
-	if err != nil {
-		return fmt.Errorf("刷新 Meta 信息失败: %w", err)
-	}
-
-	// ✅ 并发安全：使用写锁保护 meta 字段更新
-	t.metaMutex.Lock()
-	t.meta = meta
-	t.metaMutex.Unlock()
-
-	log.Printf("✅ Meta 信息已刷新，包含 %d 个资产", len(meta.Universe))
-
-	// 验证刷新后的 Asset ID
-	assetID = t.exchange.Info().NameToAsset(coin)
-	if assetID == 0 {
-		return fmt.Errorf("❌ 即使在刷新 Meta 后，资产 %s 的 Asset ID 仍为 0。可能原因：\n"+
-			"  1. 该币种未在 Hyperliquid 上市\n"+
-			"  2. 币种名称错误（应为 BTC 而非 BTCUSDT）\n"+
-			"  3. API 连接问题", coin)
-	}
-
-	log.Printf("✅ 刷新后 Asset ID 检查通过: %s -> %d", coin, assetID)
-	return nil
-}
-
 // OpenLong 开多仓
 func (t *HyperliquidTrader) OpenLong(symbol string, quantity float64, leverage int) (map[string]interface{}, error) {
 	// 先取消该币种的所有委托单

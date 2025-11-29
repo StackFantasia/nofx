@@ -996,11 +996,12 @@ func (d *Database) UpdateAIModel(userID, id string, enabled bool, apiKey, custom
 	`, provider).Scan(&name)
 	if err != nil {
 		// 如果找不到基本信息，使用默认值
-		if provider == "deepseek" {
+		switch provider {
+		case "deepseek":
 			name = "DeepSeek AI"
-		} else if provider == "qwen" {
+		case "qwen":
 			name = "Qwen AI"
-		} else {
+		default:
 			name = provider + " AI"
 		}
 	}
@@ -1143,22 +1144,23 @@ func (d *Database) UpdateExchange(userID, id string, enabled bool, apiKey, secre
 
 		// 根据交易所ID确定基本信息
 		var name, typ string
-		if id == "binance" {
+		switch id {
+		case "binance":
 			name = "Binance Futures"
 			typ = "cex"
-		} else if id == "bybit" {
+		case "bybit":
 			name = "Bybit Futures"
 			typ = "cex"
-		} else if id == "hyperliquid" {
+		case "hyperliquid":
 			name = "Hyperliquid"
 			typ = "dex"
-		} else if id == "aster" {
+		case "aster":
 			name = "Aster DEX"
 			typ = "dex"
-		} else if id == "lighter" {
+		case "lighter":
 			name = "LIGHTER DEX"
 			typ = "dex"
-		} else {
+		default:
 			name = id + " Exchange"
 			typ = "cex"
 		}
