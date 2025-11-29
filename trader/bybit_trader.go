@@ -18,12 +18,12 @@ type BybitTrader struct {
 	client *bybit.Client
 
 	// 余额缓存
-	cachedBalance     map[string]interface{}
+	cachedBalance     map[string]any
 	balanceCacheTime  time.Time
 	balanceCacheMutex sync.RWMutex
 
 	// 持仓缓存
-	cachedPositions     []map[string]interface{}
+	cachedPositions     []map[string]any
 	positionsCacheTime  time.Time
 	positionsCacheMutex sync.RWMutex
 
@@ -72,7 +72,7 @@ func (h *headerRoundTripper) RoundTrip(req *http.Request) (*http.Response, error
 }
 
 // GetBalance 获取账户余额
-func (t *BybitTrader) GetBalance() (map[string]interface{}, error) {
+func (t *BybitTrader) GetBalance() (map[string]any, error) {
 	// 检查缓存
 	t.balanceCacheMutex.RLock()
 	if t.cachedBalance != nil && time.Since(t.balanceCacheTime) < t.cacheDuration {
@@ -83,7 +83,7 @@ func (t *BybitTrader) GetBalance() (map[string]interface{}, error) {
 	t.balanceCacheMutex.RUnlock()
 
 	// 调用 API
-	params := map[string]interface{}{
+	params := map[string]any{
 		"accountType": "UNIFIED",
 	}
 
@@ -93,21 +93,21 @@ func (t *BybitTrader) GetBalance() (map[string]interface{}, error) {
 	}
 
 	if result.RetCode != 0 {
-		return nil, fmt.Errorf("Bybit API 错误: %s", result.RetMsg)
+		return nil, fmt.Errorf("bybit API 错误: %s", result.RetMsg)
 	}
 
 	// 提取余额信息
-	resultData, ok := result.Result.(map[string]interface{})
+	resultData, ok := result.Result.(map[string]any)
 	if !ok {
-		return nil, fmt.Errorf("Bybit 余额返回格式错误")
+		return nil, fmt.Errorf("bybit 余额返回格式错误")
 	}
 
-	list, _ := resultData["list"].([]interface{})
+	list, _ := resultData["list"].([]any)
 
 	var totalEquity, availableBalance float64 = 0, 0
 
 	if len(list) > 0 {
-		account, _ := list[0].(map[string]interface{})
+		account, _ := list[0].(map[string]any)
 		if equityStr, ok := account["totalEquity"].(string); ok {
 			totalEquity, _ = strconv.ParseFloat(equityStr, 64)
 		}
@@ -116,7 +116,7 @@ func (t *BybitTrader) GetBalance() (map[string]interface{}, error) {
 		}
 	}
 
-	balance := map[string]interface{}{
+	balance := map[string]any{
 		"totalEquity":      totalEquity,
 		"availableBalance": availableBalance,
 		"balance":          totalEquity, // 兼容其他交易所格式
@@ -132,7 +132,7 @@ func (t *BybitTrader) GetBalance() (map[string]interface{}, error) {
 }
 
 // GetPositions 获取所有持仓
-func (t *BybitTrader) GetPositions() ([]map[string]interface{}, error) {
+func (t *BybitTrader) GetPositions() ([]map[string]any, error) {
 	// 检查缓存
 	t.positionsCacheMutex.RLock()
 	if t.cachedPositions != nil && time.Since(t.positionsCacheTime) < t.cacheDuration {
@@ -143,7 +143,7 @@ func (t *BybitTrader) GetPositions() ([]map[string]interface{}, error) {
 	t.positionsCacheMutex.RUnlock()
 
 	// 调用 API
-	params := map[string]interface{}{
+	params := map[string]any{
 		"category":   "linear",
 		"settleCoin": "USDT",
 	}
@@ -154,20 +154,20 @@ func (t *BybitTrader) GetPositions() ([]map[string]interface{}, error) {
 	}
 
 	if result.RetCode != 0 {
-		return nil, fmt.Errorf("Bybit API 错误: %s", result.RetMsg)
+		return nil, fmt.Errorf("bybit API 错误: %s", result.RetMsg)
 	}
 
-	resultData, ok := result.Result.(map[string]interface{})
+	resultData, ok := result.Result.(map[string]any)
 	if !ok {
-		return nil, fmt.Errorf("Bybit 持仓返回格式错误")
+		return nil, fmt.Errorf("bybit 持仓返回格式错误")
 	}
 
-	list, _ := resultData["list"].([]interface{})
+	list, _ := resultData["list"].([]any)
 
-	var positions []map[string]interface{}
+	var positions []map[string]any
 
 	for _, item := range list {
-		pos, ok := item.(map[string]interface{})
+		pos, ok := item.(map[string]any)
 		if !ok {
 			continue
 		}
@@ -199,7 +199,7 @@ func (t *BybitTrader) GetPositions() ([]map[string]interface{}, error) {
 			positionAmt = -size
 		}
 
-		position := map[string]interface{}{
+		position := map[string]any{
 			"symbol":        pos["symbol"],
 			"side":          side,
 			"positionAmt":   positionAmt,
@@ -221,13 +221,13 @@ func (t *BybitTrader) GetPositions() ([]map[string]interface{}, error) {
 }
 
 // OpenLong 开多仓
-func (t *BybitTrader) OpenLong(symbol string, quantity float64, leverage int) (map[string]interface{}, error) {
+func (t *BybitTrader) OpenLong(symbol string, quantity float64, leverage int) (map[string]any, error) {
 	// 先设置杠杆
 	if err := t.SetLeverage(symbol, leverage); err != nil {
 		log.Printf("⚠️ [Bybit] 设置杠杆失败: %v", err)
 	}
 
-	params := map[string]interface{}{
+	params := map[string]any{
 		"category":    "linear",
 		"symbol":      symbol,
 		"side":        "Buy",
@@ -238,7 +238,7 @@ func (t *BybitTrader) OpenLong(symbol string, quantity float64, leverage int) (m
 
 	result, err := t.client.NewUtaBybitServiceWithParams(params).PlaceOrder(context.Background())
 	if err != nil {
-		return nil, fmt.Errorf("Bybit 开多失败: %w", err)
+		return nil, fmt.Errorf("bybit 开多失败: %w", err)
 	}
 
 	// 清除缓存
@@ -248,13 +248,13 @@ func (t *BybitTrader) OpenLong(symbol string, quantity float64, leverage int) (m
 }
 
 // OpenShort 开空仓
-func (t *BybitTrader) OpenShort(symbol string, quantity float64, leverage int) (map[string]interface{}, error) {
+func (t *BybitTrader) OpenShort(symbol string, quantity float64, leverage int) (map[string]any, error) {
 	// 先设置杠杆
 	if err := t.SetLeverage(symbol, leverage); err != nil {
 		log.Printf("⚠️ [Bybit] 设置杠杆失败: %v", err)
 	}
 
-	params := map[string]interface{}{
+	params := map[string]any{
 		"category":    "linear",
 		"symbol":      symbol,
 		"side":        "Sell",
@@ -265,7 +265,7 @@ func (t *BybitTrader) OpenShort(symbol string, quantity float64, leverage int) (
 
 	result, err := t.client.NewUtaBybitServiceWithParams(params).PlaceOrder(context.Background())
 	if err != nil {
-		return nil, fmt.Errorf("Bybit 开空失败: %w", err)
+		return nil, fmt.Errorf("bybit 开空失败: %w", err)
 	}
 
 	// 清除缓存
@@ -275,7 +275,7 @@ func (t *BybitTrader) OpenShort(symbol string, quantity float64, leverage int) (
 }
 
 // CloseLong 平多仓
-func (t *BybitTrader) CloseLong(symbol string, quantity float64) (map[string]interface{}, error) {
+func (t *BybitTrader) CloseLong(symbol string, quantity float64) (map[string]any, error) {
 	// 如果 quantity = 0，获取当前持仓数量
 	if quantity == 0 {
 		positions, err := t.GetPositions()
@@ -294,7 +294,7 @@ func (t *BybitTrader) CloseLong(symbol string, quantity float64) (map[string]int
 		return nil, fmt.Errorf("没有多仓可平")
 	}
 
-	params := map[string]interface{}{
+	params := map[string]any{
 		"category":    "linear",
 		"symbol":      symbol,
 		"side":        "Sell", // 平多用 Sell
@@ -306,7 +306,7 @@ func (t *BybitTrader) CloseLong(symbol string, quantity float64) (map[string]int
 
 	result, err := t.client.NewUtaBybitServiceWithParams(params).PlaceOrder(context.Background())
 	if err != nil {
-		return nil, fmt.Errorf("Bybit 平多失败: %w", err)
+		return nil, fmt.Errorf("bybit 平多失败: %w", err)
 	}
 
 	// 清除缓存
@@ -316,7 +316,7 @@ func (t *BybitTrader) CloseLong(symbol string, quantity float64) (map[string]int
 }
 
 // CloseShort 平空仓
-func (t *BybitTrader) CloseShort(symbol string, quantity float64) (map[string]interface{}, error) {
+func (t *BybitTrader) CloseShort(symbol string, quantity float64) (map[string]any, error) {
 	// 如果 quantity = 0，获取当前持仓数量
 	if quantity == 0 {
 		positions, err := t.GetPositions()
@@ -335,7 +335,7 @@ func (t *BybitTrader) CloseShort(symbol string, quantity float64) (map[string]in
 		return nil, fmt.Errorf("没有空仓可平")
 	}
 
-	params := map[string]interface{}{
+	params := map[string]any{
 		"category":    "linear",
 		"symbol":      symbol,
 		"side":        "Buy", // 平空用 Buy
@@ -347,7 +347,7 @@ func (t *BybitTrader) CloseShort(symbol string, quantity float64) (map[string]in
 
 	result, err := t.client.NewUtaBybitServiceWithParams(params).PlaceOrder(context.Background())
 	if err != nil {
-		return nil, fmt.Errorf("Bybit 平空失败: %w", err)
+		return nil, fmt.Errorf("bybit 平空失败: %w", err)
 	}
 
 	// 清除缓存
@@ -358,7 +358,7 @@ func (t *BybitTrader) CloseShort(symbol string, quantity float64) (map[string]in
 
 // SetLeverage 设置杠杆
 func (t *BybitTrader) SetLeverage(symbol string, leverage int) error {
-	params := map[string]interface{}{
+	params := map[string]any{
 		"category":     "linear",
 		"symbol":       symbol,
 		"buyLeverage":  fmt.Sprintf("%d", leverage),
@@ -388,7 +388,7 @@ func (t *BybitTrader) SetMarginMode(symbol string, isCrossMargin bool) error {
 		tradeMode = 0 // 全仓
 	}
 
-	params := map[string]interface{}{
+	params := map[string]any{
 		"category":  "linear",
 		"symbol":    symbol,
 		"tradeMode": tradeMode,
@@ -411,7 +411,7 @@ func (t *BybitTrader) SetMarginMode(symbol string, isCrossMargin bool) error {
 
 // GetMarketPrice 获取市场价格
 func (t *BybitTrader) GetMarketPrice(symbol string) (float64, error) {
-	params := map[string]interface{}{
+	params := map[string]any{
 		"category": "linear",
 		"symbol":   symbol,
 	}
@@ -425,18 +425,18 @@ func (t *BybitTrader) GetMarketPrice(symbol string) (float64, error) {
 		return 0, fmt.Errorf("API 错误: %s", result.RetMsg)
 	}
 
-	resultData, ok := result.Result.(map[string]interface{})
+	resultData, ok := result.Result.(map[string]any)
 	if !ok {
 		return 0, fmt.Errorf("返回格式错误")
 	}
 
-	list, _ := resultData["list"].([]interface{})
+	list, _ := resultData["list"].([]any)
 
 	if len(list) == 0 {
 		return 0, fmt.Errorf("未找到 %s 的价格数据", symbol)
 	}
 
-	ticker, _ := list[0].(map[string]interface{})
+	ticker, _ := list[0].(map[string]any)
 	lastPriceStr, _ := ticker["lastPrice"].(string)
 	lastPrice, err := strconv.ParseFloat(lastPriceStr, 64)
 	if err != nil {
@@ -464,7 +464,7 @@ func (t *BybitTrader) SetStopLoss(symbol string, positionSide string, quantity, 
 		triggerDirection = 1 // 价格上涨触发（空单止损）
 	}
 
-	params := map[string]interface{}{
+	params := map[string]any{
 		"category":         "linear",
 		"symbol":           symbol,
 		"side":             side,
@@ -507,7 +507,7 @@ func (t *BybitTrader) SetTakeProfit(symbol string, positionSide string, quantity
 		triggerDirection = 2 // 价格下跌触发（空单止盈）
 	}
 
-	params := map[string]interface{}{
+	params := map[string]any{
 		"category":         "linear",
 		"symbol":           symbol,
 		"side":             side,
@@ -544,7 +544,7 @@ func (t *BybitTrader) CancelTakeProfitOrders(symbol string) error {
 
 // CancelAllOrders 取消所有挂单
 func (t *BybitTrader) CancelAllOrders(symbol string) error {
-	params := map[string]interface{}{
+	params := map[string]any{
 		"category": "linear",
 		"symbol":   symbol,
 	}
@@ -586,19 +586,19 @@ func (t *BybitTrader) clearCache() {
 	t.positionsCacheMutex.Unlock()
 }
 
-func (t *BybitTrader) parseOrderResult(result *bybit.ServerResponse) (map[string]interface{}, error) {
+func (t *BybitTrader) parseOrderResult(result *bybit.ServerResponse) (map[string]any, error) {
 	if result.RetCode != 0 {
 		return nil, fmt.Errorf("下单失败: %s", result.RetMsg)
 	}
 
-	resultData, ok := result.Result.(map[string]interface{})
+	resultData, ok := result.Result.(map[string]any)
 	if !ok {
 		return nil, fmt.Errorf("返回格式错误")
 	}
 
 	orderId, _ := resultData["orderId"].(string)
 
-	return map[string]interface{}{
+	return map[string]any{
 		"orderId": orderId,
 		"status":  "NEW",
 	}, nil
@@ -606,7 +606,7 @@ func (t *BybitTrader) parseOrderResult(result *bybit.ServerResponse) (map[string
 
 func (t *BybitTrader) cancelConditionalOrders(symbol string, orderType string) error {
 	// 先获取所有条件单
-	params := map[string]interface{}{
+	params := map[string]any{
 		"category":    "linear",
 		"symbol":      symbol,
 		"orderFilter": "StopOrder", // 条件单
@@ -621,16 +621,16 @@ func (t *BybitTrader) cancelConditionalOrders(symbol string, orderType string) e
 		return nil // 没有订单
 	}
 
-	resultData, ok := result.Result.(map[string]interface{})
+	resultData, ok := result.Result.(map[string]any)
 	if !ok {
 		return nil
 	}
 
-	list, _ := resultData["list"].([]interface{})
+	list, _ := resultData["list"].([]any)
 
 	// 取消匹配的订单
 	for _, item := range list {
-		order, ok := item.(map[string]interface{})
+		order, ok := item.(map[string]any)
 		if !ok {
 			continue
 		}
@@ -648,7 +648,7 @@ func (t *BybitTrader) cancelConditionalOrders(symbol string, orderType string) e
 		}
 
 		if shouldCancel && orderId != "" {
-			cancelParams := map[string]interface{}{
+			cancelParams := map[string]any{
 				"category": "linear",
 				"symbol":   symbol,
 				"orderId":  orderId,

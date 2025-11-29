@@ -46,13 +46,12 @@ type LighterTraderV2 struct {
 	accountIndex     int64  // 賬戶索引
 
 	// 認證令牌
-	authToken     string
-	tokenExpiry   time.Time
-	accountMutex  sync.RWMutex
+	authToken    string
+	tokenExpiry  time.Time
+	accountMutex sync.RWMutex
 
 	// 市場信息緩存
 	symbolPrecision map[string]SymbolPrecision
-	precisionMutex  sync.RWMutex
 
 	// 市場索引緩存
 	marketIndexMap map[string]uint8 // symbol -> market_id

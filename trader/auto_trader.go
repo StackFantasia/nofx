@@ -340,7 +340,7 @@ func (at *AutoTrader) runCycle() error {
 
 	// 1. 检查是否需要停止交易
 	if time.Now().Before(at.stopUntil) {
-		remaining := at.stopUntil.Sub(time.Now())
+		remaining := time.Until(at.stopUntil)
 		log.Printf("⏸ 风险控制：暂停交易中，剩余 %.0f 分钟", remaining.Minutes())
 		record.Success = false
 		record.ErrorMessage = fmt.Sprintf("风险控制暂停中，剩余 %.0f 分钟", remaining.Minutes())
@@ -1565,10 +1565,6 @@ func (at *AutoTrader) checkPositionDrawdown() {
 		side := pos["side"].(string)
 		entryPrice := pos["entryPrice"].(float64)
 		markPrice := pos["markPrice"].(float64)
-		quantity := pos["positionAmt"].(float64)
-		if quantity < 0 {
-			quantity = -quantity // 空仓数量为负，转为正数
-		}
 
 		// 计算当前盈亏百分比
 		leverage := 10 // 默认值
