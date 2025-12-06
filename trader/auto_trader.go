@@ -1531,7 +1531,7 @@ func (at *AutoTrader) recordAndConfirmOrder(orderResult map[string]any, symbol, 
 }
 
 // recordPositionChange 记录仓位变化（开仓创建记录，平仓更新记录）
-func (at *AutoTrader) recordPositionChange(orderID, symbol, side, action string, quantity, price float64, leverage int, entryPrice float64) {
+func (at *AutoTrader) recordPositionChange(orderID, symbol, side, action string, quantity, price float64, leverage int, _ float64) {
 	if at.store == nil {
 		return
 	}
@@ -1541,6 +1541,7 @@ func (at *AutoTrader) recordPositionChange(orderID, symbol, side, action string,
 		// 开仓：创建新的仓位记录
 		pos := &store.TraderPosition{
 			TraderID:     at.id,
+			ExchangeID:   at.exchange, // 记录具体的交易所ID
 			Symbol:       symbol,
 			Side:         side, // LONG or SHORT
 			Quantity:     quantity,
