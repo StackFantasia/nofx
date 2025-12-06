@@ -162,8 +162,8 @@ func (e *StrategyEngine) FetchMarketData(symbol string) (*market.Data, error) {
 }
 
 // FetchExternalData 获取外部数据源
-func (e *StrategyEngine) FetchExternalData() (map[string]interface{}, error) {
-	externalData := make(map[string]interface{})
+func (e *StrategyEngine) FetchExternalData() (map[string]any, error) {
+	externalData := make(map[string]any)
 
 	for _, source := range e.config.Indicators.ExternalDataSources {
 		data, err := e.fetchSingleExternalSource(source)
@@ -274,7 +274,7 @@ func (e *StrategyEngine) FetchQuantDataBatch(symbols []string) map[string]*Quant
 }
 
 // fetchSingleExternalSource 获取单个外部数据源
-func (e *StrategyEngine) fetchSingleExternalSource(source store.ExternalDataSource) (interface{}, error) {
+func (e *StrategyEngine) fetchSingleExternalSource(source store.ExternalDataSource) (any, error) {
 	client := &http.Client{
 		Timeout: time.Duration(source.RefreshSecs) * time.Second,
 	}
@@ -304,7 +304,7 @@ func (e *StrategyEngine) fetchSingleExternalSource(source store.ExternalDataSour
 		return nil, err
 	}
 
-	var result interface{}
+	var result any
 	if err := json.Unmarshal(body, &result); err != nil {
 		return nil, err
 	}
@@ -318,12 +318,12 @@ func (e *StrategyEngine) fetchSingleExternalSource(source store.ExternalDataSour
 }
 
 // extractJSONPath 提取 JSON 路径数据（简单实现）
-func extractJSONPath(data interface{}, path string) interface{} {
+func extractJSONPath(data any, path string) any {
 	parts := strings.Split(path, ".")
 	current := data
 
 	for _, part := range parts {
-		if m, ok := current.(map[string]interface{}); ok {
+		if m, ok := current.(map[string]any); ok {
 			current = m[part]
 		} else {
 			return nil

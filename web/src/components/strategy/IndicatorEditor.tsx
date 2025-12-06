@@ -35,7 +35,10 @@ export function IndicatorEditor({
   const t = (key: string) => {
     const translations: Record<string, Record<string, string>> = {
       timeframes: { zh: '时间周期', en: 'Timeframes' },
-      timeframesDesc: { zh: '选择要分析的K线周期（可多选）', en: 'Select K-line timeframes to analyze (multi-select)' },
+      timeframesDesc: {
+        zh: '选择要分析的K线周期（可多选）',
+        en: 'Select K-line timeframes to analyze (multi-select)',
+      },
       primaryTimeframe: { zh: '主周期', en: 'Primary' },
       klineCount: { zh: 'K线数量', en: 'K-line Count' },
       technicalIndicators: { zh: '技术指标', en: 'Technical Indicators' },
@@ -52,14 +55,19 @@ export function IndicatorEditor({
       swing: { zh: '波段', en: 'Swing' },
       position: { zh: '趋势', en: 'Position' },
       quantData: { zh: '量化数据', en: 'Quant Data' },
-      quantDataDesc: { zh: '资金流向、持仓变化、价格变化（按币种查询）', en: 'Netflow, OI delta, price change (per coin)' },
+      quantDataDesc: {
+        zh: '资金流向、持仓变化、价格变化（按币种查询）',
+        en: 'Netflow, OI delta, price change (per coin)',
+      },
       quantDataUrl: { zh: '量化数据 API', en: 'Quant Data API' },
     }
     return translations[key]?.[language] || key
   }
 
   // 获取当前选中的时间周期
-  const selectedTimeframes = config.klines.selected_timeframes || [config.klines.primary_timeframe]
+  const selectedTimeframes = config.klines.selected_timeframes || [
+    config.klines.primary_timeframe,
+  ]
 
   // 切换时间周期选择
   const toggleTimeframe = (tf: string) => {
@@ -72,7 +80,10 @@ export function IndicatorEditor({
       if (current.length > 1) {
         current.splice(index, 1)
         // 如果取消的是主周期，则选第一个为主周期
-        const newPrimary = tf === config.klines.primary_timeframe ? current[0] : config.klines.primary_timeframe
+        const newPrimary =
+          tf === config.klines.primary_timeframe
+            ? current[0]
+            : config.klines.primary_timeframe
         onChange({
           ...config,
           klines: {
@@ -110,10 +121,25 @@ export function IndicatorEditor({
   }
 
   const indicators = [
-    { key: 'enable_ema', label: 'ema', color: '#F0B90B', periodKey: 'ema_periods' },
+    {
+      key: 'enable_ema',
+      label: 'ema',
+      color: '#F0B90B',
+      periodKey: 'ema_periods',
+    },
     { key: 'enable_macd', label: 'macd', color: '#0ECB81' },
-    { key: 'enable_rsi', label: 'rsi', color: '#F6465D', periodKey: 'rsi_periods' },
-    { key: 'enable_atr', label: 'atr', color: '#60a5fa', periodKey: 'atr_periods' },
+    {
+      key: 'enable_rsi',
+      label: 'rsi',
+      color: '#F6465D',
+      periodKey: 'rsi_periods',
+    },
+    {
+      key: 'enable_atr',
+      label: 'atr',
+      color: '#60a5fa',
+      periodKey: 'atr_periods',
+    },
     { key: 'enable_volume', label: 'volume', color: '#c084fc' },
     { key: 'enable_oi', label: 'oi', color: '#34d399' },
     { key: 'enable_funding_rate', label: 'fundingRate', color: '#fbbf24' },
@@ -132,64 +158,89 @@ export function IndicatorEditor({
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Clock className="w-4 h-4" style={{ color: '#F0B90B' }} />
-          <span className="text-sm font-medium" style={{ color: '#EAECEF' }}>{t('timeframes')}</span>
+          <span className="text-sm font-medium" style={{ color: '#EAECEF' }}>
+            {t('timeframes')}
+          </span>
         </div>
-        <p className="text-xs mb-3" style={{ color: '#848E9C' }}>{t('timeframesDesc')}</p>
+        <p className="text-xs mb-3" style={{ color: '#848E9C' }}>
+          {t('timeframesDesc')}
+        </p>
 
         {/* Timeframe Grid by Category */}
         <div className="space-y-2">
-          {(['scalp', 'intraday', 'swing', 'position'] as const).map((category) => {
-            const categoryTfs = allTimeframes.filter((tf) => tf.category === category)
-            return (
-              <div key={category} className="flex items-center gap-2">
-                <span
-                  className="text-[10px] w-14 flex-shrink-0"
-                  style={{ color: categoryColors[category] }}
-                >
-                  {t(category)}
-                </span>
-                <div className="flex flex-wrap gap-1">
-                  {categoryTfs.map((tf) => {
-                    const isSelected = selectedTimeframes.includes(tf.value)
-                    const isPrimary = config.klines.primary_timeframe === tf.value
-                    return (
-                      <div key={tf.value} className="relative">
-                        <button
-                          onClick={() => toggleTimeframe(tf.value)}
-                          onDoubleClick={() => setPrimaryTimeframe(tf.value)}
-                          disabled={disabled}
-                          className={`px-2.5 py-1 rounded text-xs font-medium transition-all ${
-                            isSelected ? 'ring-1' : 'opacity-50 hover:opacity-100'
-                          }`}
-                          style={{
-                            background: isSelected ? `${categoryColors[category]}20` : '#0B0E11',
-                            border: `1px solid ${isSelected ? categoryColors[category] : '#2B3139'}`,
-                            color: isSelected ? categoryColors[category] : '#848E9C',
-                            boxShadow: isPrimary ? `0 0 0 2px ${categoryColors[category]}` : undefined,
-                          }}
-                          title={isPrimary ? `${tf.label} (${t('primaryTimeframe')})` : tf.label}
-                        >
-                          {tf.label}
-                          {isPrimary && (
-                            <span className="ml-1 text-[8px]">★</span>
-                          )}
-                        </button>
-                      </div>
-                    )
-                  })}
+          {(['scalp', 'intraday', 'swing', 'position'] as const).map(
+            (category) => {
+              const categoryTfs = allTimeframes.filter(
+                (tf) => tf.category === category
+              )
+              return (
+                <div key={category} className="flex items-center gap-2">
+                  <span
+                    className="text-[10px] w-14 flex-shrink-0"
+                    style={{ color: categoryColors[category] }}
+                  >
+                    {t(category)}
+                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {categoryTfs.map((tf) => {
+                      const isSelected = selectedTimeframes.includes(tf.value)
+                      const isPrimary =
+                        config.klines.primary_timeframe === tf.value
+                      return (
+                        <div key={tf.value} className="relative">
+                          <button
+                            onClick={() => toggleTimeframe(tf.value)}
+                            onDoubleClick={() => setPrimaryTimeframe(tf.value)}
+                            disabled={disabled}
+                            className={`px-2.5 py-1 rounded text-xs font-medium transition-all ${
+                              isSelected
+                                ? 'ring-1'
+                                : 'opacity-50 hover:opacity-100'
+                            }`}
+                            style={{
+                              background: isSelected
+                                ? `${categoryColors[category]}20`
+                                : '#0B0E11',
+                              border: `1px solid ${isSelected ? categoryColors[category] : '#2B3139'}`,
+                              color: isSelected
+                                ? categoryColors[category]
+                                : '#848E9C',
+                              boxShadow: isPrimary
+                                ? `0 0 0 2px ${categoryColors[category]}`
+                                : undefined,
+                            }}
+                            title={
+                              isPrimary
+                                ? `${tf.label} (${t('primaryTimeframe')})`
+                                : tf.label
+                            }
+                          >
+                            {tf.label}
+                            {isPrimary && (
+                              <span className="ml-1 text-[8px]">★</span>
+                            )}
+                          </button>
+                        </div>
+                      )
+                    })}
+                  </div>
                 </div>
-              </div>
-            )
-          })}
+              )
+            }
+          )}
         </div>
 
         <p className="text-[10px] mt-2" style={{ color: '#5E6673' }}>
-          {language === 'zh' ? '★ = 主周期 (双击设置)' : '★ = Primary (double-click to set)'}
+          {language === 'zh'
+            ? '★ = 主周期 (双击设置)'
+            : '★ = Primary (double-click to set)'}
         </p>
 
         {/* K-line Count */}
         <div className="mt-3 flex items-center gap-3">
-          <span className="text-xs" style={{ color: '#848E9C' }}>{t('klineCount')}:</span>
+          <span className="text-xs" style={{ color: '#848E9C' }}>
+            {t('klineCount')}:
+          </span>
           <input
             type="number"
             value={config.klines.primary_count}
@@ -197,14 +248,21 @@ export function IndicatorEditor({
               !disabled &&
               onChange({
                 ...config,
-                klines: { ...config.klines, primary_count: parseInt(e.target.value) || 30 },
+                klines: {
+                  ...config.klines,
+                  primary_count: parseInt(e.target.value) || 30,
+                },
               })
             }
             disabled={disabled}
             min={10}
             max={200}
             className="w-20 px-2 py-1 rounded text-xs"
-            style={{ background: '#0B0E11', border: '1px solid #2B3139', color: '#EAECEF' }}
+            style={{
+              background: '#0B0E11',
+              border: '1px solid #2B3139',
+              color: '#EAECEF',
+            }}
           />
         </div>
       </div>
@@ -213,7 +271,9 @@ export function IndicatorEditor({
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Activity className="w-4 h-4" style={{ color: '#0ECB81' }} />
-          <span className="text-sm font-medium" style={{ color: '#EAECEF' }}>{t('technicalIndicators')}</span>
+          <span className="text-sm font-medium" style={{ color: '#EAECEF' }}>
+            {t('technicalIndicators')}
+          </span>
         </div>
 
         <div className="grid grid-cols-2 gap-2">
@@ -224,14 +284,23 @@ export function IndicatorEditor({
               style={{ background: '#0B0E11', border: '1px solid #2B3139' }}
             >
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full" style={{ background: color }} />
-                <span className="text-xs" style={{ color: '#EAECEF' }}>{t(label)}</span>
+                <div
+                  className="w-2 h-2 rounded-full"
+                  style={{ background: color }}
+                />
+                <span className="text-xs" style={{ color: '#EAECEF' }}>
+                  {t(label)}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 {periodKey && config[key as keyof IndicatorConfig] && (
                   <input
                     type="text"
-                    value={(config[periodKey as keyof IndicatorConfig] as number[])?.join(',') || ''}
+                    value={
+                      (
+                        config[periodKey as keyof IndicatorConfig] as number[]
+                      )?.join(',') || ''
+                    }
                     onChange={(e) => {
                       if (disabled) return
                       const periods = e.target.value
@@ -243,14 +312,19 @@ export function IndicatorEditor({
                     disabled={disabled}
                     placeholder="7,14"
                     className="w-16 px-1.5 py-0.5 rounded text-[10px] text-center"
-                    style={{ background: '#1E2329', border: '1px solid #2B3139', color: '#EAECEF' }}
+                    style={{
+                      background: '#1E2329',
+                      border: '1px solid #2B3139',
+                      color: '#EAECEF',
+                    }}
                   />
                 )}
                 <input
                   type="checkbox"
                   checked={config[key as keyof IndicatorConfig] as boolean}
                   onChange={(e) =>
-                    !disabled && onChange({ ...config, [key]: e.target.checked })
+                    !disabled &&
+                    onChange({ ...config, [key]: e.target.checked })
                   }
                   disabled={disabled}
                   className="w-4 h-4 rounded accent-yellow-500"
@@ -265,9 +339,13 @@ export function IndicatorEditor({
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Database className="w-4 h-4" style={{ color: '#22c55e' }} />
-          <span className="text-sm font-medium" style={{ color: '#EAECEF' }}>{t('quantData')}</span>
+          <span className="text-sm font-medium" style={{ color: '#EAECEF' }}>
+            {t('quantData')}
+          </span>
         </div>
-        <p className="text-xs mb-3" style={{ color: '#848E9C' }}>{t('quantDataDesc')}</p>
+        <p className="text-xs mb-3" style={{ color: '#848E9C' }}>
+          {t('quantDataDesc')}
+        </p>
 
         <div
           className="p-3 rounded-lg space-y-3"
@@ -276,14 +354,20 @@ export function IndicatorEditor({
           {/* Enable Toggle */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full" style={{ background: '#22c55e' }} />
-              <span className="text-xs" style={{ color: '#EAECEF' }}>{t('quantData')}</span>
+              <div
+                className="w-2 h-2 rounded-full"
+                style={{ background: '#22c55e' }}
+              />
+              <span className="text-xs" style={{ color: '#EAECEF' }}>
+                {t('quantData')}
+              </span>
             </div>
             <input
               type="checkbox"
               checked={config.enable_quant_data || false}
               onChange={(e) =>
-                !disabled && onChange({ ...config, enable_quant_data: e.target.checked })
+                !disabled &&
+                onChange({ ...config, enable_quant_data: e.target.checked })
               }
               disabled={disabled}
               className="w-4 h-4 rounded accent-green-500"
@@ -293,19 +377,28 @@ export function IndicatorEditor({
           {/* API URL */}
           {config.enable_quant_data && (
             <div>
-              <label className="text-[10px] mb-1 block" style={{ color: '#848E9C' }}>
-                {t('quantDataUrl')} <span style={{ color: '#5E6673' }}>({'{symbol}'} = 币种)</span>
+              <label
+                className="text-[10px] mb-1 block"
+                style={{ color: '#848E9C' }}
+              >
+                {t('quantDataUrl')}{' '}
+                <span style={{ color: '#5E6673' }}>({'{symbol}'} = 币种)</span>
               </label>
               <input
                 type="text"
                 value={config.quant_data_api_url || ''}
                 onChange={(e) =>
-                  !disabled && onChange({ ...config, quant_data_api_url: e.target.value })
+                  !disabled &&
+                  onChange({ ...config, quant_data_api_url: e.target.value })
                 }
                 disabled={disabled}
                 placeholder="http://example.com/api/coin/{symbol}?include=netflow,oi,price"
                 className="w-full px-2 py-1.5 rounded text-xs font-mono"
-                style={{ background: '#1E2329', border: '1px solid #2B3139', color: '#EAECEF' }}
+                style={{
+                  background: '#1E2329',
+                  border: '1px solid #2B3139',
+                  color: '#EAECEF',
+                }}
               />
             </div>
           )}

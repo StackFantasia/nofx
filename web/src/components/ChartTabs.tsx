@@ -13,7 +13,11 @@ interface ChartTabsProps {
 
 type ChartTab = 'equity' | 'kline'
 
-export function ChartTabs({ traderId, selectedSymbol, updateKey }: ChartTabsProps) {
+export function ChartTabs({
+  traderId,
+  selectedSymbol,
+  updateKey,
+}: ChartTabsProps) {
   const { language } = useLanguage()
   const [activeTab, setActiveTab] = useState<ChartTab>('equity')
   const [chartSymbol, setChartSymbol] = useState<string>('BTCUSDT')
@@ -21,7 +25,12 @@ export function ChartTabs({ traderId, selectedSymbol, updateKey }: ChartTabsProp
   // 当从外部选择币种时，自动切换到K线图
   useEffect(() => {
     if (selectedSymbol) {
-      console.log('[ChartTabs] 收到币种选择:', selectedSymbol, 'updateKey:', updateKey)
+      console.log(
+        '[ChartTabs] 收到币种选择:',
+        selectedSymbol,
+        'updateKey:',
+        updateKey
+      )
       setChartSymbol(selectedSymbol)
       setActiveTab('kline')
     }
