@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import useSWR from 'swr'
+import useSWR, { mutate } from 'swr'
 import { api } from '../lib/api'
 import { ChartTabs } from '../components/ChartTabs'
 import { useLanguage } from '../contexts/LanguageContext'
@@ -22,6 +22,7 @@ import {
   Loader2,
 } from 'lucide-react'
 import { stripLeadingIcons } from '../lib/text'
+import { confirmToast, notify } from '../lib/notify'
 import type {
   SystemStatus,
   AccountInfo,
@@ -91,16 +92,25 @@ export default function TraderDashboard() {
         ? `确定要平仓 ${symbol} ${side === 'LONG' ? '多仓' : '空仓'} 吗？`
         : `Are you sure you want to close ${symbol} ${side === 'LONG' ? 'LONG' : 'SHORT'} position?`
 
-    if (!confirm(confirmMsg)) return
+    const confirmed = await confirmToast(confirmMsg, {
+      title: language === 'zh' ? '确认平仓' : 'Confirm Close',
+      okText: language === 'zh' ? '确认' : 'Confirm',
+      cancelText: language === 'zh' ? '取消' : 'Cancel',
+    })
+
+    if (!confirmed) return
 
     setClosingPosition(symbol)
     try {
       await api.closePosition(selectedTraderId, symbol, side)
-      const successMsg =
+      notify.success(
         language === 'zh' ? '平仓成功' : 'Position closed successfully'
-      alert(successMsg)
-      // 刷新持仓数据
-      window.location.reload()
+      )
+      // 使用 SWR mutate 刷新数据而非重新加载页面
+      await Promise.all([
+        mutate(`positions-${selectedTraderId}`),
+        mutate(`account-${selectedTraderId}`),
+      ])
     } catch (err: unknown) {
       const errorMsg =
         err instanceof Error
@@ -108,7 +118,7 @@ export default function TraderDashboard() {
           : language === 'zh'
             ? '平仓失败'
             : 'Failed to close position'
-      alert(errorMsg)
+      notify.error(errorMsg)
     } finally {
       setClosingPosition(null)
     }
