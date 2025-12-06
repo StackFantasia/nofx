@@ -1,5 +1,13 @@
 import { useState } from 'react'
-import { Plus, X, Database, TrendingUp, List, Link, AlertCircle } from 'lucide-react'
+import {
+  Plus,
+  X,
+  Database,
+  TrendingUp,
+  List,
+  Link,
+  AlertCircle,
+} from 'lucide-react'
 import type { CoinSourceConfig } from '../../types'
 
 interface CoinSourceEditorProps {
@@ -29,12 +37,21 @@ export function CoinSourceEditor({
       useCoinPool: { zh: '启用 AI500 币种池', en: 'Enable AI500 Coin Pool' },
       coinPoolLimit: { zh: '币种池数量上限', en: 'Coin Pool Limit' },
       coinPoolApiUrl: { zh: 'AI500 API URL', en: 'AI500 API URL' },
-      coinPoolApiUrlPlaceholder: { zh: '输入 AI500 币种池 API 地址...', en: 'Enter AI500 coin pool API URL...' },
+      coinPoolApiUrlPlaceholder: {
+        zh: '输入 AI500 币种池 API 地址...',
+        en: 'Enter AI500 coin pool API URL...',
+      },
       useOITop: { zh: '启用 OI Top 数据', en: 'Enable OI Top' },
       oiTopLimit: { zh: 'OI Top 数量上限', en: 'OI Top Limit' },
       oiTopApiUrl: { zh: 'OI Top API URL', en: 'OI Top API URL' },
-      oiTopApiUrlPlaceholder: { zh: '输入 OI Top 持仓数据 API 地址...', en: 'Enter OI Top API URL...' },
-      staticDesc: { zh: '手动指定交易币种列表', en: 'Manually specify trading coins' },
+      oiTopApiUrlPlaceholder: {
+        zh: '输入 OI Top 持仓数据 API 地址...',
+        en: 'Enter OI Top API URL...',
+      },
+      staticDesc: {
+        zh: '手动指定交易币种列表',
+        en: 'Manually specify trading coins',
+      },
       coinpoolDesc: {
         zh: '使用 AI500 智能筛选的热门币种',
         en: 'Use AI500 smart-filtered popular coins',
@@ -47,7 +64,10 @@ export function CoinSourceEditor({
         zh: '组合多种数据源，AI500 + OI Top + 自定义',
         en: 'Combine multiple sources: AI500 + OI Top + Custom',
       },
-      apiUrlRequired: { zh: '需要填写 API URL 才能获取数据', en: 'API URL required to fetch data' },
+      apiUrlRequired: {
+        zh: '需要填写 API URL 才能获取数据',
+        en: 'API URL required to fetch data',
+      },
       dataSourceConfig: { zh: '数据源配置', en: 'Data Source Configuration' },
     }
     return translations[key]?.[language] || key
@@ -85,7 +105,10 @@ export function CoinSourceEditor({
     <div className="space-y-6">
       {/* Source Type Selector */}
       <div>
-        <label className="block text-sm font-medium mb-3" style={{ color: '#EAECEF' }}>
+        <label
+          className="block text-sm font-medium mb-3"
+          style={{ color: '#EAECEF' }}
+        >
           {t('sourceType')}
         </label>
         <div className="grid grid-cols-4 gap-3">
@@ -94,7 +117,10 @@ export function CoinSourceEditor({
               key={value}
               onClick={() =>
                 !disabled &&
-                onChange({ ...config, source_type: value as CoinSourceConfig['source_type'] })
+                onChange({
+                  ...config,
+                  source_type: value as CoinSourceConfig['source_type'],
+                })
               }
               disabled={disabled}
               className={`p-4 rounded-lg border transition-all ${
@@ -125,7 +151,10 @@ export function CoinSourceEditor({
       {/* Static Coins */}
       {(config.source_type === 'static' || config.source_type === 'mixed') && (
         <div>
-          <label className="block text-sm font-medium mb-3" style={{ color: '#EAECEF' }}>
+          <label
+            className="block text-sm font-medium mb-3"
+            style={{ color: '#EAECEF' }}
+          >
             {t('staticCoins')}
           </label>
           <div className="flex flex-wrap gap-2 mb-3">
@@ -176,7 +205,8 @@ export function CoinSourceEditor({
       )}
 
       {/* Coin Pool Options */}
-      {(config.source_type === 'coinpool' || config.source_type === 'mixed') && (
+      {(config.source_type === 'coinpool' ||
+        config.source_type === 'mixed') && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-2">
             <Link className="w-4 h-4" style={{ color: '#F0B90B' }} />
@@ -192,7 +222,8 @@ export function CoinSourceEditor({
                   type="checkbox"
                   checked={config.use_coin_pool}
                   onChange={(e) =>
-                    !disabled && onChange({ ...config, use_coin_pool: e.target.checked })
+                    !disabled &&
+                    onChange({ ...config, use_coin_pool: e.target.checked })
                   }
                   disabled={disabled}
                   className="w-5 h-5 rounded accent-yellow-500"
@@ -209,7 +240,10 @@ export function CoinSourceEditor({
                     value={config.coin_pool_limit || 30}
                     onChange={(e) =>
                       !disabled &&
-                      onChange({ ...config, coin_pool_limit: parseInt(e.target.value) || 30 })
+                      onChange({
+                        ...config,
+                        coin_pool_limit: parseInt(e.target.value) || 30,
+                      })
                     }
                     disabled={disabled}
                     min={1}
@@ -228,14 +262,18 @@ export function CoinSourceEditor({
 
           {config.use_coin_pool && (
             <div>
-              <label className="block text-sm mb-2" style={{ color: '#848E9C' }}>
+              <label
+                className="block text-sm mb-2"
+                style={{ color: '#848E9C' }}
+              >
                 {t('coinPoolApiUrl')}
               </label>
               <input
                 type="url"
                 value={config.coin_pool_api_url || ''}
                 onChange={(e) =>
-                  !disabled && onChange({ ...config, coin_pool_api_url: e.target.value })
+                  !disabled &&
+                  onChange({ ...config, coin_pool_api_url: e.target.value })
                 }
                 disabled={disabled}
                 placeholder={t('coinPoolApiUrlPlaceholder')}
@@ -248,7 +286,10 @@ export function CoinSourceEditor({
               />
               {!config.coin_pool_api_url && (
                 <div className="flex items-center gap-2 mt-2">
-                  <AlertCircle className="w-4 h-4" style={{ color: '#F0B90B' }} />
+                  <AlertCircle
+                    className="w-4 h-4"
+                    style={{ color: '#F0B90B' }}
+                  />
                   <span className="text-xs" style={{ color: '#F0B90B' }}>
                     {t('apiUrlRequired')}
                   </span>
@@ -276,7 +317,8 @@ export function CoinSourceEditor({
                   type="checkbox"
                   checked={config.use_oi_top}
                   onChange={(e) =>
-                    !disabled && onChange({ ...config, use_oi_top: e.target.checked })
+                    !disabled &&
+                    onChange({ ...config, use_oi_top: e.target.checked })
                   }
                   disabled={disabled}
                   className="w-5 h-5 rounded accent-yellow-500"
@@ -293,7 +335,10 @@ export function CoinSourceEditor({
                     value={config.oi_top_limit || 20}
                     onChange={(e) =>
                       !disabled &&
-                      onChange({ ...config, oi_top_limit: parseInt(e.target.value) || 20 })
+                      onChange({
+                        ...config,
+                        oi_top_limit: parseInt(e.target.value) || 20,
+                      })
                     }
                     disabled={disabled}
                     min={1}
@@ -312,14 +357,18 @@ export function CoinSourceEditor({
 
           {config.use_oi_top && (
             <div>
-              <label className="block text-sm mb-2" style={{ color: '#848E9C' }}>
+              <label
+                className="block text-sm mb-2"
+                style={{ color: '#848E9C' }}
+              >
                 {t('oiTopApiUrl')}
               </label>
               <input
                 type="url"
                 value={config.oi_top_api_url || ''}
                 onChange={(e) =>
-                  !disabled && onChange({ ...config, oi_top_api_url: e.target.value })
+                  !disabled &&
+                  onChange({ ...config, oi_top_api_url: e.target.value })
                 }
                 disabled={disabled}
                 placeholder={t('oiTopApiUrlPlaceholder')}
@@ -332,7 +381,10 @@ export function CoinSourceEditor({
               />
               {!config.oi_top_api_url && (
                 <div className="flex items-center gap-2 mt-2">
-                  <AlertCircle className="w-4 h-4" style={{ color: '#F0B90B' }} />
+                  <AlertCircle
+                    className="w-4 h-4"
+                    style={{ color: '#F0B90B' }}
+                  />
                   <span className="text-xs" style={{ color: '#F0B90B' }}>
                     {t('apiUrlRequired')}
                   </span>

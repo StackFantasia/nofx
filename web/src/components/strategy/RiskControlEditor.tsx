@@ -18,21 +18,39 @@ export function RiskControlEditor({
     const translations: Record<string, Record<string, string>> = {
       positionLimits: { zh: '仓位限制', en: 'Position Limits' },
       maxPositions: { zh: '最大持仓数量', en: 'Max Positions' },
-      maxPositionsDesc: { zh: '同时持有的最大币种数量', en: 'Maximum coins held simultaneously' },
+      maxPositionsDesc: {
+        zh: '同时持有的最大币种数量',
+        en: 'Maximum coins held simultaneously',
+      },
       btcEthLeverage: { zh: 'BTC/ETH 最大杠杆', en: 'BTC/ETH Max Leverage' },
       altcoinLeverage: { zh: '山寨币最大杠杆', en: 'Altcoin Max Leverage' },
       riskParameters: { zh: '风险参数', en: 'Risk Parameters' },
       minRiskReward: { zh: '最小风险回报比', en: 'Min Risk/Reward Ratio' },
-      minRiskRewardDesc: { zh: '开仓要求的最低盈亏比', en: 'Minimum profit ratio for opening' },
+      minRiskRewardDesc: {
+        zh: '开仓要求的最低盈亏比',
+        en: 'Minimum profit ratio for opening',
+      },
       maxMarginUsage: { zh: '最大保证金使用率', en: 'Max Margin Usage' },
-      maxMarginUsageDesc: { zh: '保证金使用率上限', en: 'Maximum margin utilization' },
+      maxMarginUsageDesc: {
+        zh: '保证金使用率上限',
+        en: 'Maximum margin utilization',
+      },
       maxPositionRatio: { zh: '单币最大仓位比', en: 'Max Position Ratio' },
-      maxPositionRatioDesc: { zh: '相对账户净值的倍数', en: 'Multiple of account equity' },
+      maxPositionRatioDesc: {
+        zh: '相对账户净值的倍数',
+        en: 'Multiple of account equity',
+      },
       entryRequirements: { zh: '开仓要求', en: 'Entry Requirements' },
       minPositionSize: { zh: '最小开仓金额', en: 'Min Position Size' },
-      minPositionSizeDesc: { zh: 'USDT 最小名义价值', en: 'Minimum notional value in USDT' },
+      minPositionSizeDesc: {
+        zh: 'USDT 最小名义价值',
+        en: 'Minimum notional value in USDT',
+      },
       minConfidence: { zh: '最小信心度', en: 'Min Confidence' },
-      minConfidenceDesc: { zh: 'AI 开仓信心度阈值', en: 'AI confidence threshold for entry' },
+      minConfidenceDesc: {
+        zh: 'AI 开仓信心度阈值',
+        en: 'AI confidence threshold for entry',
+      },
     }
     return translations[key]?.[language] || key
   }
@@ -170,7 +188,10 @@ export function RiskControlEditor({
                 type="number"
                 value={config.min_risk_reward_ratio}
                 onChange={(e) =>
-                  updateField('min_risk_reward_ratio', parseFloat(e.target.value) || 3)
+                  updateField(
+                    'min_risk_reward_ratio',
+                    parseFloat(e.target.value) || 3
+                  )
                 }
                 disabled={disabled}
                 min={1}
@@ -201,14 +222,20 @@ export function RiskControlEditor({
                 type="range"
                 value={config.max_margin_usage * 100}
                 onChange={(e) =>
-                  updateField('max_margin_usage', parseInt(e.target.value) / 100)
+                  updateField(
+                    'max_margin_usage',
+                    parseInt(e.target.value) / 100
+                  )
                 }
                 disabled={disabled}
                 min={10}
                 max={100}
                 className="flex-1 accent-red-500"
               />
-              <span className="w-12 text-center font-mono" style={{ color: '#F6465D' }}>
+              <span
+                className="w-12 text-center font-mono"
+                style={{ color: '#F6465D' }}
+              >
                 {Math.round(config.max_margin_usage * 100)}%
               </span>
             </div>
@@ -229,7 +256,10 @@ export function RiskControlEditor({
                 type="number"
                 value={config.max_position_ratio}
                 onChange={(e) =>
-                  updateField('max_position_ratio', parseFloat(e.target.value) || 1.5)
+                  updateField(
+                    'max_position_ratio',
+                    parseFloat(e.target.value) || 1.5
+                  )
                 }
                 disabled={disabled}
                 min={0.5}
@@ -275,7 +305,10 @@ export function RiskControlEditor({
                 type="number"
                 value={config.min_position_size}
                 onChange={(e) =>
-                  updateField('min_position_size', parseFloat(e.target.value) || 12)
+                  updateField(
+                    'min_position_size',
+                    parseFloat(e.target.value) || 12
+                  )
                 }
                 disabled={disabled}
                 min={10}
@@ -315,7 +348,10 @@ export function RiskControlEditor({
                 max={100}
                 className="flex-1 accent-green-500"
               />
-              <span className="w-12 text-center font-mono" style={{ color: '#0ECB81' }}>
+              <span
+                className="w-12 text-center font-mono"
+                style={{ color: '#0ECB81' }}
+              >
                 {config.min_confidence}
               </span>
             </div>
