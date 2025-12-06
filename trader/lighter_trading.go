@@ -2,13 +2,13 @@ package trader
 
 import (
 	"fmt"
-	"log"
+	"nofx/logger"
 )
 
 // OpenLong 开多仓
-func (t *LighterTrader) OpenLong(symbol string, quantity float64, leverage int) (map[string]interface{}, error) {
+func (t *LighterTrader) OpenLong(symbol string, quantity float64, leverage int) (map[string]any, error) {
 	// TODO: 实现完整的开多仓逻辑
-	log.Printf("🚧 LIGHTER OpenLong 暂未完全实现 (symbol=%s, qty=%.4f, leverage=%d)", symbol, quantity, leverage)
+	logger.Infof("🚧 LIGHTER OpenLong 暂未完全实现 (symbol=%s, qty=%.4f, leverage=%d)", symbol, quantity, leverage)
 
 	// 使用市价买入单
 	orderID, err := t.CreateOrder(symbol, "buy", quantity, 0, "market")
@@ -16,7 +16,7 @@ func (t *LighterTrader) OpenLong(symbol string, quantity float64, leverage int) 
 		return nil, fmt.Errorf("开多仓失败: %w", err)
 	}
 
-	return map[string]interface{}{
+	return map[string]any{
 		"orderId": orderID,
 		"symbol":  symbol,
 		"status":  "FILLED",
@@ -24,9 +24,9 @@ func (t *LighterTrader) OpenLong(symbol string, quantity float64, leverage int) 
 }
 
 // OpenShort 开空仓
-func (t *LighterTrader) OpenShort(symbol string, quantity float64, leverage int) (map[string]interface{}, error) {
+func (t *LighterTrader) OpenShort(symbol string, quantity float64, leverage int) (map[string]any, error) {
 	// TODO: 实现完整的开空仓逻辑
-	log.Printf("🚧 LIGHTER OpenShort 暂未完全实现 (symbol=%s, qty=%.4f, leverage=%d)", symbol, quantity, leverage)
+	logger.Infof("🚧 LIGHTER OpenShort 暂未完全实现 (symbol=%s, qty=%.4f, leverage=%d)", symbol, quantity, leverage)
 
 	// 使用市价卖出单
 	orderID, err := t.CreateOrder(symbol, "sell", quantity, 0, "market")
@@ -34,7 +34,7 @@ func (t *LighterTrader) OpenShort(symbol string, quantity float64, leverage int)
 		return nil, fmt.Errorf("开空仓失败: %w", err)
 	}
 
-	return map[string]interface{}{
+	return map[string]any{
 		"orderId": orderID,
 		"symbol":  symbol,
 		"status":  "FILLED",
@@ -42,7 +42,7 @@ func (t *LighterTrader) OpenShort(symbol string, quantity float64, leverage int)
 }
 
 // CloseLong 平多仓（quantity=0表示全部平仓）
-func (t *LighterTrader) CloseLong(symbol string, quantity float64) (map[string]interface{}, error) {
+func (t *LighterTrader) CloseLong(symbol string, quantity float64) (map[string]any, error) {
 	// 如果quantity=0，获取当前持仓数量
 	if quantity == 0 {
 		pos, err := t.GetPosition(symbol)
@@ -50,7 +50,7 @@ func (t *LighterTrader) CloseLong(symbol string, quantity float64) (map[string]i
 			return nil, fmt.Errorf("获取持仓失败: %w", err)
 		}
 		if pos == nil || pos.Size == 0 {
-			return map[string]interface{}{
+			return map[string]any{
 				"symbol": symbol,
 				"status": "NO_POSITION",
 			}, nil
@@ -66,10 +66,10 @@ func (t *LighterTrader) CloseLong(symbol string, quantity float64) (map[string]i
 
 	// 平仓后取消所有挂单
 	if err := t.CancelAllOrders(symbol); err != nil {
-		log.Printf("  ⚠ 取消挂单失败: %v", err)
+		logger.Infof("  ⚠ 取消挂单失败: %v", err)
 	}
 
-	return map[string]interface{}{
+	return map[string]any{
 		"orderId": orderID,
 		"symbol":  symbol,
 		"status":  "FILLED",
@@ -77,7 +77,7 @@ func (t *LighterTrader) CloseLong(symbol string, quantity float64) (map[string]i
 }
 
 // CloseShort 平空仓（quantity=0表示全部平仓）
-func (t *LighterTrader) CloseShort(symbol string, quantity float64) (map[string]interface{}, error) {
+func (t *LighterTrader) CloseShort(symbol string, quantity float64) (map[string]any, error) {
 	// 如果quantity=0，获取当前持仓数量
 	if quantity == 0 {
 		pos, err := t.GetPosition(symbol)
@@ -85,7 +85,7 @@ func (t *LighterTrader) CloseShort(symbol string, quantity float64) (map[string]
 			return nil, fmt.Errorf("获取持仓失败: %w", err)
 		}
 		if pos == nil || pos.Size == 0 {
-			return map[string]interface{}{
+			return map[string]any{
 				"symbol": symbol,
 				"status": "NO_POSITION",
 			}, nil
@@ -101,10 +101,10 @@ func (t *LighterTrader) CloseShort(symbol string, quantity float64) (map[string]
 
 	// 平仓后取消所有挂单
 	if err := t.CancelAllOrders(symbol); err != nil {
-		log.Printf("  ⚠ 取消挂单失败: %v", err)
+		logger.Infof("  ⚠ 取消挂单失败: %v", err)
 	}
 
-	return map[string]interface{}{
+	return map[string]any{
 		"orderId": orderID,
 		"symbol":  symbol,
 		"status":  "FILLED",
@@ -114,7 +114,7 @@ func (t *LighterTrader) CloseShort(symbol string, quantity float64) (map[string]
 // SetStopLoss 设置止损单
 func (t *LighterTrader) SetStopLoss(symbol string, positionSide string, quantity, stopPrice float64) error {
 	// TODO: 实现完整的止损单逻辑
-	log.Printf("🚧 LIGHTER SetStopLoss 暂未完全实现 (symbol=%s, side=%s, qty=%.4f, stop=%.2f)", symbol, positionSide, quantity, stopPrice)
+	logger.Infof("🚧 LIGHTER SetStopLoss 暂未完全实现 (symbol=%s, side=%s, qty=%.4f, stop=%.2f)", symbol, positionSide, quantity, stopPrice)
 
 	// 确定订单方向（做空止损用买单，做多止损用卖单）
 	side := "sell"
@@ -128,14 +128,14 @@ func (t *LighterTrader) SetStopLoss(symbol string, positionSide string, quantity
 		return fmt.Errorf("设置止损失败: %w", err)
 	}
 
-	log.Printf("✓ LIGHTER - 止损已设置: %.2f (side: %s)", stopPrice, side)
+	logger.Infof("✓ LIGHTER - 止损已设置: %.2f (side: %s)", stopPrice, side)
 	return nil
 }
 
 // SetTakeProfit 设置止盈单
 func (t *LighterTrader) SetTakeProfit(symbol string, positionSide string, quantity, takeProfitPrice float64) error {
 	// TODO: 实现完整的止盈单逻辑
-	log.Printf("🚧 LIGHTER SetTakeProfit 暂未完全实现 (symbol=%s, side=%s, qty=%.4f, tp=%.2f)", symbol, positionSide, quantity, takeProfitPrice)
+	logger.Infof("🚧 LIGHTER SetTakeProfit 暂未完全实现 (symbol=%s, side=%s, qty=%.4f, tp=%.2f)", symbol, positionSide, quantity, takeProfitPrice)
 
 	// 确定订单方向（做空止盈用买单，做多止盈用卖单）
 	side := "sell"
@@ -149,7 +149,7 @@ func (t *LighterTrader) SetTakeProfit(symbol string, positionSide string, quanti
 		return fmt.Errorf("设置止盈失败: %w", err)
 	}
 
-	log.Printf("✓ LIGHTER - 止盈已设置: %.2f (side: %s)", takeProfitPrice, side)
+	logger.Infof("✓ LIGHTER - 止盈已设置: %.2f (side: %s)", takeProfitPrice, side)
 	return nil
 }
 
@@ -160,7 +160,7 @@ func (t *LighterTrader) SetMarginMode(symbol string, isCrossMargin bool) error {
 	if isCrossMargin {
 		modeStr = "全仓"
 	}
-	log.Printf("🚧 LIGHTER SetMarginMode 暂未实现 (symbol=%s, mode=%s)", symbol, modeStr)
+	logger.Infof("🚧 LIGHTER SetMarginMode 暂未实现 (symbol=%s, mode=%s)", symbol, modeStr)
 	return nil
 }
 

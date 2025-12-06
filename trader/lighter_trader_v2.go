@@ -6,8 +6,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
+	"nofx/logger"
 	"strings"
 	"sync"
 	"time"
@@ -75,7 +75,7 @@ func NewLighterTraderV2(l1PrivateKeyHex, walletAddr, apiKeyPrivateKeyHex string,
 	// 2. 如果沒有提供錢包地址，從私鑰派生
 	if walletAddr == "" {
 		walletAddr = crypto.PubkeyToAddress(*l1PrivateKey.Public().(*ecdsa.PublicKey)).Hex()
-		log.Printf("✓ 從私鑰派生錢包地址: %s", walletAddr)
+		logger.Infof("✓ 從私鑰派生錢包地址: %s", walletAddr)
 	}
 
 	// 3. 確定 API URL 和 Chain ID
@@ -111,8 +111,8 @@ func NewLighterTraderV2(l1PrivateKeyHex, walletAddr, apiKeyPrivateKeyHex string,
 
 	// 6. 如果沒有 API Key，提示用戶需要生成
 	if apiKeyPrivateKeyHex == "" {
-		log.Printf("⚠️  未提供 API Key 私鑰，請調用 GenerateAndRegisterAPIKey() 生成")
-		log.Printf("   或者從 LIGHTER 官網獲取現有的 API Key")
+		logger.Infof("⚠️  未提供 API Key 私鑰，請調用 GenerateAndRegisterAPIKey() 生成")
+		logger.Infof("   或者從 LIGHTER 官網獲取現有的 API Key")
 		return trader, nil
 	}
 
@@ -132,12 +132,12 @@ func NewLighterTraderV2(l1PrivateKeyHex, walletAddr, apiKeyPrivateKeyHex string,
 
 	// 8. 驗證 API Key 是否正確
 	if err := trader.checkClient(); err != nil {
-		log.Printf("⚠️  API Key 驗證失敗: %v", err)
-		log.Printf("   您可能需要重新生成 API Key 或檢查配置")
+		logger.Infof("⚠️  API Key 驗證失敗: %v", err)
+		logger.Infof("   您可能需要重新生成 API Key 或檢查配置")
 		return trader, err
 	}
 
-	log.Printf("✓ LIGHTER 交易器初始化成功 (account=%d, apiKey=%d, testnet=%v)",
+	logger.Infof("✓ LIGHTER 交易器初始化成功 (account=%d, apiKey=%d, testnet=%v)",
 		trader.accountIndex, trader.apiKeyIndex, testnet)
 
 	return trader, nil
@@ -155,7 +155,7 @@ func (t *LighterTraderV2) initializeAccount() error {
 	t.accountIndex = accountInfo.AccountIndex
 	t.accountMutex.Unlock()
 
-	log.Printf("✓ 賬戶索引: %d", t.accountIndex)
+	logger.Infof("✓ 賬戶索引: %d", t.accountIndex)
 	return nil
 }
 
@@ -213,7 +213,7 @@ func (t *LighterTraderV2) checkClient() error {
 		return fmt.Errorf("API Key 不匹配：本地=%s, 服務器=%s", localPubKey, publicKey)
 	}
 
-	log.Printf("✓ API Key 驗證通過")
+	logger.Infof("✓ API Key 驗證通過")
 	return nil
 }
 
@@ -248,7 +248,7 @@ func (t *LighterTraderV2) refreshAuthToken() error {
 	t.tokenExpiry = deadline
 	t.accountMutex.Unlock()
 
-	log.Printf("✓ 認證令牌已生成（有效期至: %s）", t.tokenExpiry.Format(time.RFC3339))
+	logger.Infof("✓ 認證令牌已生成（有效期至: %s）", t.tokenExpiry.Format(time.RFC3339))
 	return nil
 }
 
@@ -259,7 +259,7 @@ func (t *LighterTraderV2) ensureAuthToken() error {
 	t.accountMutex.RUnlock()
 
 	if expired {
-		log.Println("🔄 認證令牌即將過期，刷新中...")
+		logger.Info("🔄 認證令牌即將過期，刷新中...")
 		return t.refreshAuthToken()
 	}
 
@@ -273,6 +273,6 @@ func (t *LighterTraderV2) GetExchangeType() string {
 
 // Cleanup 清理資源
 func (t *LighterTraderV2) Cleanup() error {
-	log.Println("⏹  LIGHTER 交易器清理完成")
+	logger.Info("⏹  LIGHTER 交易器清理完成")
 	return nil
 }
