@@ -13,6 +13,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"nofx/logger"
 	"os"
 	"strings"
 	"time"
@@ -75,12 +76,14 @@ func NewCryptoService() (*CryptoService, error) {
 // loadRSAPrivateKeyFromEnv 从环境变量加载 RSA 私钥
 func loadRSAPrivateKeyFromEnv() (*rsa.PrivateKey, error) {
 	keyPEM := os.Getenv(EnvRSAPrivateKey)
+	logger.Infof("RSA Private Key: %s", keyPEM)
 	if keyPEM == "" {
 		return nil, fmt.Errorf("环境变量 %s 未设置，请在 .env 中配置 RSA 私钥", EnvRSAPrivateKey)
 	}
 
 	// 处理环境变量中的换行符（\n -> 实际换行）
 	keyPEM = strings.ReplaceAll(keyPEM, "\\n", "\n")
+	logger.Infof("RSA Private Key: %s", keyPEM)
 
 	return ParseRSAPrivateKeyFromPEM([]byte(keyPEM))
 }
