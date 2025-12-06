@@ -362,9 +362,10 @@ func (s *PositionStore) GetRecentTrades(traderID string, limit int) ([]RecentTra
 		}
 
 		// 转换 side 格式
-		if t.Side == "LONG" {
+		switch t.Side {
+		case "LONG":
 			t.Side = "long"
-		} else if t.Side == "SHORT" {
+		case "SHORT":
 			t.Side = "short"
 		}
 

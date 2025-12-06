@@ -713,7 +713,7 @@ func (r *Runner) determineQuantity(dec decision.Decision, price float64) float64
 	return qty
 }
 
-func (r *Runner) determineCloseQuantity(symbol, side string, dec decision.Decision) float64 {
+func (r *Runner) determineCloseQuantity(symbol, side string, _ decision.Decision) float64 {
 	for _, pos := range r.account.Positions() {
 		if pos.Symbol == strings.ToUpper(symbol) && pos.Side == side {
 			return pos.Quantity
@@ -818,7 +818,7 @@ func (r *Runner) totalMarginUsed() float64 {
 	return sum
 }
 
-func (r *Runner) updateState(ts int64, equity, unrealized, marginUsed float64, priceMap map[string]float64, advancedDecision bool) {
+func (r *Runner) updateState(ts int64, equity, unrealized, _ float64, _ map[string]float64, advancedDecision bool) {
 	r.stateMu.Lock()
 	defer r.stateMu.Unlock()
 

@@ -463,18 +463,18 @@ func (m *Manager) RestoreRuns() error {
 	for _, runID := range runIDs {
 		meta, err := LoadRunMetadata(runID)
 		if err != nil {
-			logger.Info("skip run %s: %v", runID, err)
+			logger.Infof("skip run %s: %v", runID, err)
 			continue
 		}
 		if meta.State == RunStateRunning {
 			lock, err := loadRunLock(runID)
 			if err != nil || lockIsStale(lock) {
 				if err := deleteRunLock(runID); err != nil {
-					logger.Info("failed to cleanup lock for %s: %v", runID, err)
+					logger.Infof("failed to cleanup lock for %s: %v", runID, err)
 				}
 				meta.State = RunStatePaused
 				if err := SaveRunMetadata(meta); err != nil {
-					logger.Info("failed to mark %s paused: %v", runID, err)
+					logger.Infof("failed to mark %s paused: %v", runID, err)
 				}
 			}
 		}

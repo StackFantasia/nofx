@@ -7,13 +7,8 @@ import { useAuth } from '../contexts/AuthContext'
 import { useTradersConfigStore, useTradersModalStore } from '../stores'
 import { useTraderActions } from '../hooks/useTraderActions'
 import { TraderConfigModal } from '../components/TraderConfigModal'
-import {
-  SignalSourceModal,
-  ModelConfigModal,
-  ExchangeConfigModal,
-} from '../components/traders'
+import { ModelConfigModal, ExchangeConfigModal } from '../components/traders'
 import { PageHeader } from '../components/traders/sections/PageHeader'
-import { SignalSourceWarning } from '../components/traders/sections/SignalSourceWarning'
 import { AIModelsSection } from '../components/traders/sections/AIModelsSection'
 import { ExchangesSection } from '../components/traders/sections/ExchangesSection'
 import { TradersGrid } from '../components/traders/sections/TradersGrid'
@@ -35,11 +30,9 @@ export function AITradersPage({ onTraderSelect }: AITradersPageProps) {
     supportedExchanges,
     configuredModels,
     configuredExchanges,
-    userSignalSource,
     loadConfigs,
     setAllModels,
     setAllExchanges,
-    setUserSignalSource,
   } = useTradersConfigStore()
 
   const {
@@ -47,7 +40,6 @@ export function AITradersPage({ onTraderSelect }: AITradersPageProps) {
     showEditModal,
     showModelModal,
     showExchangeModal,
-    showSignalSourceModal,
     editingModel,
     editingExchange,
     editingTrader,
@@ -55,7 +47,6 @@ export function AITradersPage({ onTraderSelect }: AITradersPageProps) {
     setShowEditModal,
     setShowModelModal,
     setShowExchangeModal,
-    setShowSignalSourceModal,
     setEditingModel,
     setEditingExchange,
     setEditingTrader,
@@ -90,7 +81,6 @@ export function AITradersPage({ onTraderSelect }: AITradersPageProps) {
     handleDeleteModel,
     handleSaveExchange,
     handleDeleteExchange,
-    handleSaveSignalSource,
   } = useTraderActions({
     traders,
     allModels,
@@ -101,12 +91,10 @@ export function AITradersPage({ onTraderSelect }: AITradersPageProps) {
     mutateTraders,
     setAllModels,
     setAllExchanges,
-    setUserSignalSource,
     setShowCreateModal,
     setShowEditModal,
     setShowModelModal,
     setShowExchangeModal,
-    setShowSignalSourceModal,
     setEditingModel,
     setEditingExchange,
     editingTrader,
@@ -127,12 +115,6 @@ export function AITradersPage({ onTraderSelect }: AITradersPageProps) {
       return true
     }) || []
 
-  // 检查是否需要显示信号源警告
-  const showSignalWarning =
-    traders?.some((t) => t.use_coin_pool || t.use_oi_top) &&
-    !userSignalSource.coinPoolUrl &&
-    !userSignalSource.oiTopUrl
-
   // 处理交易员查看
   const handleTraderSelect = (traderId: string) => {
     if (onTraderSelect) {
@@ -152,17 +134,8 @@ export function AITradersPage({ onTraderSelect }: AITradersPageProps) {
         configuredExchangesCount={configuredExchanges.length}
         onAddModel={handleAddModel}
         onAddExchange={handleAddExchange}
-        onConfigureSignalSource={() => setShowSignalSourceModal(true)}
         onCreateTrader={() => setShowCreateModal(true)}
       />
-
-      {/* Signal Source Warning */}
-      {showSignalWarning && (
-        <SignalSourceWarning
-          language={language}
-          onConfigure={() => setShowSignalSourceModal(true)}
-        />
-      )}
 
       {/* Configuration Status */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
@@ -230,16 +203,6 @@ export function AITradersPage({ onTraderSelect }: AITradersPageProps) {
           onSave={handleSaveExchange}
           onDelete={handleDeleteExchange}
           onClose={() => setShowExchangeModal(false)}
-          language={language}
-        />
-      )}
-
-      {showSignalSourceModal && (
-        <SignalSourceModal
-          coinPoolUrl={userSignalSource.coinPoolUrl}
-          oiTopUrl={userSignalSource.oiTopUrl}
-          onSave={handleSaveSignalSource}
-          onClose={() => setShowSignalSourceModal(false)}
           language={language}
         />
       )}
